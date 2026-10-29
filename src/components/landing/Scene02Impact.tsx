@@ -45,14 +45,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
   const headlineSecondLineRef = useRef<HTMLSpanElement>(null);
   const scene03SublineRef = useRef<HTMLParagraphElement>(null);
   const leftRailRef = useRef<HTMLDivElement>(null);
-  const bottomTrackerRef = useRef<HTMLDivElement>(null);
-
-  // Bottom tracker stage step indicators
-  const step01Ref = useRef<HTMLSpanElement>(null);
-  const step02Ref = useRef<HTMLSpanElement>(null);
-  const step03Ref = useRef<HTMLSpanElement>(null);
-  const step04Ref = useRef<HTMLSpanElement>(null);
-  const step05Ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const stage = sectionRef.current;
@@ -478,7 +470,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       if (headlineSecondLineRef.current) gsap.set(headlineSecondLineRef.current, { opacity: 0, y: 16 });
       if (scene03SublineRef.current) gsap.set(scene03SublineRef.current, { opacity: 0, y: 14 });
       if (leftRailRef.current) gsap.set(leftRailRef.current, { opacity: 0, x: -20 });
-      if (bottomTrackerRef.current) gsap.set(bottomTrackerRef.current, { opacity: 0, y: 20 });
 
       // Master Scrubbed Timeline (0.0s to 12.0s across 3800px pinned scroll)
       const masterTl = gsap.timeline({
@@ -512,7 +503,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
         if (headlineSecondLineRef.current) gsap.set(headlineSecondLineRef.current, { opacity: 1, y: 0 });
         if (scene03SublineRef.current) gsap.set(scene03SublineRef.current, { opacity: 1, y: 0 });
         if (leftRailRef.current) gsap.set(leftRailRef.current, { opacity: 1, x: 0 });
-        if (bottomTrackerRef.current) gsap.set(bottomTrackerRef.current, { opacity: 1, y: 0 });
         return;
       }
 
@@ -646,14 +636,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       if (leftRailRef.current) {
         masterTl.to(leftRailRef.current, { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }, 5.6);
       }
-      if (bottomTrackerRef.current) {
-        masterTl.to(bottomTrackerRef.current, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, 5.6);
-      }
-
-      // Step 01 Highlight: 0% Broken
-      if (step01Ref.current) {
-        masterTl.to(step01Ref.current, { color: '#ffffff', textDecoration: 'underline', duration: 0.2 }, 5.6);
-      }
 
       // Headline begins near top of viewport ("Start here.")
       if (scene03HeadlineBoxRef.current) {
@@ -685,30 +667,14 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
         );
       }
 
-      // Step 02 Highlight: 25% Pieces move
-      if (step01Ref.current) masterTl.to(step01Ref.current, { color: '#71717a', textDecoration: 'none', duration: 0.2 }, 6.8);
-      if (step02Ref.current) masterTl.to(step02Ref.current, { color: '#ffffff', textDecoration: 'underline', duration: 0.2 }, 6.8);
-
       // Smooth master assembleProgress driving individual organic magnetic curves
       masterTl.to(trans, { assembleProgress: 0.60, duration: 1.6, ease: 'power2.inOut' }, 6.8);
-
-      // Step 03 Highlight: 50% Structure forms
-      if (step02Ref.current) masterTl.to(step02Ref.current, { color: '#71717a', textDecoration: 'none', duration: 0.2 }, 8.0);
-      if (step03Ref.current) masterTl.to(step03Ref.current, { color: '#ffffff', textDecoration: 'underline', duration: 0.2 }, 8.0);
 
       // =======================================================================
       // PART 6: SCENE 03 — STAGE 4 & 5: FINAL ASSEMBLY & LOCK (8.8s → 10.8s)
       // =======================================================================
       // Remaining blocks sweep along parabolic arcs and snap into 3x3x3 grid
       masterTl.to(trans, { assembleProgress: 1.0, duration: 1.6, ease: 'power3.out' }, 8.6);
-
-      // Step 04 Highlight: 75% Almost complete
-      if (step03Ref.current) masterTl.to(step03Ref.current, { color: '#71717a', textDecoration: 'none', duration: 0.2 }, 8.8);
-      if (step04Ref.current) masterTl.to(step04Ref.current, { color: '#ffffff', textDecoration: 'underline', duration: 0.2 }, 8.8);
-
-      // Step 05 Highlight: 100% Fully assembled
-      if (step04Ref.current) masterTl.to(step04Ref.current, { color: '#71717a', textDecoration: 'none', duration: 0.2 }, 9.8);
-      if (step05Ref.current) masterTl.to(step05Ref.current, { color: '#ffffff', textDecoration: 'underline', duration: 0.2 }, 9.8);
 
       // Subtle ambient cube rotation as monolith locks into completion
       masterTl.to(trans, { cubeRotationY: 0.10, duration: 1.8, ease: 'power1.out' }, 9.8);
@@ -850,11 +816,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
           ref={scene03HeadlineBoxRef}
           className="w-full flex flex-col items-center text-center mt-12 sm:mt-16 lg:mt-18 z-30 max-w-4xl mx-auto will-change-transform"
         >
-          {/* Section Kicker */}
-          <span className="font-mono text-[10px] sm:text-[11px] tracking-[0.28em] uppercase text-neutral-400 mb-3 block">
-            SECTION 02
-          </span>
-
           {/* Main Headline (Descending in Stage 2) */}
           <h2 className="font-rector text-4xl sm:text-6xl md:text-7xl lg:text-[76px] xl:text-[84px] font-bold tracking-[-0.03em] leading-[1.02] text-white select-none">
             <span className="block">Start here.</span>
@@ -874,27 +835,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
             You don't become a builder by knowing everything already. You become one
             by learning how the pieces fit together.
           </p>
-        </div>
-
-        {/* Bottom Interactive Timeline Indicator (From Reference Image) */}
-        <div
-          ref={bottomTrackerRef}
-          className="w-full flex flex-col items-center justify-center z-30 pb-2 pointer-events-none space-y-2.5"
-        >
-          <span className="font-mono text-[10px] tracking-[0.25em] text-neutral-400 uppercase">
-            SCROLL TO BUILD
-          </span>
-          <div className="flex items-center space-x-2 sm:space-x-8 lg:space-x-12 text-[9px] sm:text-[11px] font-mono tracking-wider text-neutral-500">
-            <span ref={step01Ref}>0%<span className="hidden sm:inline"> Broken</span></span>
-            <span className="text-neutral-700">·</span>
-            <span ref={step02Ref}>25%<span className="hidden sm:inline"> Pieces move</span></span>
-            <span className="text-neutral-700">·</span>
-            <span ref={step03Ref}>50%<span className="hidden sm:inline"> Structure forms</span></span>
-            <span className="text-neutral-700">·</span>
-            <span ref={step04Ref}>75%<span className="hidden sm:inline"> Almost complete</span></span>
-            <span className="text-neutral-700">·</span>
-            <span ref={step05Ref}>100%<span className="hidden sm:inline"> Fully assembled</span></span>
-          </div>
         </div>
       </div>
     </section>
