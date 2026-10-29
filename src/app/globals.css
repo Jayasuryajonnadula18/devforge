@@ -1,0 +1,214 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  color-scheme: dark;
+  --surface: #131518;
+  --surface-hover: #1a1d22;
+  --surface-active: #22262c;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-light: #2e3440;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+  --accent: #ffffff;
+  --accent-hover: #e5e5e5;
+  --accent-text: #000000;
+  --success: #16a34a;
+  --success-bg: #052e16;
+  --danger: #dc2626;
+  --danger-bg: #450a0a;
+  --warning: #d97706;
+  --warning-bg: #451a03;
+  --background: #0c0d10;
+  --foreground: #f5f4f0;
+  --card: #111216;
+  --card-foreground: #f5f4f0;
+  --popover: #111216;
+  --popover-foreground: #f5f4f0;
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+  --secondary: #181a20;
+  --secondary-foreground: #f5f4f0;
+  --muted: #181a20;
+  --muted-foreground: #8e8f96;
+  --accent-foreground: #000000;
+  --destructive: #ef4444;
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: rgba(255, 255, 255, 0.3);
+  --radius: 0.625rem;
+  --sidebar-accent: #181a20;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: rgba(255, 255, 255, 0.3);
+}
+
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
+
+body {
+  background-color: #000000;
+  color: #ffffff;
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar for dense workstation view */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0c0d0e;
+}
+::-webkit-scrollbar-thumb {
+  background: #23272f;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #374151;
+}
+
+/* Primary Font: Montserrat (Headings, UI, Navigation, Body) */
+.font-sans,
+.font-display {
+  font-family: var(--font-sans), 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Anchor Font: Rector (with high-contrast editorial chiseled serif fallbacks) */
+.font-rector,
+.font-anchor {
+  font-family: 'Rector', var(--font-rector), 'Cormorant Garamond', 'Cinzel Decorative', 'Playfair Display', Georgia, serif;
+  font-feature-settings: "ss01", "ss02", "dlig", "liga";
+  letter-spacing: -0.03em;
+}
+
+/* Secondary Font: Acma (with modernist technical grotesque fallbacks) */
+.font-acma,
+.font-secondary {
+  font-family: 'Acma', var(--font-acma), 'Space Grotesk', 'Syne', var(--font-sans), sans-serif;
+  letter-spacing: -0.015em;
+}
+
+/* Secondary Font: Playfair Display (Editorial Serif for Italic Accents & Emphasis) */
+.font-serif,
+.font-editorial,
+.font-accent {
+  font-family: var(--font-serif), 'Playfair Display', Georgia, serif;
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+@keyframes telemetryPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.pulse-telemetry {
+  animation: telemetryPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    background-color: #0c0d10 !important;
+    color: #f5f4f0 !important;
+  }
+  html {
+    @apply font-sans;
+    color-scheme: dark;
+    background-color: #0c0d10;
+  }
+}
