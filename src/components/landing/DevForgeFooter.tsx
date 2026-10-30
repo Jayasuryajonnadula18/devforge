@@ -1,9 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { ProjectTrack } from '../../types';
 import { toast } from 'sonner';
-import { ArrowUpRight, Check, Hammer } from 'lucide-react';
+import { ArrowUpRight, Check } from 'lucide-react';
 
 interface DevForgeFooterProps {
   projects?: ProjectTrack[];
@@ -54,6 +55,9 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
         background: 'linear-gradient(180deg, #050608 0%, #0d0907 20%, #2a150b 50%, #5c2912 80%, #7e3a19 100%)',
       }}
     >
+      {/* Top Seam Blending (Invisible smooth handoff from the forge void) */}
+      <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-[#050608] via-[#050608]/70 to-transparent pointer-events-none z-10" />
+
       {/* Subtle Noise / Film Grain Overlay (Edge-to-Edge Full Bleed) */}
       <div 
         className="absolute inset-0 opacity-[0.035] mix-blend-overlay pointer-events-none"
@@ -62,7 +66,7 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
         }}
       />
 
-      {/* Ambient Top Glow / Vignette (Edge-to-Edge) */}
+      {/* Ambient Top Glow / Vignette */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{
@@ -70,17 +74,15 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
         }}
       />
 
-      {/* Main Full-Width Centered Content Container */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-20 sm:py-28 lg:py-32 text-[#f5f4f0]">
-        
-        {/* Top Logo / Forge Icon Badge */}
-        <div className="mb-12 sm:mb-16">
-          <div className="w-9 h-9 rounded-full bg-white/[0.08] border border-white/[0.12] flex items-center justify-center backdrop-blur-md shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-            <Hammer className="w-4 h-4 text-neutral-200" />
-          </div>
-        </div>
-
-        {/* Middle Grid: Left Newsletter / Right Links */}
+      {/* Smoothly Animated Content Container */}
+      <motion.div 
+        initial={{ opacity: 0, y: 32 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-24 sm:py-32 lg:py-36 text-[#f5f4f0]"
+      >
+        {/* Main Grid: Left Newsletter / Right Links */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
           {/* Left Column: Heading & Newsletter */}
@@ -94,7 +96,7 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
               Get early access when new production-grade architecture tracks drop.
             </p>
 
-            {/* Newsletter / Action Button Form */}
+            {/* Newsletter / Action Button Form (Glitch-Free Solid Glass) */}
             <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-3 pt-2 max-w-md">
               {!isSubscribed ? (
                 <>
@@ -103,18 +105,18 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="px-4 py-2.5 rounded-xl bg-white/[0.07] border border-white/[0.12] text-sm text-white placeholder:text-neutral-400 focus:outline-none focus:border-white/30 backdrop-blur-md flex-1 transition-all"
+                    className="h-12 px-4 rounded-xl bg-[#180e08]/90 border border-white/15 text-sm text-white placeholder:text-neutral-400 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/20 transition-colors flex-1 w-full"
                   />
                   <button
                     type="submit"
-                    className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-sm font-medium text-white backdrop-blur-md transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer whitespace-nowrap shadow-[0_4px_16px_rgba(0,0,0,0.3)]"
+                    className="h-12 px-6 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-sm font-medium text-white transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] cursor-pointer whitespace-nowrap shadow-[0_4px_16px_rgba(0,0,0,0.3)] shrink-0"
                   >
                     Join the list
                   </button>
                 </>
               ) : (
-                <div className="inline-flex items-center space-x-2 text-sm text-emerald-300 bg-emerald-950/40 border border-emerald-500/20 px-4 py-2.5 rounded-xl">
-                  <Check className="w-4 h-4" />
+                <div className="h-12 inline-flex items-center space-x-2 text-sm text-emerald-300 bg-emerald-950/40 border border-emerald-500/25 px-4 rounded-xl">
+                  <Check className="w-4 h-4 text-emerald-400" />
                   <span>You're on the list. First principles updates coming soon.</span>
                 </div>
               )}
@@ -253,7 +255,7 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
           </div>
         </div>
 
-      </div>
+      </motion.div>
     </footer>
   );
 };

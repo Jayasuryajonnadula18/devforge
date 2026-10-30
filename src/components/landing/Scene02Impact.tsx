@@ -700,14 +700,30 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       masterTl.to(trans, { assembleProgress: 1.0, duration: 1.6, ease: 'power3.out' }, 10.8);
 
       // =======================================================================
-      // ACT 6: THE CINEMATIC REPOSE (12.2s → 16.5s)
-      // Generous 4.3-second reading and appreciation plateau (~1300px scroll runway).
-      // Complete monolith in slow ambient rotation, typography anchored in high contrast.
+      // ACT 6: THE CINEMATIC REPOSE & SEAMLESS OUT-DISSOLVE (12.2s → 16.5s)
+      // Generous reading plateau from 12.2s to 14.8s (~1000px scroll runway).
+      // Then, velvety smooth dissolution from 14.8s to 16.5s into the footer void!
       // =======================================================================
       masterTl.to(trans, { cubeRotationY: 0.16, duration: 4.3, ease: 'none' }, 12.2);
 
-      // Gentle hold before natural transition into the problem statement section
-      masterTl.to({}, { duration: 1.0 }, 16.5);
+      // Smoothly dissolve Scene 03 text into the void
+      if (scene03HeadlineBoxRef.current) {
+        masterTl.to(scene03HeadlineBoxRef.current, { opacity: 0, y: -26, duration: 1.2, ease: 'power2.inOut' }, 14.8);
+      }
+      if (scene03SublineRef.current) {
+        masterTl.to(scene03SublineRef.current, { opacity: 0, y: -16, duration: 1.0, ease: 'power2.inOut' }, 14.8);
+      }
+
+      // Smoothly dissolve the 3D cube and floor into the deep dark void
+      masterTl.to([faceMat, bodyMat], { opacity: 0, duration: 1.4, ease: 'power2.inOut' }, 14.9);
+      masterTl.to([floorMat, contactShadow.material], { opacity: 0, duration: 1.2, ease: 'power2.inOut' }, 14.9);
+      masterTl.to(warmRimLight, { intensity: 0, duration: 1.2, ease: 'power2.inOut' }, 14.9);
+
+      // Camera gently draws back
+      masterTl.to(trans, { camZ: 8.4, camY: 1.45, duration: 1.5, ease: 'power1.inOut' }, 14.8);
+
+      // Settle on clean dark void before seamless release into the footer
+      masterTl.to({}, { duration: 0.8 }, 16.5);
     }, stage);
 
     // Resize & Cleanup
