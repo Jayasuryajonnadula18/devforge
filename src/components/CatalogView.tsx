@@ -8,8 +8,7 @@ import { TooltipProvider } from './ui/tooltip';
 import { DialedNavbar } from './dialedweb/DialedNavbar';
 import WebThreads from './reactbits/WebThreads';
 import { Scene02Impact } from './landing/Scene02Impact';
-import { ProblemStatementSection } from './landing/ProblemStatementSection';
-import { PortalFinaleSection } from './landing/PortalFinaleSection';
+import { DevForgeFooter } from './landing/DevForgeFooter';
 
 interface CatalogViewProps {
   projects: ProjectTrack[];
@@ -173,11 +172,8 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           onSelectProject={() => onSelectProject(pythonProjects[0] || projects[0])}
         />
 
-        {/* ================= SCENE 03: PROBLEM STATEMENT & PHILOSOPHY ================= */}
-        <ProblemStatementSection />
-
-        {/* ================= SCENE 04: THE PORTAL FINALE ================= */}
-        <PortalFinaleSection
+        {/* ================= FOOTER: 108 SUPPLY INSPIRED COPPER GLOW FOOTER ================= */}
+        <DevForgeFooter
           projects={projects}
           onSelectProject={onSelectProject}
         />
