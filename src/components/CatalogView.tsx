@@ -9,6 +9,7 @@ import { DialedNavbar } from './dialedweb/DialedNavbar';
 import WebThreads from './reactbits/WebThreads';
 import { Scene02Impact } from './landing/Scene02Impact';
 import { ProblemStatementSection } from './landing/ProblemStatementSection';
+import { PortalFinaleSection } from './landing/PortalFinaleSection';
 
 interface CatalogViewProps {
   projects: ProjectTrack[];
@@ -174,6 +175,12 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
 
         {/* ================= SCENE 03: PROBLEM STATEMENT & PHILOSOPHY ================= */}
         <ProblemStatementSection />
+
+        {/* ================= SCENE 04: THE PORTAL FINALE ================= */}
+        <PortalFinaleSection
+          projects={projects}
+          onSelectProject={onSelectProject}
+        />
 
       </div>
     </TooltipProvider>
