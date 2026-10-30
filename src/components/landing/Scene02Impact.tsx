@@ -37,14 +37,12 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
   const brandGlowRef = useRef<HTMLDivElement>(null);
   const wordMeetRef = useRef<HTMLSpanElement>(null);
   const wordDevForgeRef = useRef<HTMLSpanElement>(null);
-  const scene02SublineRef = useRef<HTMLParagraphElement>(null);
 
   // Scene 03: Cube Assembly Overlay Refs
   const scene03StageRef = useRef<HTMLDivElement>(null);
   const scene03HeadlineBoxRef = useRef<HTMLDivElement>(null);
   const headlineSecondLineRef = useRef<HTMLSpanElement>(null);
   const scene03SublineRef = useRef<HTMLParagraphElement>(null);
-  const leftRailRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const stage = sectionRef.current;
@@ -197,12 +195,12 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     });
 
     // =========================================================================
-    // 5. Authentic Sledge Hammer
+    // 5. Authentic Sledge Hammer (3D spatial stance)
     // =========================================================================
     const hammerGeos = buildAuthenticHammerGeometries();
     const hammerPivot = new THREE.Group();
-    hammerPivot.position.set(ANVIL_X - 1.85, ANVIL_Y + 1.125, 0);
-    hammerPivot.rotation.z = 0.58;
+    hammerPivot.position.set(ANVIL_X - 1.95, ANVIL_Y + 1.45, 0.35);
+    hammerPivot.rotation.set(-0.15, 0.20, 0.65);
     scene.add(hammerPivot);
 
     const hammerHeadMat = new THREE.MeshStandardMaterial({
@@ -460,8 +458,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
           filter: 'blur(14px) brightness(2.0)',
         });
       }
-      if (scene02SublineRef.current) gsap.set(scene02SublineRef.current, { opacity: 0, y: 14 });
-
       // Scene 03 Overlay Initial States
       if (scene03StageRef.current) gsap.set(scene03StageRef.current, { opacity: 0 });
       if (scene03HeadlineBoxRef.current) {
@@ -469,17 +465,16 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       }
       if (headlineSecondLineRef.current) gsap.set(headlineSecondLineRef.current, { opacity: 0, y: 16 });
       if (scene03SublineRef.current) gsap.set(scene03SublineRef.current, { opacity: 0, y: 14 });
-      if (leftRailRef.current) gsap.set(leftRailRef.current, { opacity: 0, x: -20 });
 
-      // Master Scrubbed Timeline (0.0s to 12.0s across 3800px pinned scroll)
+      // Master Scrubbed Timeline (0.0s to 12.0s across 2200px responsive pinned scroll with 0.15 tactile scrub)
       const masterTl = gsap.timeline({
         scrollTrigger: {
           trigger: stage,
           start: 'top top',
-          end: '+=3800',
+          end: '+=2200',
           pin: true,
           pinSpacing: true,
-          scrub: 0.45,
+          scrub: 0.15,
           anticipatePin: 1,
           invalidateOnRefresh: true,
         },
@@ -502,7 +497,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
         if (scene03HeadlineBoxRef.current) gsap.set(scene03HeadlineBoxRef.current, { opacity: 1, y: 0 });
         if (headlineSecondLineRef.current) gsap.set(headlineSecondLineRef.current, { opacity: 1, y: 0 });
         if (scene03SublineRef.current) gsap.set(scene03SublineRef.current, { opacity: 1, y: 0 });
-        if (leftRailRef.current) gsap.set(leftRailRef.current, { opacity: 1, x: 0 });
         return;
       }
 
@@ -542,19 +536,33 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
           1.6
         );
       }
-      if (scene02SublineRef.current) {
-        masterTl.to(scene02SublineRef.current, { opacity: 1.0, y: 0, duration: 0.65, ease: 'power2.out' }, 1.4);
-      }
-
-      // Hammer solidifies in poised angle (~33°)
+      // Hammer solidifies in poised angle in 3D space
       masterTl.to([hammerHeadMat, hammerStrikeFaceMat, hammerWoodMat], { opacity: 1.0, duration: 0.5 }, 1.5);
       masterTl.to(hammerPivot.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 0.6, ease: 'power2.out' }, 1.5);
 
-      // Hammer backswing in anticipation (~45° tension angle)
-      masterTl.to(hammerPivot.rotation, { z: 0.78, duration: 0.6, ease: 'power1.out' }, 2.2);
+      // Deep anticipatory backswing & apex tension (raising high in 3D perspective)
+      masterTl.to(
+        hammerPivot.position,
+        { x: ANVIL_X - 2.15, y: ANVIL_Y + 1.85, z: 0.50, duration: 0.75, ease: 'power2.out' },
+        2.1
+      );
+      masterTl.to(
+        hammerPivot.rotation,
+        { x: -0.25, y: 0.30, z: 1.05, duration: 0.75, ease: 'power2.out' },
+        2.1
+      );
 
-      // Decisive accelerated downswing into the anvil face
-      masterTl.to(hammerPivot.rotation, { z: 0.0, duration: 0.35, ease: 'power3.in' }, 3.25);
+      // Decisive, aggressive accelerated downswing with wrist snap into anvil face plate
+      masterTl.to(
+        hammerPivot.position,
+        { x: ANVIL_X - 1.85, y: ANVIL_Y + 1.125, z: 0.0, duration: 0.65, ease: 'power3.in' },
+        2.95
+      );
+      masterTl.to(
+        hammerPivot.rotation,
+        { x: 0.0, y: 0.0, z: 0.0, duration: 0.65, ease: 'power4.in' },
+        2.95
+      );
 
       // =======================================================================
       // PART 2: THE IMPACT STRIKE BEAT AT 3.60s (Instant Swap to Fragments!)
@@ -568,6 +576,10 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       masterTl.set(burstMesh.scale, { x: 0.1, y: 0.1, z: 0.1 }, 3.60);
       masterTl.set(trans, { sparkProgress: 0 }, 3.60);
 
+      // Dynamic specular light blast at contact point
+      masterTl.set(travelingLight.position, { x: ANVIL_X, y: ANVIL_Y + 0.90, z: 0.4 }, 3.60);
+      masterTl.fromTo(travelingLight, { intensity: 10.0 }, { intensity: 0, duration: 0.22, ease: 'power2.out' }, 3.60);
+
       // Contact shockwave flash & sparks burst
       masterTl.to(flashLine.scale, { x: 1.6, y: 1, z: 1, duration: 0.22, ease: 'power3.out' }, 3.60);
       masterTl.to(flashLineMat, { opacity: 0, duration: 0.22, ease: 'power3.out' }, 3.60);
@@ -577,8 +589,8 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       masterTl.to(trans, { sparkProgress: 1, duration: 0.28, ease: 'power1.out' }, 3.60);
       masterTl.set([flashGroup, sparkPoints], { visible: false }, 3.90);
 
-      // Strike Recoil & Brand Title Pulse
-      masterTl.to(trans, { camY: 0.58, duration: 0.06, yoyo: true, repeat: 1, ease: 'power1.inOut' }, 3.60);
+      // Strike Recoil Camera Punch & Brand Title Pulse
+      masterTl.to(trans, { camY: 0.54, duration: 0.05, yoyo: true, repeat: 1, ease: 'power2.out' }, 3.60);
       if (wordDevForgeRef.current) {
         masterTl.to(
           wordDevForgeRef.current,
@@ -590,10 +602,22 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       // Initial shock fracture along shear planes
       masterTl.to(trans, { fracture: 1.0, duration: 0.6, ease: 'power2.out' }, 3.62);
 
-      // Hammer elastic rebound bounce and dissolve
-      masterTl.to(hammerPivot.rotation, { z: 0.08, duration: 0.16, ease: 'power1.out' }, 3.62);
-      masterTl.to(hammerPivot.rotation, { z: 0.0, duration: 0.26, ease: 'bounce.out' }, 3.78);
-      masterTl.to([hammerHeadMat, hammerStrikeFaceMat, hammerWoodMat], { opacity: 0, duration: 0.6 }, 4.0);
+      // Hammer explosive kinetic recoil & immediate clean exit (no lingering or hovering)
+      masterTl.to(
+        hammerPivot.position,
+        { x: ANVIL_X - 2.05, y: ANVIL_Y + 1.35, z: 0.25, duration: 0.18, ease: 'power2.out' },
+        3.60
+      );
+      masterTl.to(
+        hammerPivot.rotation,
+        { x: -0.10, y: 0.12, z: 0.20, duration: 0.18, ease: 'power2.out' },
+        3.60
+      );
+      masterTl.to(
+        [hammerHeadMat, hammerStrikeFaceMat, hammerWoodMat],
+        { opacity: 0, duration: 0.18, ease: 'power2.out' },
+        3.62
+      );
 
       // Scene 02 Text fades out into darkness
       if (scene02TitleBoxRef.current) {
@@ -632,9 +656,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       // =======================================================================
       if (scene03StageRef.current) {
         masterTl.to(scene03StageRef.current, { opacity: 1, duration: 0.5 }, 5.5);
-      }
-      if (leftRailRef.current) {
-        masterTl.to(leftRailRef.current, { opacity: 1, x: 0, duration: 0.6, ease: 'power2.out' }, 5.6);
       }
 
       // Headline begins near top of viewport ("Start here.")
@@ -770,15 +791,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
             DevForge.
           </span>
         </h2>
-
-        {/* Narrative Subtitle (High Contrast, 18-20px Desktop, 16-18px Mobile) */}
-        <p
-          ref={scene02SublineRef}
-          className="font-acma text-[16px] sm:text-[18px] lg:text-[19px] xl:text-[20px] text-[#EDEDED] font-normal sm:font-medium leading-[1.68] max-w-[480px] lg:max-w-[530px] mt-6 sm:mt-8 select-none"
-        >
-          A new perspective on learning to build software. Master the architecture
-          of real-world computing systems from the ground up.
-        </p>
       </div>
 
       {/* ===================================================================== */}
@@ -788,29 +800,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
         ref={scene03StageRef}
         className="absolute inset-0 w-full h-full pointer-events-none z-30 opacity-0 flex flex-col justify-between p-6 sm:p-12 lg:p-16 select-none"
       >
-        {/* Left Rail Navigation Tracker (From Reference Image) */}
-        <div
-          ref={leftRailRef}
-          className="absolute left-6 lg:left-12 top-1/2 -translate-y-1/2 hidden md:flex flex-col space-y-7 z-30 text-[11px] font-mono tracking-widest pointer-events-none"
-        >
-          <div className="flex items-center space-x-3 text-neutral-500 opacity-60">
-            <span className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
-            <span>01 Meet DevForge</span>
-          </div>
-          <div className="flex items-center space-x-3 text-white">
-            <span className="w-2 h-2 rounded-full bg-white shadow-[0_0_10px_#ffffff]" />
-            <span className="font-semibold text-neutral-100">02 Start here</span>
-          </div>
-          <div className="flex items-center space-x-3 text-neutral-500 opacity-60">
-            <span className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
-            <span>03 Courses</span>
-          </div>
-          <div className="flex items-center space-x-3 text-neutral-500 opacity-60">
-            <span className="w-1.5 h-1.5 rounded-full bg-neutral-600" />
-            <span>04 Join the era</span>
-          </div>
-        </div>
-
         {/* Center Descending Headline & Narrative */}
         <div
           ref={scene03HeadlineBoxRef}
