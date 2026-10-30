@@ -466,15 +466,15 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       if (headlineSecondLineRef.current) gsap.set(headlineSecondLineRef.current, { opacity: 0, y: 16 });
       if (scene03SublineRef.current) gsap.set(scene03SublineRef.current, { opacity: 0, y: 14 });
 
-      // Master Scrubbed Timeline (0.0s to 11.2s across 2400px responsive pinned scroll with 0.15 tactile scrub)
+      // Master Scrubbed Timeline: Monumental Cinematic Journey across 4600px pinned scroll
       const masterTl = gsap.timeline({
         scrollTrigger: {
           trigger: stage,
           start: 'top top',
-          end: '+=2400',
+          end: '+=4600',
           pin: true,
           pinSpacing: true,
-          scrub: 0.15,
+          scrub: 0.2,
           anticipatePin: 1,
           invalidateOnRefresh: true,
         },
@@ -501,139 +501,145 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       }
 
       // =======================================================================
-      // PART 1: SCENE 02 — THE FORGE & DYNAMIC STRIKE (0.0s → 2.60s)
-      // Crisp entry, swift athletic swing, no sluggish waiting
+      // ACT 1: THE FOUNDRY & ANVIL REVELATION (0.0s → 3.0s)
+      // Atmospheric emergence out of the void, specular light sweep across steel
       // =======================================================================
-      masterTl.to([solidFaceMat, solidBodyMat], { opacity: 1.0, duration: 0.4, ease: 'power1.out' }, 0.2);
-      masterTl.to(floorMat, { opacity: 0.82, duration: 0.6, ease: 'power2.out' }, 0.3);
+      masterTl.to([solidFaceMat, solidBodyMat], { opacity: 1.0, duration: 0.8, ease: 'power1.out' }, 0.4);
+      masterTl.to(floorMat, { opacity: 0.82, duration: 1.0, ease: 'power2.out' }, 0.6);
 
-      // Specular sweep across the smooth working face
-      masterTl.to(travelingLight, { intensity: 4.8, duration: 0.25, ease: 'power2.out' }, 0.4);
-      masterTl.to(travelingLight.position, { x: ANVIL_X + 1.85, y: ANVIL_Y + 0.92, z: 0.4, duration: 0.6, ease: 'power1.inOut' }, 0.4);
-      masterTl.to(travelingLight, { intensity: 0, duration: 0.25, ease: 'power2.in' }, 0.9);
+      // Focused specular sweep across the polished top face
+      masterTl.to(travelingLight, { intensity: 5.2, duration: 0.4, ease: 'power2.out' }, 0.8);
+      masterTl.to(travelingLight.position, { x: ANVIL_X + 1.85, y: ANVIL_Y + 0.92, z: 0.4, duration: 1.2, ease: 'power1.inOut' }, 0.8);
+      masterTl.to(travelingLight, { intensity: 0, duration: 0.4, ease: 'power2.in' }, 1.8);
 
-      // Scene 02 Text Entry: "Meet DevForge." crystallizes swiftly and stays clear
+      // Scene 02 Text Entry: "Meet DevForge." with luminous foundry aura
       if (brandGlowRef.current) {
-        masterTl.to(brandGlowRef.current, { opacity: 1, scale: 1.0, duration: 0.8, ease: 'power2.out' }, 0.4);
+        masterTl.to(brandGlowRef.current, { opacity: 1, scale: 1.0, duration: 1.4, ease: 'power2.out' }, 0.8);
       }
       if (wordMeetRef.current) {
         masterTl.to(
           wordMeetRef.current,
-          { opacity: 1, y: 0, scale: 1, letterSpacing: '-0.035em', filter: 'blur(0px) brightness(1)', duration: 0.6, ease: 'power3.out' },
-          0.4
+          { opacity: 1, y: 0, scale: 1, letterSpacing: '-0.035em', filter: 'blur(0px) brightness(1)', duration: 1.0, ease: 'power3.out' },
+          0.8
         );
       }
       if (wordDevForgeRef.current) {
         masterTl.to(
           wordDevForgeRef.current,
-          { opacity: 1, y: 0, scale: 1, letterSpacing: '-0.038em', filter: 'blur(0px) brightness(1)', duration: 0.7, ease: 'power3.out' },
-          0.55
+          { opacity: 1, y: 0, scale: 1, letterSpacing: '-0.038em', filter: 'blur(0px) brightness(1)', duration: 1.2, ease: 'power3.out' },
+          1.1
         );
         masterTl.fromTo(
           wordDevForgeRef.current,
           { filter: 'brightness(1) drop-shadow(0 0 0px rgba(255,255,255,0))' },
-          { filter: 'brightness(1.3) drop-shadow(0 0 26px rgba(200,225,255,0.45))', duration: 0.35, yoyo: true, repeat: 1, ease: 'power2.inOut' },
-          0.9
+          { filter: 'brightness(1.35) drop-shadow(0 0 30px rgba(200,225,255,0.5))', duration: 0.6, yoyo: true, repeat: 1, ease: 'power2.inOut' },
+          1.8
         );
       }
 
-      // Hammer solidifies in poised angle in 3D space
-      masterTl.to([hammerHeadMat, hammerStrikeFaceMat, hammerWoodMat], { opacity: 1.0, duration: 0.4 }, 1.1);
-      masterTl.to(hammerPivot.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 0.4, ease: 'power2.out' }, 1.1);
+      // =======================================================================
+      // ACT 2: THE BLACKSMITH'S SLEDGE HAMMER STRIKE (3.0s → 6.0s)
+      // Suspenseful 3D wind-up, immense physical weight, unstoppable downswing
+      // =======================================================================
+      // Hammer solidifies in poised 3D angle
+      masterTl.to([hammerHeadMat, hammerStrikeFaceMat, hammerWoodMat], { opacity: 1.0, duration: 0.8 }, 2.8);
+      masterTl.to(hammerPivot.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 0.8, ease: 'power2.out' }, 2.8);
 
-      // Energetic anticipatory backswing & apex tension (raising high in 3D perspective)
+      // Majestic anticipatory backswing & apex tension (drawing back in 3D perspective)
       masterTl.to(
         hammerPivot.position,
-        { x: ANVIL_X - 2.15, y: ANVIL_Y + 1.85, z: 0.50, duration: 0.6, ease: 'power2.out' },
-        1.4
+        { x: ANVIL_X - 2.25, y: ANVIL_Y + 2.05, z: 0.55, duration: 1.5, ease: 'power2.out' },
+        3.5
       );
       masterTl.to(
         hammerPivot.rotation,
-        { x: -0.25, y: 0.30, z: 1.05, duration: 0.6, ease: 'power2.out' },
-        1.4
+        { x: -0.28, y: 0.35, z: 1.15, duration: 1.5, ease: 'power2.out' },
+        3.5
       );
 
       // Decisive, aggressive accelerated downswing with wrist snap into anvil face plate
       masterTl.to(
         hammerPivot.position,
-        { x: ANVIL_X - 1.85, y: ANVIL_Y + 1.125, z: 0.0, duration: 0.55, ease: 'power3.in' },
-        2.05
+        { x: ANVIL_X - 1.85, y: ANVIL_Y + 1.125, z: 0.0, duration: 0.95, ease: 'power3.in' },
+        5.05
       );
       masterTl.to(
         hammerPivot.rotation,
-        { x: 0.0, y: 0.0, z: 0.0, duration: 0.55, ease: 'power4.in' },
-        2.05
+        { x: 0.0, y: 0.0, z: 0.0, duration: 0.95, ease: 'power4.in' },
+        5.05
       );
 
       // =======================================================================
-      // PART 2: THE IMPACT STRIKE BEAT AT 2.60s (Instant Swap to Fragments!)
+      // ACT 3: THE IMPACT STRIKE & SHOCKWAVE BEAT (6.00s)
+      // Instant transformation: Anvil fractures along 26 geometric shear planes
       // =======================================================================
-      // Anvil shatters: solid anvil is hidden, 26 fragment meshes become active!
-      masterTl.set(solidAnvilGroup, { visible: false }, 2.60);
-      masterTl.set(anvilFragmentsGroup, { visible: true }, 2.60);
-      masterTl.set([flashGroup, sparkPoints], { visible: true }, 2.60);
-      masterTl.set([flashLineMat, burstMat, sparkMat], { opacity: 1.0 }, 2.60);
-      masterTl.set(flashLine.scale, { x: 0.05, y: 1, z: 1 }, 2.60);
-      masterTl.set(burstMesh.scale, { x: 0.1, y: 0.1, z: 0.1 }, 2.60);
-      masterTl.set(trans, { sparkProgress: 0 }, 2.60);
+      masterTl.set(solidAnvilGroup, { visible: false }, 6.00);
+      masterTl.set(anvilFragmentsGroup, { visible: true }, 6.00);
+      masterTl.set([flashGroup, sparkPoints], { visible: true }, 6.00);
+      masterTl.set([flashLineMat, burstMat, sparkMat], { opacity: 1.0 }, 6.00);
+      masterTl.set(flashLine.scale, { x: 0.05, y: 1, z: 1 }, 6.00);
+      masterTl.set(burstMesh.scale, { x: 0.1, y: 0.1, z: 0.1 }, 6.00);
+      masterTl.set(trans, { sparkProgress: 0 }, 6.00);
 
-      // Dynamic specular light blast at contact point
-      masterTl.set(travelingLight.position, { x: ANVIL_X, y: ANVIL_Y + 0.90, z: 0.4 }, 2.60);
-      masterTl.fromTo(travelingLight, { intensity: 10.0 }, { intensity: 0, duration: 0.20, ease: 'power2.out' }, 2.60);
+      // Blinding contact light explosion
+      masterTl.set(travelingLight.position, { x: ANVIL_X, y: ANVIL_Y + 0.90, z: 0.4 }, 6.00);
+      masterTl.fromTo(travelingLight, { intensity: 12.0 }, { intensity: 0, duration: 0.35, ease: 'power2.out' }, 6.00);
 
       // Contact shockwave flash & sparks burst
-      masterTl.to(flashLine.scale, { x: 1.6, y: 1, z: 1, duration: 0.20, ease: 'power3.out' }, 2.60);
-      masterTl.to(flashLineMat, { opacity: 0, duration: 0.20, ease: 'power3.out' }, 2.60);
-      masterTl.to(burstMesh.scale, { x: 1.8, y: 1.8, z: 1.8, duration: 0.25, ease: 'power2.out' }, 2.60);
-      masterTl.to(burstMat, { opacity: 0, duration: 0.25, ease: 'power2.out' }, 2.60);
-      masterTl.to(sparkMat, { opacity: 0, duration: 0.25, ease: 'power2.out' }, 2.60);
-      masterTl.to(trans, { sparkProgress: 1, duration: 0.25, ease: 'power1.out' }, 2.60);
-      masterTl.set([flashGroup, sparkPoints], { visible: false }, 2.90);
+      masterTl.to(flashLine.scale, { x: 1.8, y: 1, z: 1, duration: 0.30, ease: 'power3.out' }, 6.00);
+      masterTl.to(flashLineMat, { opacity: 0, duration: 0.30, ease: 'power3.out' }, 6.00);
+      masterTl.to(burstMesh.scale, { x: 2.2, y: 2.2, z: 2.2, duration: 0.45, ease: 'power2.out' }, 6.00);
+      masterTl.to(burstMat, { opacity: 0, duration: 0.45, ease: 'power2.out' }, 6.00);
+      masterTl.to(sparkMat, { opacity: 0, duration: 0.45, ease: 'power2.out' }, 6.00);
+      masterTl.to(trans, { sparkProgress: 1, duration: 0.45, ease: 'power1.out' }, 6.00);
+      masterTl.set([flashGroup, sparkPoints], { visible: false }, 6.50);
 
-      // Strike Recoil Camera Punch & Brand Title Pulse
-      masterTl.to(trans, { camY: 0.54, duration: 0.05, yoyo: true, repeat: 1, ease: 'power2.out' }, 2.60);
+      // Cinematic Camera Punch & Brand Title Pulse
+      masterTl.to(trans, { camY: 0.52, duration: 0.08, yoyo: true, repeat: 1, ease: 'power2.out' }, 6.00);
       if (wordDevForgeRef.current) {
         masterTl.to(
           wordDevForgeRef.current,
-          { filter: 'brightness(1.55) drop-shadow(0 0 35px rgba(255,255,255,0.95))', duration: 0.08, yoyo: true, repeat: 1, ease: 'power2.out' },
-          2.60
+          { filter: 'brightness(1.6) drop-shadow(0 0 40px rgba(255,255,255,1))', duration: 0.12, yoyo: true, repeat: 1, ease: 'power2.out' },
+          6.00
         );
       }
 
       // Initial shock fracture along shear planes
-      masterTl.to(trans, { fracture: 1.0, duration: 0.5, ease: 'power2.out' }, 2.62);
+      masterTl.to(trans, { fracture: 1.0, duration: 0.8, ease: 'power2.out' }, 6.02);
 
-      // Hammer explosive kinetic recoil & immediate clean exit (no lingering or hovering)
+      // Hammer explosive kinetic recoil & clean exit
       masterTl.to(
         hammerPivot.position,
-        { x: ANVIL_X - 2.05, y: ANVIL_Y + 1.35, z: 0.25, duration: 0.18, ease: 'power2.out' },
-        2.60
+        { x: ANVIL_X - 2.15, y: ANVIL_Y + 1.45, z: 0.30, duration: 0.25, ease: 'power2.out' },
+        6.00
       );
       masterTl.to(
         hammerPivot.rotation,
-        { x: -0.10, y: 0.12, z: 0.20, duration: 0.18, ease: 'power2.out' },
-        2.60
+        { x: -0.12, y: 0.15, z: 0.24, duration: 0.25, ease: 'power2.out' },
+        6.00
       );
       masterTl.to(
         [hammerHeadMat, hammerStrikeFaceMat, hammerWoodMat],
-        { opacity: 0, duration: 0.18, ease: 'power2.out' },
-        2.62
+        { opacity: 0, duration: 0.25, ease: 'power2.out' },
+        6.02
       );
 
-      // Scene 02 Text fades out into darkness as Scene 03 begins
+      // =======================================================================
+      // ACT 4: ZERO-G SCATTER & GRAND CAMERA ELEVATION (6.2s → 9.2s)
+      // Fragments tumble in 3D orbit cloud, camera ascends into isometric vantage
+      // =======================================================================
+      // Scene 02 Title dissolves into darkness
       if (scene02TitleBoxRef.current) {
-        masterTl.to(scene02TitleBoxRef.current, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 2.85);
+        masterTl.to(scene02TitleBoxRef.current, { opacity: 0, duration: 0.9, ease: 'power2.inOut' }, 6.3);
       }
       if (brandGlowRef.current) {
-        masterTl.to(brandGlowRef.current, { opacity: 0, duration: 0.4 }, 2.85);
+        masterTl.to(brandGlowRef.current, { opacity: 0, duration: 0.7 }, 6.3);
       }
 
-      // =======================================================================
-      // PART 3: PHASE C — SCATTER & CAMERA ELEVATION (2.85s → 4.2s)
-      // =======================================================================
-      masterTl.to(trans, { scatter: 1.0, duration: 1.3, ease: 'power2.inOut' }, 2.85);
+      // 26 Fragments smoothly disperse into 3D space
+      masterTl.to(trans, { scatter: 1.0, duration: 2.2, ease: 'power2.inOut' }, 6.4);
 
-      // Camera smoothly lifts into isometric three-quarter elevation
+      // Camera majestically glides into isometric three-quarter elevation
       masterTl.to(
         trans,
         {
@@ -642,30 +648,30 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
           camZ: 7.4,
           lookX: 0.0,
           lookY: 0.25,
-          duration: 1.4,
+          duration: 2.4,
           ease: 'power2.inOut',
         },
-        2.85
+        6.4
       );
 
-      // Warm Amber Rim Light from bottom-left fades in (from reference image)
-      masterTl.to(warmRimLight, { intensity: 2.8, duration: 1.0, ease: 'power2.out' }, 3.3);
-      masterTl.to(contactShadow.material, { opacity: 0.35, duration: 1.0, ease: 'power2.out' }, 3.3);
+      // Warm Amber Rim Light flares up from below (from reference image)
+      masterTl.to(warmRimLight, { intensity: 3.0, duration: 1.8, ease: 'power2.out' }, 7.2);
+      masterTl.to(contactShadow.material, { opacity: 0.40, duration: 1.8, ease: 'power2.out' }, 7.2);
 
       // =======================================================================
-      // PART 4: SCENE 03 — EARLY TEXT ENTRY & CONVERGENCE (3.6s → 6.2s)
-      // Text appears early so user can comfortably read it during and after assembly!
+      // ACT 5: MONUMENTAL TYPOGRAPHY & MAGNETIC ASSEMBLY (8.8s → 12.2s)
+      // Words settle with authority while fragments lock into the 3x3x3 Monolith
       // =======================================================================
       if (scene03StageRef.current) {
-        masterTl.to(scene03StageRef.current, { opacity: 1, duration: 0.4 }, 3.6);
+        masterTl.to(scene03StageRef.current, { opacity: 1, duration: 0.8 }, 8.6);
       }
 
       // Headline enters: "Start here."
       if (scene03HeadlineBoxRef.current) {
         masterTl.to(
           scene03HeadlineBoxRef.current,
-          { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' },
-          3.7
+          { opacity: 1, y: 0, duration: 1.2, ease: 'power2.out' },
+          8.8
         );
       }
 
@@ -673,36 +679,35 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       if (headlineSecondLineRef.current) {
         masterTl.to(
           headlineSecondLineRef.current,
-          { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
-          4.1
+          { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' },
+          9.4
         );
       }
 
-      // Supporting narrative reveals EARLY (fully readable by 5.0s!)
+      // Supporting narrative reveals with crystal clarity
       if (scene03SublineRef.current) {
         masterTl.to(
           scene03SublineRef.current,
-          { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out' },
-          4.4
+          { opacity: 1, y: 0, duration: 1.0, ease: 'power2.out' },
+          9.8
         );
       }
 
-      // Core structural blocks assemble first
-      masterTl.to(trans, { assembleProgress: 0.65, duration: 1.2, ease: 'power2.inOut' }, 4.4);
+      // Wave 1: Core structural blocks converge along parabolic curves
+      masterTl.to(trans, { assembleProgress: 0.65, duration: 1.8, ease: 'power2.inOut' }, 9.4);
 
-      // Remaining corner blocks snap into 3x3x3 grid by 6.0s
-      masterTl.to(trans, { assembleProgress: 1.0, duration: 1.1, ease: 'power3.out' }, 5.5);
+      // Wave 2: Remaining corner blocks sweep in and snap with tactile lock into 3x3x3 grid
+      masterTl.to(trans, { assembleProgress: 1.0, duration: 1.6, ease: 'power3.out' }, 10.8);
 
       // =======================================================================
-      // PART 5: THE READING PLATEAU (6.2s → 10.4s)
-      // Generous 4.2-second window with fully assembled cube in ambient rotation.
-      // The user can effortlessly read the complete headline and supporting copy!
+      // ACT 6: THE CINEMATIC REPOSE (12.2s → 16.5s)
+      // Generous 4.3-second reading and appreciation plateau (~1300px scroll runway).
+      // Complete monolith in slow ambient rotation, typography anchored in high contrast.
       // =======================================================================
-      // Subtle ambient rotation as monolith rests in completion
-      masterTl.to(trans, { cubeRotationY: 0.12, duration: 4.2, ease: 'none' }, 6.2);
+      masterTl.to(trans, { cubeRotationY: 0.16, duration: 4.3, ease: 'none' }, 12.2);
 
-      // Hold reading state before gentle release into next section
-      masterTl.to({}, { duration: 0.8 }, 10.4);
+      // Gentle hold before natural transition into the problem statement section
+      masterTl.to({}, { duration: 1.0 }, 16.5);
     }, stage);
 
     // Resize & Cleanup

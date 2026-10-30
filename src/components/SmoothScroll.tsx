@@ -9,14 +9,14 @@ gsap.registerPlugin(ScrollTrigger);
 
 export const SmoothScroll: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
-    // Lenis smooth inertia scroll configured with crisp, responsive tactile pacing
+    // Lenis smooth inertia scroll configured for cinematic, velvety camera motion
     const lenis = new Lenis({
-      duration: 0.65,
+      duration: 0.85,
       easing: (t) => 1 - Math.pow(1 - t, 3),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 1.15,
+      wheelMultiplier: 1.0,
     });
 
     // Synchronize Lenis with GSAP ScrollTrigger
