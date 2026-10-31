@@ -188,7 +188,7 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
                 <li>
                   <button
                     type="button"
-                    onClick={() => toast.info('Distributed Raft Track — Coming Soon', {
+                    onClick={() => toast.info('Distributed Raft Track — In Private Verification', {
                       description: 'Consensus state machines & leader election track is currently in private verification.',
                     })}
                     className="hover:text-white transition-colors cursor-pointer text-left flex items-center group text-neutral-400 hover:text-neutral-200"
@@ -196,24 +196,18 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
                     <span className="group-hover:translate-x-0.5 transition-transform">
                       Distributed Raft
                     </span>
-                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider ml-1.5 leading-none">
-                      Soon
-                    </span>
                   </button>
                 </li>
                 <li>
                   <button
                     type="button"
-                    onClick={() => toast.info('eBPF Kernel Track — Coming Soon', {
+                    onClick={() => toast.info('eBPF Kernel Track — In Private Verification', {
                       description: 'Linux kernel tracepoints & ring buffer observability track dropping in Q1 2027.',
                     })}
                     className="hover:text-white transition-colors cursor-pointer text-left flex items-center group text-neutral-400 hover:text-neutral-200"
                   >
                     <span className="group-hover:translate-x-0.5 transition-transform">
                       eBPF Observability
-                    </span>
-                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider ml-1.5 leading-none">
-                      Soon
                     </span>
                   </button>
                 </li>
@@ -277,15 +271,12 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
                 <li>
                   <button
                     type="button"
-                    onClick={() => toast.info('LSM-Tree Storage Engine — Coming Soon', {
+                    onClick={() => toast.info('LSM-Tree Storage Engine — In Preparation', {
                       description: 'SSTables, MemTable flushing & Bloom filter architecture guide dropping soon.',
                     })}
                     className="inline-flex items-center space-x-1.5 hover:text-white transition-colors cursor-pointer text-left text-neutral-400 hover:text-neutral-200"
                   >
                     <span>LSM-Tree Engine</span>
-                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider leading-none">
-                      Soon
-                    </span>
                   </button>
                 </li>
               </ul>
@@ -305,43 +296,34 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
                 <li>
                   <button
                     type="button"
-                    onClick={() => toast.info('First Principles Manifesto — Coming Soon', {
+                    onClick={() => toast.info('First Principles Manifesto', {
                       description: 'Architectural writings on zero-cost abstractions and invariant-driven software engineering.',
                     })}
                     className="hover:text-white transition-colors cursor-pointer flex items-center text-left"
                   >
                     <span>First Principles</span>
-                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider ml-1.5 leading-none">
-                      Soon
-                    </span>
                   </button>
                 </li>
                 <li>
                   <button
                     type="button"
-                    onClick={() => toast.info('Formal Invariants Guide — Coming Soon', {
+                    onClick={() => toast.info('Formal Invariants Guide', {
                       description: 'Formal proofs and systems safety invariants coming in v1.0.',
                     })}
                     className="hover:text-white transition-colors cursor-pointer flex items-center text-left"
                   >
                     <span>System Invariants</span>
-                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider ml-1.5 leading-none">
-                      Soon
-                    </span>
                   </button>
                 </li>
                 <li>
                   <button
                     type="button"
                     onClick={() => toast.info('Privacy & Safety Invariants', {
-                      description: 'DevForge is strictly local-first and zero-telemetry. Official terms and licensing documentation coming soon.',
+                      description: 'DevForge is strictly local-first and zero-telemetry. Official terms and licensing documentation.',
                     })}
                     className="hover:text-white transition-colors cursor-pointer flex items-center text-left"
                   >
                     <span>Privacy & Terms</span>
-                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider ml-1.5 leading-none">
-                      Soon
-                    </span>
                   </button>
                 </li>
               </ul>

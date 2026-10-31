@@ -145,7 +145,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     itemEntranceTweenRef.current?.kill();
 
     const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel'));
-    const numberEls = Array.from(panel.querySelectorAll('.sm-panel-list[data-numbering] .sm-panel-item'));
     const socialTitle = panel.querySelector('.sm-socials-title');
     const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'));
 
@@ -155,9 +154,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
     if (itemEls.length) {
       gsap.set(itemEls, { yPercent: 140, rotate: 10 });
-    }
-    if (numberEls.length) {
-      gsap.set(numberEls, { '--sm-num-opacity': 0 });
     }
     if (socialTitle) {
       gsap.set(socialTitle, { opacity: 0 });
@@ -195,18 +191,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         },
         itemsStart
       );
-      if (numberEls.length) {
-        tl.to(
-          numberEls,
-          {
-            duration: 0.5,
-            ease: 'power2.out',
-            '--sm-num-opacity': 1,
-            stagger: { each: 0.06, from: 'start' }
-          },
-          itemsStart + 0.1
-        );
-      }
     }
 
     if (socialTitle || socialLinks.length) {
@@ -279,10 +263,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel'));
         if (itemEls.length) {
           gsap.set(itemEls, { yPercent: 140, rotate: 10 });
-        }
-        const numberEls = Array.from(panel.querySelectorAll('.sm-panel-list[data-numbering] .sm-panel-item'));
-        if (numberEls.length) {
-          gsap.set(numberEls, { '--sm-num-opacity': 0 });
         }
         const socialTitle = panel.querySelector('.sm-socials-title');
         const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'));
@@ -503,22 +483,16 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
                 className="flex flex-col h-full"
               >
-                <ul className="sm-panel-list" role="list" data-numbering={displayItemNumbering || undefined}>
+                <ul className="sm-panel-list" role="list">
                   {/* Integrated Courses Trigger inside the menu */}
                   <li className="sm-panel-itemWrap">
                     <button
                       type="button"
                       className="sm-panel-item group flex items-center justify-between w-full pr-0 cursor-pointer"
-                      data-index={1}
                       onClick={() => setView('courses')}
                     >
-                      <div className="flex items-center space-x-3">
-                        <span className="sm-panel-itemLabel">Courses</span>
-                        <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                          {projects.length} Tracks
-                        </span>
-                      </div>
-                      <ChevronRight className="w-6 h-6 text-neutral-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
+                      <span className="sm-panel-itemLabel">Courses</span>
+                      <ChevronRight className="w-5 h-5 text-neutral-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
                     </button>
                   </li>
 
@@ -530,33 +504,21 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                             type="button"
                             className="sm-panel-item flex items-center justify-between w-full pr-0 cursor-pointer"
                             aria-label={it.ariaLabel || it.label}
-                            data-index={idx + 2}
                             onClick={() => {
                               it.onClick?.();
                               closeMenu();
                             }}
                           >
                             <span className="sm-panel-itemLabel">{it.label}</span>
-                            {it.badge && (
-                              <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-neutral-400">
-                                {it.badge}
-                              </span>
-                            )}
                           </button>
                         ) : (
                           <a 
                             className="sm-panel-item flex items-center justify-between w-full pr-0" 
                             href={it.link || '#'} 
                             aria-label={it.ariaLabel || it.label} 
-                            data-index={idx + 2}
                             onClick={closeMenu}
                           >
                             <span className="sm-panel-itemLabel">{it.label}</span>
-                            {it.badge && (
-                              <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-neutral-400">
-                                {it.badge}
-                              </span>
-                            )}
                           </a>
                         )}
                       </li>

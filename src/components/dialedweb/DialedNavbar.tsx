@@ -71,7 +71,6 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
     {
       label: 'Architecture Atlas',
       ariaLabel: 'Architecture Topologies',
-      badge: 'Soon',
       onClick: () => {
         setIsMenuOpen(false);
         toast.info('Architecture Atlas — Coming Soon', {
@@ -82,7 +81,6 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
     {
       label: 'System Invariants',
       ariaLabel: 'Formal System Invariants',
-      badge: 'Soon',
       onClick: () => {
         setIsMenuOpen(false);
         toast.info('Formal Invariants Guide — Coming Soon', {
@@ -133,12 +131,9 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
                     description: 'Interactive visual system topologies & distributed system maps dropping in Q1 2027.',
                   });
                 }}
-                className="text-white/60 hover:text-white px-3 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold flex items-center gap-1.5 cursor-pointer"
+                className="text-white/60 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold cursor-pointer"
               >
-                <span>Architecture</span>
-                <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider leading-none">
-                  Soon
-                </span>
+                Architecture
               </button>
 
               {/* Courses Button: Opens the Menu directly into the Courses View */}
