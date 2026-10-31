@@ -111,7 +111,7 @@ export const ExploreComingSoon: React.FC<ExploreComingSoonProps> = ({ onBack }) 
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="engineer@domain.com"
+                  placeholder="Enter your email"
                   className="flex-1 bg-transparent border-b border-white/20 py-3 text-base text-white placeholder:text-neutral-700 focus:border-white focus:outline-none transition-colors rounded-none"
                 />
                 <button

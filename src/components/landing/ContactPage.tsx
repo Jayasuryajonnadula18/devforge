@@ -143,15 +143,15 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     e?.preventDefault();
     e?.stopPropagation();
     try {
-      await navigator.clipboard.writeText('engineering@devforge.org');
+      await navigator.clipboard.writeText('jayasuryajonnadula18@gmail.com');
       setCopiedEmail(true);
       toast.success('Email Copied to Clipboard', {
-        description: 'engineering@devforge.org',
+        description: 'jayasuryajonnadula18@gmail.com',
       });
       setTimeout(() => setCopiedEmail(false), 2400);
     } catch {
       toast.error('Failed to copy email address', {
-        description: 'Please copy manually: engineering@devforge.org',
+        description: 'Please copy manually: jayasuryajonnadula18@gmail.com',
       });
     }
   };
@@ -162,22 +162,22 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
 
     // 1. Copy email address to clipboard immediately
     try {
-      navigator.clipboard.writeText('engineering@devforge.org');
+      navigator.clipboard.writeText('jayasuryajonnadula18@gmail.com');
       setCopiedEmail(true);
       setTimeout(() => setCopiedEmail(false), 2400);
     } catch {}
 
     // 2. Open default mail client
-    window.location.href = 'mailto:engineering@devforge.org?subject=DevForge%20Inquiry';
+    window.location.href = 'mailto:jayasuryajonnadula18@gmail.com?subject=DevForge%20Inquiry';
 
     // 3. Clear toast confirming action with Gmail fallback
     toast.success('Opening Email App', {
-      description: 'Address copied to clipboard: engineering@devforge.org',
+      description: 'Address copied to clipboard: jayasuryajonnadula18@gmail.com',
       action: {
         label: 'Open in Gmail',
         onClick: () => {
           window.open(
-            'https://mail.google.com/mail/?view=cm&fs=1&to=engineering@devforge.org&su=DevForge%20Inquiry',
+            'https://mail.google.com/mail/?view=cm&fs=1&to=jayasuryajonnadula18@gmail.com&su=DevForge%20Inquiry',
             '_blank'
           );
         },
@@ -400,20 +400,20 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           {/* Left: Open Source Platform Info */}
           <div className="md:col-span-4 space-y-2 text-xs sm:text-sm font-sans text-neutral-400 select-none">
             <span className="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold block">
-              Open-Source Platform
+              Creator & Maintainer
             </span>
             <p className="text-neutral-300 leading-relaxed text-xs sm:text-sm">
-              DevForge is an open-source educational platform and curriculum for engineering real-world software systems from first principles.
+              DevForge is created and maintained by <span className="text-white font-medium">Jaya Surya</span> as an open-source systems engineering platform and curriculum.
             </p>
           </div>
 
           {/* Center: Inquiries & Contributions */}
           <div className="md:col-span-5 text-left space-y-1.5 select-none">
             <span className="text-[11px] font-sans uppercase tracking-widest text-neutral-400 font-medium">
-              Questions & Feedback
+              Direct Contact
             </span>
             <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-sm">
-              Have questions regarding courses, system designs, or want to contribute to the curriculum? Reach out directly via email or use the form below.
+              Have questions regarding the tracks, ideas, or feedback? Send a note below or reach out directly at <span className="text-white font-medium">jayasuryajonnadula18@gmail.com</span>.
             </p>
           </div>
 
@@ -459,16 +459,17 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           {/* Primary Semantic Mailto Anchor with Reliable Click & Copy Feedback */}
           <a
             ref={emailRef}
-            href="mailto:engineering@devforge.org?subject=DevForge%20Inquiry"
+            href="mailto:jayasuryajonnadula18@gmail.com?subject=DevForge%20Inquiry"
             onClick={handleEmailAction}
             onMouseEnter={() => setIsHoveringEmail(true)}
             onMouseLeave={() => setIsHoveringEmail(false)}
             className="w-full block cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-4 focus-visible:ring-offset-black rounded-xl transition-all"
-            aria-label="Send email to engineering@devforge.org (opens your default email client or copies address)"
+            aria-label="Send email to jayasuryajonnadula18@gmail.com (opens your default email client or copies address)"
           >
-            <div className="text-4xl sm:text-6xl md:text-7xl lg:text-[88px] xl:text-[104px] font-sans font-black tracking-tight leading-[0.92] text-white group-hover:text-neutral-300 transition-colors">
-              <span className="block">engineering@</span>
-              <span className="block">devforge.org</span>
+            <div className="text-3xl sm:text-5xl md:text-6xl lg:text-[76px] xl:text-[88px] font-sans font-black tracking-tight leading-[0.92] text-white group-hover:text-neutral-300 transition-colors">
+              <span className="block">jayasurya</span>
+              <span className="block">jonnadula18@</span>
+              <span className="block">gmail.com</span>
             </div>
           </a>
 
@@ -566,7 +567,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                         Send a Message
                       </h3>
                       <p className="text-xs text-neutral-400 font-sans">
-                        Leave a question, curriculum suggestion, or feedback for the DevForge maintainers.
+                        Send a note, question, or feedback directly to Jaya Surya.
                       </p>
                     </div>
 
@@ -581,7 +582,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                           required
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          placeholder="Ada Lovelace"
+                          placeholder="Your name"
                           className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors"
                         />
                       </div>
@@ -596,7 +597,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                           required
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="ada@domain.com"
+                          placeholder="Your email address"
                           className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors"
                         />
                       </div>
@@ -611,7 +612,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                         type="text"
                         value={subject}
                         onChange={(e) => setSubject(e.target.value)}
-                        placeholder="e.g. Distributed systems track question, feedback, or collaboration"
+                        placeholder="Subject or topic"
                         className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors"
                       />
                     </div>
@@ -626,14 +627,14 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                         required
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Write your note, question, or proposal..."
+                        placeholder="Write your message..."
                         className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors resize-none"
                       />
                     </div>
 
                     <div className="pt-1 flex items-center justify-between">
-                      <span className="text-xs text-neutral-500 font-sans">
-                        Direct maintainer inbox
+                      <span className="text-xs text-neutral-400 font-sans">
+                        Delivered to jayasuryajonnadula18@gmail.com
                       </span>
                       <button
                         type="submit"
