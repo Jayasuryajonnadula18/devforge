@@ -26,14 +26,7 @@
 }
 
 .flowing-menu__divider {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 1px;
-  background: var(--flowing-menu-border, rgba(255, 255, 255, 0.14));
-  transform-origin: left center;
-  pointer-events: none;
+  display: none !important;
 }
 
 .flowing-menu__link {

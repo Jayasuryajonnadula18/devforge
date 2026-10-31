@@ -121,11 +121,13 @@ To prevent animation collision and the twitchy feel of vibecoded templates, all 
   1. `Courses` $\rightarrow$ Triggers the minimalist editorial curriculum view.
   2. `The Forge` $\rightarrow$ Deep-links to `#meet-devforge` (Philosophy and Foundation).
   3. `Architecture` $\rightarrow$ Clean toast notice for the upcoming system topology explorer.
+- **Pure Whitespace & Zero Line Dividers**:
+  - **No lines beneath menu options**: Dividers between rows are strictly prohibited (`dividers={false}`). Row separation is achieved through generous vertical cadence and pure whitespace.
+  - Alignment: Centered typography (`align="center"`).
 - **Flowing Hover Effect**:
-  - Background band: Molten Amber (`#f59e0b`).
-  - Marquee text: Jet Black (`#090706`), bold Montserrat.
+  - Background band: High-contrast Crisp White (`#ffffff`).
+  - Marquee text: Jet Black (`#120F17` / `#090706`), bold Montserrat repeating destination titles.
   - Image thumbnail: Monochrome pill (`imageShape="pill"`).
-  - Dividers: Subtle white hairlines between items.
 - **Social / Ecosystem Footer**:
   - Title: `DevForge Ecosystem` in primary Montserrat sans (`uppercase`, `tracking-widest`, `text-xs`).
   - Links: `GitHub`, `Philosophy`, `Terms` with clean hover dimming across peers.

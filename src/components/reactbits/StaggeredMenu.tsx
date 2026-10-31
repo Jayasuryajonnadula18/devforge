@@ -348,20 +348,17 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   const defaultFlowingItems: FlowingMenuItem[] = [
     {
       text: 'Courses',
-      marquee: 'Curriculum · Systems Architecture · Compilers · In Verification ·',
       image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&h=400&fit=crop&sat=-100&auto=format',
       onClick: () => setView('courses'),
     },
     {
       text: 'The Forge',
-      marquee: 'Philosophy · Monolith & Engine · First Principles Foundation ·',
       image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&h=400&fit=crop&sat=-100&auto=format',
       link: '#meet-devforge',
       onClick: () => closeMenu(),
     },
     {
       text: 'Architecture',
-      marquee: 'Distributed Systems · Visual Topologies · Fault Tolerance · Coming Soon ·',
       image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=600&h=400&fit=crop&sat=-100&auto=format',
       onClick: () => {
         closeMenu();
@@ -431,14 +428,15 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                       followCursor={0.4}
                       textColor="#ffffff"
                       bgColor="transparent"
-                      marqueeBgColor="#f59e0b"
-                      marqueeTextColor="#090706"
-                      borderColor="rgba(255, 255, 255, 0.14)"
-                      dividers={true}
+                      marqueeBgColor="#ffffff"
+                      marqueeTextColor="#120F17"
+                      borderColor="transparent"
+                      dividers={false}
                       showIndex={false}
                       showArrow={false}
                       intro={false}
-                      align="left"
+                      align="center"
+                      imageShape="pill"
                     />
                   </div>
                 </div>
