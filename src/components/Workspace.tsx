@@ -247,8 +247,10 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out`;
   useEffect(() => {
     window.scrollTo(0, 0);
     const lenis = (window as any).lenis;
-    if (lenis) {
+    if (lenis && typeof lenis.scrollTo === 'function') {
       lenis.scrollTo(0, { immediate: true });
+    }
+    if (lenis && typeof lenis.resize === 'function') {
       setTimeout(() => lenis.resize(), 60);
     }
   }, [viewMode]);

@@ -128,7 +128,7 @@ export const ExploreComingSoon: React.FC<ExploreComingSoonProps> = ({ onBack }) 
 
       {/* Clean Footer */}
       <footer className="w-full px-6 sm:px-12 lg:px-20 py-8 border-t border-white/[0.06] flex items-center justify-between text-xs font-sans text-neutral-500 select-none">
-        <span>© {new Date().getFullYear()} DevForge</span>
+        <span>© 2026 DevForge</span>
         <span>Systems Architecture</span>
       </footer>
     </div>

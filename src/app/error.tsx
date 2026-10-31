@@ -103,7 +103,7 @@ export default function ErrorBoundaryPage({ error, reset }: ErrorProps) {
 
       {/* Clean Monochromatic Footer */}
       <footer className="w-full px-6 sm:px-12 lg:px-20 py-7 border-t border-white/[0.06] flex items-center justify-between text-xs font-sans text-neutral-500 select-none">
-        <span>© {new Date().getFullYear()} DevForge · Systems Engineering Lab</span>
+        <span>© 2026 DevForge · Systems Engineering Lab</span>
         <span>Fault Tolerance &amp; Supervisor Architecture</span>
       </footer>
     </div>

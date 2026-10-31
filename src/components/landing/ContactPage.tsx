@@ -144,8 +144,10 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     const lenis = (window as any).lenis;
-    if (lenis) {
+    if (lenis && typeof lenis.scrollTo === 'function') {
       lenis.scrollTo(0, { immediate: true });
+    }
+    if (lenis && typeof lenis.resize === 'function') {
       lenis.resize();
     }
     window.dispatchEvent(new Event('resize'));
@@ -155,7 +157,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       const lenis = (window as any).lenis;
-      if (lenis) lenis.resize();
+      if (lenis && typeof lenis.resize === 'function') lenis.resize();
       window.dispatchEvent(new Event('resize'));
     }, 320);
     return () => clearTimeout(timer);
@@ -215,8 +217,10 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
           const lenis = (window as any).lenis;
           if (lenis) {
-            lenis.resize();
-            lenis.scrollTo(formSectionRef.current, { offset: -60, duration: 0.8 });
+            if (typeof lenis.resize === 'function') lenis.resize();
+            if (typeof lenis.scrollTo === 'function') {
+              lenis.scrollTo(formSectionRef.current, { offset: -60, duration: 0.8 });
+            }
           }
         }, 140);
       }
@@ -687,7 +691,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
 
       {/* ================= CLEAN FOOTER ================= */}
       <footer className="relative z-20 w-full px-6 sm:px-12 lg:px-20 py-6 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-sans text-neutral-500 select-none">
-        <span>© {new Date().getFullYear()} DevForge · Jaya Surya · Mangalagiri, Andhra Pradesh, India</span>
+        <span>© 2026 DevForge · Jaya Surya · Mangalagiri, Andhra Pradesh, India</span>
         <button
           type="button"
           onClick={onBack}
