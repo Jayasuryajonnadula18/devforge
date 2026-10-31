@@ -121,8 +121,8 @@ export const CONNECT_GROUP: NavGroupConfig = {
     {
       id: 'contact',
       label: 'Contact',
-      status: 'coming-soon',
-      comingSoonDetail: 'Direct engineering contact and partnership channel is opening soon.',
+      status: 'implemented',
+      description: 'Direct contact with Jaya Surya.',
     },
   ],
 };
@@ -148,8 +148,8 @@ export const ECOSYSTEM_GROUP: NavGroupConfig = {
     {
       id: 'contact',
       label: 'Contact',
-      status: 'coming-soon',
-      comingSoonDetail: 'Direct engineering contact and partnership channel is opening soon.',
+      status: 'implemented',
+      description: 'Direct contact with Jaya Surya.',
     },
   ],
 };

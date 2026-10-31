@@ -50,6 +50,28 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
 
+  // Live India Standard Time (IST) for Mangalagiri, Andhra Pradesh
+  const [indiaTime, setIndiaTime] = useState('');
+  useEffect(() => {
+    const updateTime = () => {
+      try {
+        const timeStr = new Intl.DateTimeFormat('en-US', {
+          timeZone: 'Asia/Kolkata',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          hour12: true,
+        }).format(new Date());
+        setIndiaTime(timeStr);
+      } catch {
+        setIndiaTime(new Date().toLocaleTimeString());
+      }
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Detect touch device & reduced motion
   useEffect(() => {
     setIsTouchDevice(
@@ -378,9 +400,16 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           </button>
         </div>
 
-        {/* Clean Header Indicator */}
-        <div className="text-xs font-sans uppercase tracking-widest text-neutral-400">
-          <span>Contact</span>
+        {/* Live Location & IST Telemetry */}
+        <div className="flex items-center space-x-3 text-xs font-mono text-neutral-400">
+          <span className="inline-flex items-center space-x-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="hidden sm:inline">MANGALAGIRI, AP · IST</span>
+            <span className="sm:hidden">IST</span>
+          </span>
+          <span className="px-2.5 py-1 rounded-full bg-white/[0.05] border border-white/10 text-white tabular-nums text-[11px] sm:text-xs">
+            {indiaTime || 'IST'}
+          </span>
         </div>
       </header>
 
@@ -403,22 +432,25 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
               Creator & Maintainer
             </span>
             <p className="text-neutral-300 leading-relaxed text-xs sm:text-sm">
-              DevForge is created and maintained by <span className="text-white font-medium">Jaya Surya</span> as an open-source systems engineering platform and curriculum.
+              DevForge is created and maintained by <span className="text-white font-medium">Jaya Surya</span>, based in <span className="text-white font-medium">Mangalagiri, Andhra Pradesh, India</span>, as an open-source systems engineering platform and curriculum.
             </p>
           </div>
 
           {/* Center: Inquiries & Contributions */}
           <div className="md:col-span-5 text-left space-y-1.5 select-none">
             <span className="text-[11px] font-sans uppercase tracking-widest text-neutral-400 font-medium">
-              Direct Contact
+              Direct Contact & Coordinates
             </span>
             <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-sm">
-              Have questions regarding the tracks, ideas, or feedback? Send a note below or reach out directly at <span className="text-white font-medium">jayasuryajonnadula18@gmail.com</span>.
+              Based in <span className="text-white font-medium">Mangalagiri, India (IST)</span>. Have questions or ideas? Send a note below or reach out directly at <span className="text-white font-medium">jayasuryajonnadula18@gmail.com</span>.
             </p>
           </div>
 
           {/* Right: Real Project Channels */}
           <div className="md:col-span-3 flex md:flex-col items-start md:items-end justify-start gap-3 text-xs font-sans uppercase tracking-wider text-neutral-400">
+            <span className="text-[11px] text-neutral-500 font-mono hidden md:block">
+              MANGALAGIRI · AP · INDIA
+            </span>
             <a
               href="https://github.com/Jayasuryajonnadula18/devforge"
               target="_blank"
@@ -632,9 +664,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                       />
                     </div>
 
-                    <div className="pt-1 flex items-center justify-between">
+                    <div className="pt-1 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <span className="text-xs text-neutral-400 font-sans">
-                        Delivered to jayasuryajonnadula18@gmail.com
+                        Delivered directly to Jaya Surya · Mangalagiri, Andhra Pradesh, India · jayasuryajonnadula18@gmail.com
                       </span>
                       <button
                         type="submit"
@@ -654,8 +686,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
       </main>
 
       {/* ================= CLEAN FOOTER ================= */}
-      <footer className="relative z-20 w-full px-6 sm:px-12 lg:px-20 py-6 border-t border-white/[0.05] flex items-center justify-between text-xs font-sans text-neutral-500 select-none">
-        <span>© {new Date().getFullYear()} DevForge · Open-Source Real-World Systems Curriculum</span>
+      <footer className="relative z-20 w-full px-6 sm:px-12 lg:px-20 py-6 border-t border-white/[0.05] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-sans text-neutral-500 select-none">
+        <span>© {new Date().getFullYear()} DevForge · Jaya Surya · Mangalagiri, Andhra Pradesh, India</span>
         <button
           type="button"
           onClick={onBack}
