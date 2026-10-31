@@ -1,12 +1,9 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { ForgeSymbol } from '../components/icons/ForgeSymbol';
 import { ArrowLeft, Terminal, Compass, Mail } from 'lucide-react';
-
-export const metadata = {
-  title: '404 — Invariant Not Found | DevForge',
-  description: 'The requested route does not map to any active track or laboratory surface in DevForge.',
-};
 
 export default function NotFound() {
   return (

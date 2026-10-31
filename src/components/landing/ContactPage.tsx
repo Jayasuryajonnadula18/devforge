@@ -14,7 +14,7 @@ import {
   ChevronUp,
   Clock,
   ShieldCheck,
-  GitBranch,
+  KeyRound,
 } from 'lucide-react';
 
 interface ContactPageProps {
@@ -39,12 +39,14 @@ const TIMELINE_OPTIONS = [
 export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const emailRef = useRef<HTMLDivElement>(null);
+  const briefFormRef = useRef<HTMLDivElement>(null);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Magnetic Cursor Spring Tracker (Le Fruit Studio signature interaction)
+  // Magnetic Cursor Follower (Le Fruit Studio Awwwards Interaction)
   const cursorX = useMotionValue(-500);
   const cursorY = useMotionValue(-500);
-  const springX = useSpring(cursorX, { stiffness: 400, damping: 28 });
-  const springY = useSpring(cursorY, { stiffness: 400, damping: 28 });
+  const springX = useSpring(cursorX, { stiffness: 450, damping: 28 });
+  const springY = useSpring(cursorY, { stiffness: 450, damping: 28 });
 
   const [isHoveringEmail, setIsHoveringEmail] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(false);
@@ -62,7 +64,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   const [submissionTicket, setSubmissionTicket] = useState<{ id: string; timestamp: string } | null>(null);
   const [copiedTicket, setCopiedTicket] = useState(false);
 
-  // Live Studio Clock (Pacific Time)
+  // Live Studio Clock (Pacific Time PST/PDT)
   const [sfTime, setSfTime] = useState('');
   useEffect(() => {
     const updateTime = () => {
@@ -84,12 +86,25 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     return () => clearInterval(interval);
   }, []);
 
-  // Track mouse coordinates relative to container
+  // Keyboard navigation: Escape key returns or closes brief form
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (showBriefForm) {
+          setShowBriefForm(false);
+        } else {
+          onBack();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showBriefForm, onBack]);
+
+  // Track viewport-relative mouse coordinates for fixed follower
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    cursorX.set(e.clientX - rect.left);
-    cursorY.set(e.clientY - rect.top);
+    cursorX.set(e.clientX);
+    cursorY.set(e.clientY);
     if (!cursorVisible) setCursorVisible(true);
   };
 
@@ -103,10 +118,19 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     });
     setTimeout(() => setCopiedEmail(false), 2400);
 
-    // Also trigger mailto after brief confirmation
     setTimeout(() => {
       window.location.href = 'mailto:engineering@devforge.org?subject=DevForge%20Systems%20Architecture%20Inquiry';
-    }, 400);
+    }, 450);
+  };
+
+  const handleCopyPgp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const pgp = 'pub 4096R/0x4DF7E99A 2026-01-15 DevForge Engineering Core <engineering@devforge.org>';
+    navigator.clipboard.writeText(pgp);
+    toast.success('PGP Fingerprint Copied', {
+      description: '0x4DF7E99A · 4096R',
+    });
   };
 
   const handleCopyTicket = (id: string) => {
@@ -116,6 +140,19 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
       description: id,
     });
     setTimeout(() => setCopiedTicket(false), 2000);
+  };
+
+  const toggleBriefForm = () => {
+    setShowBriefForm((prev) => {
+      const next = !prev;
+      if (next) {
+        setTimeout(() => {
+          briefFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          nameInputRef.current?.focus();
+        }, 120);
+      }
+      return next;
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -157,7 +194,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
       onMouseLeave={() => setCursorVisible(false)}
       className="relative min-h-screen w-full bg-[#050608] text-[#f5f4f0] font-sans selection:bg-white selection:text-black flex flex-col justify-between overflow-x-hidden"
     >
-      {/* ================= LE FRUIT MAGNETIC LENS FOLLOWER ================= */}
+      {/* ================= LE FRUIT MAGNETIC LENS FOLLOWER (FIXED) ================= */}
       {cursorVisible && (
         <motion.div
           style={{
@@ -167,21 +204,22 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
             y: '-50%',
           }}
           animate={{
-            width: isHoveringEmail ? 176 : 74,
-            height: isHoveringEmail ? 176 : 74,
-            borderColor: isHoveringEmail ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.25)',
+            width: isHoveringEmail ? 184 : 76,
+            height: isHoveringEmail ? 184 : 76,
+            borderColor: isHoveringEmail ? 'rgba(255, 255, 255, 0.45)' : 'rgba(255, 255, 255, 0.22)',
+            backgroundColor: isHoveringEmail ? 'rgba(5, 6, 8, 0.85)' : 'rgba(255, 255, 255, 0.02)',
           }}
-          transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-          className="pointer-events-none absolute z-30 rounded-full border flex items-center justify-center overflow-hidden backdrop-blur-sm"
+          transition={{ type: 'spring', stiffness: 450, damping: 28 }}
+          className="pointer-events-none fixed z-50 rounded-full border hidden md:flex items-center justify-center overflow-hidden backdrop-blur-md shadow-2xl"
         >
           {isHoveringEmail ? (
-            /* Expanded Visual Lens Reveal on Hover (Le Fruit signature) */
+            /* Visual Lens Reveal on Email Hover */
             <div className="relative w-full h-full flex items-center justify-center">
               <div
                 className="absolute inset-0 bg-cover bg-center opacity-85 scale-105"
                 style={{ backgroundImage: `url('/images/menu/architecture-systems.jpg')` }}
               />
-              <div className="absolute inset-0 bg-black/45" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/60" />
               <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-1">
                 {copiedEmail ? (
                   <>
@@ -201,7 +239,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
               </div>
             </div>
           ) : (
-            /* Default Outline Circle with Directional Arrow */
+            /* Rest State: Thin Architectural Circle with Directional Arrow */
             <div className="flex items-center justify-center text-white/80">
               <ArrowRight className="w-4 h-4" />
             </div>
@@ -308,11 +346,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
             </a>
             <button
               type="button"
-              onClick={handleCopyEmail}
+              onClick={handleCopyPgp}
               className="hover:text-white transition-colors inline-flex items-center space-x-1 cursor-pointer"
+              title="Copy PGP public fingerprint"
             >
+              <KeyRound className="w-3 h-3 text-neutral-500" />
               <span>Copy PGP Key</span>
-              <Copy className="w-3 h-3 text-neutral-500" />
             </button>
           </div>
         </div>
@@ -335,11 +374,11 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Brief Composer Toggle */}
+        {/* Brief Composer Toggle Trigger */}
         <div className="pt-4 flex items-center justify-between border-t border-white/[0.05]">
           <button
             type="button"
-            onClick={() => setShowBriefForm((prev) => !prev)}
+            onClick={toggleBriefForm}
             className="inline-flex items-center space-x-2 text-xs font-sans uppercase tracking-wider text-neutral-400 hover:text-white transition-colors cursor-pointer py-2 group"
           >
             <span>{showBriefForm ? 'Close Technical Brief Form' : 'Or Compose a Technical Brief Directly'}</span>
@@ -359,6 +398,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
         <AnimatePresence>
           {showBriefForm && (
             <motion.div
+              ref={briefFormRef}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -474,12 +514,13 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                         Your Name *
                       </label>
                       <input
+                        ref={nameInputRef}
                         id="contact-name"
                         type="text"
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Linus Torvalds"
+                        placeholder="Ada Lovelace"
                         className="w-full bg-transparent border-b border-white/20 py-2.5 text-base text-white placeholder:text-neutral-700 focus:border-white focus:outline-none transition-colors rounded-none"
                       />
                     </div>
