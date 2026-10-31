@@ -45,8 +45,8 @@ export interface StaggeredMenuProps {
   projects?: ProjectTrack[];
   onSelectStudio?: () => void;
   onSelectProject?: (p: ProjectTrack) => void;
-  activeView?: 'main' | 'courses';
-  onViewChange?: (view: 'main' | 'courses') => void;
+  activeView?: 'main' | 'courses' | 'explore';
+  onViewChange?: (view: 'main' | 'courses' | 'explore') => void;
   onMenuOpen?: () => void;
   onMenuClose?: () => void;
 }
@@ -83,10 +83,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   const openRef = useRef(open);
   openRef.current = open;
 
-  const [internalView, setInternalView] = useState<'main' | 'courses'>('main');
+  const [internalView, setInternalView] = useState<'main' | 'courses' | 'explore'>('main');
   const currentView = controlledActiveView || internalView;
 
-  const setView = (v: 'main' | 'courses') => {
+  const setView = (v: 'main' | 'courses' | 'explore') => {
     setInternalView(v);
     onViewChange?.(v);
   };
@@ -213,8 +213,17 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       tl.eventCallback('onComplete', () => {
         busyRef.current = false;
         if (panel) gsap.set(panel, { pointerEvents: 'auto' });
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('resize'));
+        }
       });
       tl.play(0);
+      setTimeout(() => {
+        if (typeof window !== 'undefined') window.dispatchEvent(new Event('resize'));
+      }, 150);
+      setTimeout(() => {
+        if (typeof window !== 'undefined') window.dispatchEvent(new Event('resize'));
+      }, 400);
     } else {
       busyRef.current = false;
       if (panel) gsap.set(panel, { pointerEvents: 'auto' });
@@ -358,7 +367,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     {
       text: 'Explore',
       image: '/images/menu/the-forge-hardware.jpg',
-      onClick: handleOpenStudio,
+      onClick: () => setView('explore'),
     },
     {
       text: 'About DevForge',
@@ -505,7 +514,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                   <span>© {currentYear} DevForge · Architected from first principles.</span>
                 </div>
               </motion.div>
-            ) : (
+            ) : currentView === 'courses' ? (
               /* Subview: Interactive Curriculum View */
               <motion.div
                 key="courses-view"
@@ -554,6 +563,57 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 <div className="pt-6 border-t border-white/[0.08] flex items-center justify-between text-xs font-mono text-neutral-500">
                   <span>DevForge Systems</span>
                   <span>In Development</span>
+                </div>
+              </motion.div>
+            ) : (
+              /* Subview: Systems Lab / Explore Coming Soon View */
+              <motion.div
+                key="explore-view"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
+                className="flex flex-col h-full justify-between py-2 select-none"
+              >
+                <div className="space-y-8">
+                  <button
+                    type="button"
+                    onClick={() => setView('main')}
+                    className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider text-neutral-400 hover:text-white transition-colors cursor-pointer group"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform text-amber-400" />
+                    <span>Back to Menu</span>
+                  </button>
+
+                  <div className="space-y-4 pt-4">
+                    <span className="text-xs font-mono uppercase tracking-widest text-amber-400/90 font-medium">
+                      Systems Lab
+                    </span>
+
+                    <h3 className="font-rector text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
+                      Coming <span className="italic font-normal text-amber-200/90">soon.</span>
+                    </h3>
+
+                    <p className="text-sm sm:text-base text-neutral-300/80 leading-relaxed font-sans max-w-sm pt-1">
+                      Zero-dependency execution environments, consensus visualizers, and compiler execution sandboxes are under active development.
+                    </p>
+                  </div>
+
+                  <div className="pt-2 space-y-3">
+                    <button
+                      type="button"
+                      onClick={handleOpenStudio}
+                      className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider text-amber-300 hover:text-white transition-colors group cursor-pointer"
+                    >
+                      <span>Open Full Lab Preview</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-white/[0.08] flex items-center justify-between text-xs font-mono text-neutral-500">
+                  <span>DevForge Studio</span>
+                  <span>Under Construction</span>
                 </div>
               </motion.div>
             )}

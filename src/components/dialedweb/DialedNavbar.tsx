@@ -28,7 +28,7 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<'hero' | 'about'>('hero');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [menuView, setMenuView] = useState<'main' | 'courses'>('main');
+  const [menuView, setMenuView] = useState<'main' | 'courses' | 'explore'>('main');
 
   // Track scroll state and active section
   useEffect(() => {
@@ -95,7 +95,9 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
     {
       text: 'Explore',
       image: '/images/menu/the-forge-hardware.jpg',
-      onClick: handleOpenStudio,
+      onClick: () => {
+        setMenuView('explore');
+      },
     },
     {
       text: 'About DevForge',

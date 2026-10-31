@@ -336,6 +336,10 @@ export function FlowingMenu({
   };
 
   const goTo = (index: number, from: 'top' | 'bottom' | 'center') => {
+    if (index < 0 || index >= items.length) return;
+    if (!metrics.current[index] || !metrics.current[index]?.height) {
+      measure();
+    }
     const m = metrics.current[index];
     if (!m) return;
     const b = band.current;
@@ -391,15 +395,17 @@ export function FlowingMenu({
   const rowAt = (clientY: number) => {
     const list = listRef.current;
     if (!list) return -1;
-    const y = clientY - list.getBoundingClientRect().top;
-    return metrics.current.findIndex(m => m && y >= m.top && y < m.top + m.height);
+    const listTop = list.getBoundingClientRect().top;
+    const y = clientY - listTop;
+    return metrics.current.findIndex(m => m && y >= m.top && y <= m.top + m.height);
   };
 
   const halfOf = (clientY: number, index: number): 'top' | 'bottom' => {
     const list = listRef.current;
     const m = metrics.current[index];
     if (!list || !m) return 'top';
-    return clientY - list.getBoundingClientRect().top - m.top < m.height / 2 ? 'top' : 'bottom';
+    const listTop = list.getBoundingClientRect().top;
+    return clientY - listTop - m.top < m.height / 2 ? 'top' : 'bottom';
   };
 
   const stopIntro = () => {
@@ -411,10 +417,17 @@ export function FlowingMenu({
 
   const measure = () => {
     const list = listRef.current;
-    metrics.current = rows.current.map(row =>
-      row?.item ? { top: row.item.offsetTop, height: row.item.offsetHeight } : null
-    );
-    if (list && metrics.current[0]) {
+    if (!list) return;
+    const listRect = list.getBoundingClientRect();
+    metrics.current = rows.current.map(row => {
+      if (!row?.item) return null;
+      const itemRect = row.item.getBoundingClientRect();
+      return {
+        top: itemRect.top - listRect.top,
+        height: itemRect.height || 80,
+      };
+    });
+    if (metrics.current[0]) {
       const height = metrics.current[0].height;
       const inset = insetFor(height);
       rootRef.current?.style.setProperty('--flowing-menu-band', String(height ? (height - inset * 2) / height : 1));
@@ -458,7 +471,12 @@ export function FlowingMenu({
       const part = row?.track?.firstElementChild;
       if (part) observer.observe(part);
     });
-    return () => observer.disconnect();
+    const onResize = () => measureRef.current();
+    window.addEventListener('resize', onResize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', onResize);
+    };
   }, [items, bandInset]);
 
   useIsoLayoutEffect(() => {
@@ -627,6 +645,11 @@ export function FlowingMenu({
                 rows.current[index] = { ...rows.current[index], item: node, band: null, track: null };
               }}
               className={ITEM}
+              onPointerEnter={(e) => {
+                measure();
+                const half = halfOf(e.clientY, index);
+                goTo(index, half);
+              }}
             >
               {dividers && index > 0 && <span className={DIVIDER} data-intro-rule="" aria-hidden="true" />}
               {item.link ? (
