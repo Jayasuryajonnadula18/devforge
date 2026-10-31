@@ -50,28 +50,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  // Live India Standard Time (IST) for Mangalagiri, Andhra Pradesh
-  const [indiaTime, setIndiaTime] = useState('');
-  useEffect(() => {
-    const updateTime = () => {
-      try {
-        const timeStr = new Intl.DateTimeFormat('en-US', {
-          timeZone: 'Asia/Kolkata',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: true,
-        }).format(new Date());
-        setIndiaTime(timeStr);
-      } catch {
-        setIndiaTime(new Date().toLocaleTimeString());
-      }
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
   // Detect touch device & reduced motion
   useEffect(() => {
     setIsTouchDevice(
@@ -404,16 +382,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           </button>
         </div>
 
-        {/* Live Location & IST Telemetry */}
-        <div className="flex items-center space-x-3 text-xs font-mono text-neutral-400">
-          <span className="inline-flex items-center space-x-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="hidden sm:inline">MANGALAGIRI, AP · IST</span>
-            <span className="sm:hidden">IST</span>
-          </span>
-          <span className="px-2.5 py-1 rounded-full bg-white/[0.05] border border-white/10 text-white tabular-nums text-[11px] sm:text-xs">
-            {indiaTime || 'IST'}
-          </span>
+        {/* Clean Header Indicator */}
+        <div className="text-xs font-sans uppercase tracking-widest text-neutral-400">
+          <span>Contact</span>
         </div>
       </header>
 
