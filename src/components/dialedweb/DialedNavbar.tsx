@@ -55,14 +55,14 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
   const flowingMenuItems: FlowingMenuItem[] = [
     {
       text: 'Courses',
-      image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&h=400&fit=crop&sat=-100&auto=format',
+      image: '/images/menu/courses-documentation.jpg',
       onClick: () => {
         setMenuView('courses');
       },
     },
     {
       text: 'The Forge',
-      image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&h=400&fit=crop&sat=-100&auto=format',
+      image: '/images/menu/the-forge-hardware.jpg',
       link: '#meet-devforge',
       onClick: () => {
         setIsMenuOpen(false);
@@ -70,7 +70,7 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
     },
     {
       text: 'Architecture',
-      image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=600&h=400&fit=crop&sat=-100&auto=format',
+      image: '/images/menu/architecture-systems.jpg',
       onClick: () => {
         setIsMenuOpen(false);
         toast.info('Architecture — Coming Soon', {
