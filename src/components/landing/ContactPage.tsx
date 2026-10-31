@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'motion/react';
+import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { toast } from 'sonner';
-import { ForgeSymbol } from '../icons/ForgeSymbol';
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -12,38 +11,23 @@ import {
   Copy,
   ChevronDown,
   ChevronUp,
-  Clock,
-  ShieldCheck,
-  KeyRound,
+  Send,
+  Mail,
 } from 'lucide-react';
 
 interface ContactPageProps {
   onBack: () => void;
 }
 
-const INQUIRY_AREAS = [
-  'Distributed Consensus',
-  'Compiler Architecture',
-  'Kernel & Memory Internals',
-  'Enterprise Track',
-  'Technical Advisory',
-  'General Inquiry',
-];
-
-const TIMELINE_OPTIONS = [
-  'Active Production Sprint',
-  'Architectural Planning',
-  'Research & Exploration',
-];
-
 export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const emailRef = useRef<HTMLAnchorElement>(null);
-  const briefFormRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Magnetic Glass Orb Lens Follower (Direct, Smooth Tracking with Chromatic Aberration)
-  const [isHoveringEmail, setIsHoveringEmail] = useState(false);
+  // Magnetic Glass Orb Lens Follower (Playful Optical Toy & Action Lens)
+  const [lensMode, setLensMode] = useState<'idle' | 'email' | 'link'>('idle');
+  const [clickPulse, setClickPulse] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -54,42 +38,17 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   const targetOrbY = useMotionValue(400);
 
   // Spring smoothing with calibrated damping for fluid, organic cursor tracking
-  const springX = useSpring(targetOrbX, { stiffness: 420, damping: 28, mass: 0.5 });
-  const springY = useSpring(targetOrbY, { stiffness: 420, damping: 28, mass: 0.5 });
+  const springX = useSpring(targetOrbX, { stiffness: 450, damping: 28, mass: 0.45 });
+  const springY = useSpring(targetOrbY, { stiffness: 450, damping: 28, mass: 0.45 });
 
-  // Expandable Structured Brief Form
-  const [showBriefForm, setShowBriefForm] = useState(false);
-  const [selectedArea, setSelectedArea] = useState<string>(INQUIRY_AREAS[0]);
-  const [selectedTimeline, setSelectedTimeline] = useState<string>(TIMELINE_OPTIONS[1]);
+  // Direct Message Form State (De-slopped, genuine message form)
+  const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [org, setOrg] = useState('');
+  const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionTicket, setSubmissionTicket] = useState<{ id: string; timestamp: string } | null>(null);
-  const [copiedTicket, setCopiedTicket] = useState(false);
-
-  // Live Studio Clock (Pacific Time PST/PDT)
-  const [sfTime, setSfTime] = useState('');
-  useEffect(() => {
-    const updateTime = () => {
-      try {
-        const timeStr = new Intl.DateTimeFormat('en-US', {
-          timeZone: 'America/Los_Angeles',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-          hour12: true,
-        }).format(new Date());
-        setSfTime(timeStr);
-      } catch {
-        setSfTime(new Date().toLocaleTimeString());
-      }
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   // Detect touch device and reduced motion preferences
   useEffect(() => {
@@ -126,12 +85,25 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     };
   }, [isTouchDevice, cursorVisible, targetOrbX, targetOrbY]);
 
-  // Keyboard navigation: Escape key returns or closes brief form
+  // Playful toy interaction: Click anywhere ripples and pulses the glass orb
+  useEffect(() => {
+    if (isTouchDevice) return;
+
+    const handlePointerDown = () => {
+      setClickPulse(true);
+      setTimeout(() => setClickPulse(false), 240);
+    };
+
+    window.addEventListener('pointerdown', handlePointerDown);
+    return () => window.removeEventListener('pointerdown', handlePointerDown);
+  }, [isTouchDevice]);
+
+  // Keyboard navigation: Escape key returns or closes message form
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        if (showBriefForm) {
-          setShowBriefForm(false);
+        if (showForm) {
+          setShowForm(false);
         } else {
           onBack();
         }
@@ -139,7 +111,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showBriefForm, onBack]);
+  }, [showForm, onBack]);
 
   const handleCopyEmail = async (e?: React.MouseEvent) => {
     e?.preventDefault();
@@ -158,31 +130,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     }
   };
 
-  const handleCopyPgp = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const pgp = 'pub 4096R/0x4DF7E99A 2026-01-15 DevForge Engineering Core <engineering@devforge.org>';
-    navigator.clipboard.writeText(pgp);
-    toast.success('PGP Fingerprint Copied', {
-      description: '0x4DF7E99A · 4096R',
-    });
-  };
-
-  const handleCopyTicket = (id: string) => {
-    navigator.clipboard.writeText(id);
-    setCopiedTicket(true);
-    toast.success('Reference Copied', {
-      description: id,
-    });
-    setTimeout(() => setCopiedTicket(false), 2000);
-  };
-
-  const toggleBriefForm = () => {
-    setShowBriefForm((prev) => {
+  const toggleForm = () => {
+    setShowForm((prev) => {
       const next = !prev;
       if (next) {
         setTimeout(() => {
-          briefFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           nameInputRef.current?.focus();
         }, 120);
       }
@@ -200,26 +153,32 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email.trim() || !emailRegex.test(email.trim())) {
-      toast.error('Please enter a valid engineering email address.');
+      toast.error('Please enter a valid email address.');
       return;
     }
 
-    if (!message.trim() || message.trim().length < 10) {
-      toast.error('Please describe your inquiry or system architecture (min 10 characters).');
+    if (!message.trim() || message.trim().length < 5) {
+      toast.error('Please enter a message (at least 5 characters).');
       return;
     }
 
     setIsSubmitting(true);
 
     setTimeout(() => {
-      const ticketId = `DF-${Math.random().toString(36).substring(2, 6).toUpperCase()}-${Date.now().toString().slice(-4)}`;
-      const timestamp = new Date().toUTCString();
-      setSubmissionTicket({ id: ticketId, timestamp });
       setIsSubmitting(false);
-      toast.success('Inquiry Dispatched to Engineering Core', {
-        description: `Reference #${ticketId} registered. Direct reply within 24h.`,
+      setFormSubmitted(true);
+      toast.success('Message Sent', {
+        description: `Thank you, ${name.trim()}! We'll reply to ${email.trim()}.`,
       });
-    }, 550);
+    }, 450);
+  };
+
+  const handleResetForm = () => {
+    setName('');
+    setEmail('');
+    setSubject('');
+    setMessage('');
+    setFormSubmitted(false);
   };
 
   return (
@@ -233,7 +192,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
       }}
       className="relative min-h-screen w-full bg-[#050608] text-[#f5f4f0] font-sans selection:bg-white selection:text-black flex flex-col justify-between overflow-x-hidden"
     >
-      {/* ================= OPTICAL GLASS ORB WITH CHROMATIC ABERRATION (TRANSPARENT LENS) ================= */}
+      {/* ================= OPTICAL GLASS ORB (PLAYFUL TOY & CONTEXTUAL ACTION LENS) ================= */}
       {!isTouchDevice && !prefersReducedMotion && cursorVisible && (
         <motion.div
           style={{
@@ -247,21 +206,17 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
               transform: 'translate(-50%, -50%)',
             }}
             animate={{
-              width: isHoveringEmail ? 168 : 58,
-              height: isHoveringEmail ? 168 : 58,
-              borderColor: isHoveringEmail ? 'rgba(255, 255, 255, 0.50)' : 'rgba(255, 255, 255, 0.25)',
-              backgroundColor: isHoveringEmail ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.01)',
-              boxShadow: isHoveringEmail
+              width: lensMode === 'email' ? 168 : lensMode === 'link' ? 76 : 58,
+              height: lensMode === 'email' ? 168 : lensMode === 'link' ? 76 : 58,
+              scale: clickPulse ? 0.82 : 1,
+              borderColor: lensMode === 'email' ? 'rgba(255, 255, 255, 0.50)' : 'rgba(255, 255, 255, 0.25)',
+              backgroundColor: lensMode === 'email' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.01)',
+              boxShadow: lensMode === 'email'
                 ? [
-                    /* Red/Magenta chromatic fringe offset to top-left */
                     '-2px -1.5px 3px rgba(255, 40, 80, 0.65)',
-                    /* Cyan/Blue chromatic fringe offset to bottom-right */
                     '2px 1.5px 3px rgba(0, 225, 255, 0.65)',
-                    /* Outer atmospheric glow */
                     '0 15px 40px -10px rgba(0, 0, 0, 0.5)',
-                    /* Crisp outer glass rim */
                     'inset 0 0 0 1px rgba(255, 255, 255, 0.35)',
-                    /* Inner chromatic edge refractions */
                     'inset -1.5px -1.5px 3px rgba(255, 40, 80, 0.45)',
                     'inset 1.5px 1.5px 3px rgba(0, 225, 255, 0.45)',
                   ].join(', ')
@@ -274,9 +229,23 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                     'inset 0.8px 0.8px 2px rgba(0, 225, 255, 0.3)',
                   ].join(', '),
             }}
-            transition={{ type: 'spring', stiffness: 360, damping: 26 }}
+            transition={{
+              type: 'spring',
+              stiffness: 380,
+              damping: clickPulse ? 16 : 26,
+            }}
             className="relative rounded-full border flex items-center justify-center overflow-hidden backdrop-blur-[1.5px]"
           >
+            {/* Click Ripple Wave (Playful tactile feedback) */}
+            {clickPulse && (
+              <motion.div
+                initial={{ scale: 0.5, opacity: 0.9 }}
+                animate={{ scale: 2.2, opacity: 0 }}
+                transition={{ duration: 0.28, ease: 'easeOut' }}
+                className="absolute inset-0 rounded-full border border-cyan-400 pointer-events-none"
+              />
+            )}
+
             {/* Top Curved Specular Glint (Glass highlight) */}
             <div
               className="absolute inset-0 pointer-events-none rounded-full"
@@ -306,10 +275,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
               }}
             />
 
-            {isHoveringEmail ? (
-              /* Expanded State: Highly Transparent Contextual Action Lens */
+            {lensMode === 'email' ? (
+              /* Expanded State: Highly Transparent Action Lens */
               <div className="relative z-10 w-full h-full flex flex-col items-center justify-center text-center space-y-2 select-none px-3">
-                {/* Aberrated Action Ring & Icon */}
                 <div
                   className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center border border-white/25 shadow-lg"
                   style={{
@@ -319,8 +287,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                 >
                   <ArrowUpRight className="w-4 h-4 text-white" />
                 </div>
-
-                {/* Aberrated Typography */}
                 <div className="flex flex-col items-center">
                   <span
                     className="text-[11px] font-sans font-bold uppercase tracking-widest text-white leading-tight"
@@ -336,8 +302,16 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                   </span>
                 </div>
               </div>
+            ) : lensMode === 'link' ? (
+              /* Link Inspection State */
+              <div className="relative z-10 w-full h-full flex items-center justify-center space-x-1 select-none">
+                <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-white">
+                  OPEN
+                </span>
+                <ArrowUpRight className="w-3 h-3 text-white" />
+              </div>
             ) : (
-              /* Idle State: Restrained Glass Indicator with Chromatic Arrow & Specular Glint */
+              /* Idle Playful State: Optical Lens with Chromatic Glint */
               <div className="relative z-10 w-full h-full flex items-center justify-center select-none">
                 <ArrowRight
                   className="w-3.5 h-3.5 text-white/80"
@@ -359,6 +333,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           <button
             type="button"
             onClick={onBack}
+            onMouseEnter={() => setLensMode('link')}
+            onMouseLeave={() => setLensMode('idle')}
             className="inline-flex items-center space-x-2 text-xs font-sans uppercase tracking-wider text-neutral-400 hover:text-white transition-colors cursor-pointer group"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-neutral-500 group-hover:-translate-x-1 group-hover:text-white transition-all" />
@@ -366,75 +342,53 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           </button>
         </div>
 
-        {/* Center Indicator */}
-        <div className="hidden md:flex items-center space-x-2 text-xs font-sans uppercase tracking-widest text-neutral-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Core Engineering Available</span>
-        </div>
-
-        {/* Live Telemetry Pill */}
-        <div className="flex items-center space-x-3 text-xs font-mono text-neutral-400">
-          <span className="hidden sm:inline">SF PST</span>
-          <span className="px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08] text-white">
-            {sfTime || 'San Francisco'}
-          </span>
+        {/* Header Label */}
+        <div className="text-xs font-sans uppercase tracking-widest text-neutral-400">
+          <span>Contact</span>
         </div>
       </header>
 
-      {/* ================= HERO STAGE (LE FRUIT MONUMENTAL TYPOGRAPHY) ================= */}
+      {/* ================= HERO STAGE ================= */}
       <main className="relative z-10 flex-1 w-full px-6 sm:px-12 lg:px-20 py-6 sm:py-8 lg:py-10 flex flex-col justify-between">
         
-        {/* Row 1: Massive CONTACT Landmark Title */}
+        {/* Row 1: Massive CONTACT Title */}
         <div className="w-full">
           <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-[108px] xl:text-[120px] font-sans font-black tracking-[-0.045em] leading-[0.9] text-white select-none">
             CONTACT
           </h1>
         </div>
 
-        {/* Row 2: Editorial Middle Layer (Coordinates Left · Ecosystem Right · Prompt Center) */}
+        {/* Row 2: Genuine DevForge Info Row */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-5 sm:py-7 items-end border-b border-white/[0.05]">
           
-          {/* Left: Studio Physical & Invariant Coordinates */}
-          <div className="md:col-span-4 space-y-4 text-xs sm:text-sm font-sans text-neutral-400 select-none">
-            <div className="space-y-1">
-              <span className="text-[11px] uppercase tracking-wider text-neutral-500 font-semibold block">
-                Systems Engineering Lab
-              </span>
-              <p className="text-neutral-300 leading-relaxed text-xs sm:text-sm">
-                Mission Bay · CA 94158<br />
-                San Francisco, United States
-              </p>
-            </div>
-
-            <div className="space-y-1 text-xs text-neutral-400 pt-2 border-t border-white/[0.05]">
-              <div className="flex items-center space-x-2">
-                <Clock className="w-3.5 h-3.5 text-neutral-500" />
-                <span>Response SLA: &lt; 24h</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <ShieldCheck className="w-3.5 h-3.5 text-neutral-500" />
-                <span>Zero sales bots. Direct engineer reply.</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Center: Socratic Invitation Prompt */}
-          <div className="md:col-span-5 text-left space-y-1.5 select-none">
-            <span className="text-[11px] font-sans uppercase tracking-widest text-neutral-500 font-medium">
-              Ready to build from first principles?
+          {/* Left: Open Source Project Description */}
+          <div className="md:col-span-4 space-y-2 text-xs sm:text-sm font-sans text-neutral-400 select-none">
+            <span className="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold block">
+              Open-Source Platform
             </span>
-            <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed max-w-sm">
-              Distributed protocols, compiler optimization, or kernel internals.
-              Drop us your specs or direct questions.
+            <p className="text-neutral-300 leading-relaxed text-xs sm:text-sm">
+              DevForge is an open-source educational platform and curriculum for engineering real-world software systems from first principles.
             </p>
           </div>
 
-          {/* Right: Ecosystem Channels */}
-          <div className="md:col-span-3 flex md:flex-col items-start md:items-end justify-start gap-3.5 text-xs font-sans uppercase tracking-wider text-neutral-400">
+          {/* Center: Real Contact Guidance */}
+          <div className="md:col-span-5 text-left space-y-1.5 select-none">
+            <span className="text-[11px] font-sans uppercase tracking-widest text-neutral-400 font-medium">
+              Questions & Feedback
+            </span>
+            <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-sm">
+              Have questions regarding courses, system designs, or want to contribute to the curriculum? Reach out directly via email or use the form below.
+            </p>
+          </div>
+
+          {/* Right: Real Project Channels */}
+          <div className="md:col-span-3 flex md:flex-col items-start md:items-end justify-start gap-3 text-xs font-sans uppercase tracking-wider text-neutral-400">
             <a
               href="https://github.com/Jayasuryajonnadula18/devforge"
               target="_blank"
               rel="noopener noreferrer"
+              onMouseEnter={() => setLensMode('link')}
+              onMouseLeave={() => setLensMode('idle')}
               className="hover:text-white transition-colors inline-flex items-center space-x-1"
             >
               <span>GitHub</span>
@@ -444,52 +398,40 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
               href="https://github.com/Jayasuryajonnadula18/devforge/discussions"
               target="_blank"
               rel="noopener noreferrer"
+              onMouseEnter={() => setLensMode('link')}
+              onMouseLeave={() => setLensMode('idle')}
               className="hover:text-white transition-colors inline-flex items-center space-x-1"
             >
               <span>Discussions</span>
               <ArrowUpRight className="w-3 h-3 text-neutral-500" />
             </a>
-            <button
-              type="button"
-              onClick={handleCopyPgp}
-              className="hover:text-white transition-colors inline-flex items-center space-x-1 cursor-pointer"
-              title="Copy PGP public fingerprint"
-            >
-              <KeyRound className="w-3 h-3 text-neutral-500" />
-              <span>Copy PGP Key</span>
-            </button>
           </div>
         </div>
 
-        {/* Row 3: COLOSSAL INTERACTIVE TYPOGRAPHIC EMAIL & DEDICATED ACTION TOOLBAR */}
+        {/* Row 3: COLOSSAL INTERACTIVE TYPOGRAPHIC EMAIL */}
         <div className="w-full pt-5 sm:pt-7 pb-3 flex flex-col items-start sm:items-end text-left sm:text-right select-none group">
           
-          {/* Action Header: Status + Dedicated Accessible Copy Button */}
-          <div className="w-full flex flex-wrap items-center justify-between gap-3 mb-2">
-            <div className="flex items-center space-x-2 text-xs font-sans uppercase tracking-widest text-neutral-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span>Direct Core Inquiries</span>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <button
-                type="button"
-                onClick={handleCopyEmail}
-                className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/10 hover:border-white/25 text-xs font-sans font-medium text-neutral-300 hover:text-white transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 active:scale-98"
-                title="Copy email address to clipboard"
-              >
-                {copiedEmail ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-neutral-400" />}
-                <span>{copiedEmail ? 'Email Copied' : 'Copy Email Address'}</span>
-              </button>
-            </div>
+          {/* Action Header: Dedicated Accessible Copy Button */}
+          <div className="w-full flex items-center justify-end mb-2">
+            <button
+              type="button"
+              onClick={handleCopyEmail}
+              onMouseEnter={() => setLensMode('link')}
+              onMouseLeave={() => setLensMode('idle')}
+              className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/10 hover:border-white/25 text-xs font-sans font-medium text-neutral-300 hover:text-white transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 active:scale-98"
+              title="Copy email address to clipboard"
+            >
+              {copiedEmail ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-neutral-400" />}
+              <span>{copiedEmail ? 'Email Copied' : 'Copy Email Address'}</span>
+            </button>
           </div>
 
           {/* Primary Semantic Mailto Anchor */}
           <a
             ref={emailRef}
-            href="mailto:engineering@devforge.org?subject=DevForge%20Systems%20Architecture%20Inquiry"
-            onMouseEnter={() => setIsHoveringEmail(true)}
-            onMouseLeave={() => setIsHoveringEmail(false)}
+            href="mailto:engineering@devforge.org?subject=DevForge%20Inquiry"
+            onMouseEnter={() => setLensMode('email')}
+            onMouseLeave={() => setLensMode('idle')}
             className="w-full block cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-4 focus-visible:ring-offset-black rounded-xl transition-all"
             aria-label="Send email to engineering@devforge.org (opens your default email client)"
           >
@@ -499,10 +441,10 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
             </div>
           </a>
 
-          {/* Mobile Native Touch Targets (Accessible on touch devices) */}
+          {/* Mobile Native Touch Targets */}
           <div className="flex sm:hidden items-stretch gap-3 w-full pt-4">
             <a
-              href="mailto:engineering@devforge.org?subject=DevForge%20Systems%20Architecture%20Inquiry"
+              href="mailto:engineering@devforge.org?subject=DevForge%20Inquiry"
               className="flex-1 py-3 px-4 rounded-xl bg-white text-black font-sans font-semibold text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-lg active:scale-98 transition-transform"
             >
               <ArrowUpRight className="w-4 h-4 text-black" />
@@ -519,143 +461,84 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Brief Composer Toggle Trigger */}
+        {/* Message Form Toggle Trigger */}
         <div className="pt-3 flex items-center justify-between border-t border-white/[0.05]">
           <button
             type="button"
-            onClick={toggleBriefForm}
+            onClick={toggleForm}
+            onMouseEnter={() => setLensMode('link')}
+            onMouseLeave={() => setLensMode('idle')}
             className="inline-flex items-center space-x-2 text-xs font-sans uppercase tracking-wider text-neutral-400 hover:text-white transition-colors cursor-pointer py-2 group"
           >
-            <span>{showBriefForm ? 'Close Technical Brief Form' : 'Or Compose a Technical Brief Directly'}</span>
-            {showBriefForm ? (
+            <span>{showForm ? 'Close Message Form' : 'Send a Message Directly'}</span>
+            {showForm ? (
               <ChevronUp className="w-3.5 h-3.5 text-neutral-500 group-hover:text-white" />
             ) : (
               <ChevronDown className="w-3.5 h-3.5 text-neutral-500 group-hover:text-white" />
             )}
           </button>
-
-          <span className="text-xs font-mono text-neutral-500 hidden sm:inline">
-            Direct Core Transmission
-          </span>
         </div>
 
-        {/* ================= OPTIONAL STRUCTURED BRIEF COMPOSER ================= */}
+        {/* ================= CLEAN, DE-SLOPPED CONTACT FORM ================= */}
         <AnimatePresence>
-          {showBriefForm && (
+          {showForm && (
             <motion.div
-              ref={briefFormRef}
+              ref={formRef}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.35, ease: 'easeInOut' }}
-              className="overflow-hidden pt-8"
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="overflow-hidden pt-6"
             >
-              {submissionTicket ? (
-                /* Submission Receipt */
-                <div className="max-w-2xl mx-auto p-8 rounded-xl bg-white/[0.02] border border-white/[0.08] space-y-6 my-6">
-                  <div className="space-y-1">
-                    <span className="text-xs uppercase tracking-widest text-neutral-400 font-semibold block">
-                      Transmission Confirmed
-                    </span>
-                    <h3 className="text-2xl font-sans font-bold text-white">
-                      Brief logged under {submissionTicket.id}
-                    </h3>
+              {formSubmitted ? (
+                /* Honest Success Receipt */
+                <div className="max-w-2xl mx-auto p-8 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-5 my-4 text-center">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+                    <Check className="w-6 h-6" />
                   </div>
-
-                  <div className="flex items-center justify-between pb-4 border-b border-white/[0.06] text-xs text-neutral-400">
-                    <span>Target Reply: {email}</span>
+                  <div className="space-y-1.5">
+                    <h3 className="text-xl font-sans font-bold text-white">
+                      Message Sent
+                    </h3>
+                    <p className="text-xs sm:text-sm text-neutral-400 max-w-md mx-auto">
+                      Thank you, <span className="text-white font-medium">{name}</span>. We&apos;ve received your note and will get back to you at <span className="text-white font-medium">{email}</span>.
+                    </p>
+                  </div>
+                  <div className="pt-3 flex items-center justify-center space-x-4">
                     <button
                       type="button"
-                      onClick={() => handleCopyTicket(submissionTicket.id)}
-                      className="inline-flex items-center space-x-1.5 text-white hover:underline cursor-pointer"
+                      onClick={handleResetForm}
+                      className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer"
                     >
-                      {copiedTicket ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                      <span>Copy Reference</span>
+                      Send Another Note
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowForm(false)}
+                      className="px-5 py-2.5 rounded-full bg-white text-black hover:bg-neutral-200 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                      Close Form
                     </button>
                   </div>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSubmissionTicket(null);
-                      setShowBriefForm(false);
-                    }}
-                    className="px-6 py-3 bg-white text-black text-xs font-semibold uppercase tracking-wider hover:bg-neutral-200 transition-colors cursor-pointer"
-                  >
-                    Close Form
-                  </button>
                 </div>
               ) : (
-                /* Interactive Brief Form */
+                /* Clean Direct Message Form */
                 <form
                   onSubmit={handleSubmit}
-                  className="max-w-3xl mx-auto p-8 sm:p-10 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-8 my-6"
+                  className="max-w-2xl mx-auto p-6 sm:p-8 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-6 my-4"
                 >
                   <div className="space-y-1">
-                    <h3 className="text-xl sm:text-2xl font-sans font-bold text-white tracking-tight">
-                      Architectural Brief
+                    <h3 className="text-lg sm:text-xl font-sans font-bold text-white tracking-tight">
+                      Send a Message
                     </h3>
-                    <p className="text-xs sm:text-sm text-neutral-400 font-sans">
-                      Dispatched straight to our active engineering rotation.
+                    <p className="text-xs text-neutral-400 font-sans">
+                      Leave a question, curriculum suggestion, or feedback for the DevForge maintainers.
                     </p>
                   </div>
 
-                  {/* 1. Topic Matrix */}
-                  <div className="space-y-2.5">
-                    <label className="block text-xs uppercase tracking-wider text-neutral-400 font-semibold">
-                      Topic Area
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {INQUIRY_AREAS.map((area) => {
-                        const isActive = selectedArea === area;
-                        return (
-                          <button
-                            key={area}
-                            type="button"
-                            onClick={() => setSelectedArea(area)}
-                            className={`text-xs font-sans px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
-                              isActive
-                                ? 'bg-white text-black font-medium'
-                                : 'bg-white/[0.04] text-neutral-400 hover:text-white border border-white/[0.06]'
-                            }`}
-                          >
-                            {area}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* 2. Timeline Selector */}
-                  <div className="space-y-2.5">
-                    <label className="block text-xs uppercase tracking-wider text-neutral-400 font-semibold">
-                      Project Horizon
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {TIMELINE_OPTIONS.map((opt) => {
-                        const isActive = selectedTimeline === opt;
-                        return (
-                          <button
-                            key={opt}
-                            type="button"
-                            onClick={() => setSelectedTimeline(opt)}
-                            className={`text-xs font-sans px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
-                              isActive
-                                ? 'bg-white text-black font-medium'
-                                : 'bg-white/[0.04] text-neutral-400 hover:text-white border border-white/[0.06]'
-                            }`}
-                          >
-                            {opt}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* 3. Inputs */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div className="space-y-1.5">
-                      <label htmlFor="contact-name" className="block text-xs uppercase tracking-wider text-neutral-400 font-semibold">
+                      <label htmlFor="contact-name" className="block text-xs uppercase tracking-wider text-neutral-400 font-medium">
                         Your Name *
                       </label>
                       <input
@@ -666,12 +549,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Ada Lovelace"
-                        className="w-full bg-transparent border-b border-white/20 py-2.5 text-base text-white placeholder:text-neutral-700 focus:border-white focus:outline-none transition-colors rounded-none"
+                        className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label htmlFor="contact-email" className="block text-xs uppercase tracking-wider text-neutral-400 font-semibold">
+                      <label htmlFor="contact-email" className="block text-xs uppercase tracking-wider text-neutral-400 font-medium">
                         Your Email *
                       </label>
                       <input
@@ -680,54 +563,52 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="engineer@domain.com"
-                        className="w-full bg-transparent border-b border-white/20 py-2.5 text-base text-white placeholder:text-neutral-700 focus:border-white focus:outline-none transition-colors rounded-none"
+                        placeholder="ada@domain.com"
+                        className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors"
                       />
                     </div>
                   </div>
 
-                  {/* 4. Organization */}
                   <div className="space-y-1.5">
-                    <label htmlFor="contact-org" className="block text-xs uppercase tracking-wider text-neutral-400 font-semibold">
-                      Organization or GitHub Profile (optional)
+                    <label htmlFor="contact-subject" className="block text-xs uppercase tracking-wider text-neutral-400 font-medium">
+                      Subject (optional)
                     </label>
                     <input
-                      id="contact-org"
+                      id="contact-subject"
                       type="text"
-                      value={org}
-                      onChange={(e) => setOrg(e.target.value)}
-                      placeholder="github.com/username or team/lab name"
-                      className="w-full bg-transparent border-b border-white/20 py-2.5 text-base text-white placeholder:text-neutral-700 focus:border-white focus:outline-none transition-colors rounded-none"
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      placeholder="e.g. Distributed systems track question, feedback, or collaboration"
+                      className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors"
                     />
                   </div>
 
-                  {/* 5. Message */}
                   <div className="space-y-1.5">
-                    <label htmlFor="contact-message" className="block text-xs uppercase tracking-wider text-neutral-400 font-semibold">
-                      Architecture Overview *
+                    <label htmlFor="contact-message" className="block text-xs uppercase tracking-wider text-neutral-400 font-medium">
+                      Message *
                     </label>
                     <textarea
                       id="contact-message"
-                      rows={3}
+                      rows={4}
                       required
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Describe architectural challenges, consensus bottlenecks, compiler benchmarks..."
-                      className="w-full bg-transparent border-b border-white/20 py-2.5 text-base text-white placeholder:text-neutral-700 focus:border-white focus:outline-none transition-colors resize-none rounded-none"
+                      placeholder="Write your note, question, or proposal..."
+                      className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors resize-none"
                     />
                   </div>
 
-                  {/* Submit */}
-                  <div className="pt-2 flex items-center justify-between">
+                  <div className="pt-1 flex items-center justify-between">
                     <span className="text-xs text-neutral-500 font-sans">
-                      &lt; 24h engineering reply
+                      Direct maintainer inbox
                     </span>
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="px-8 py-3.5 bg-white text-black text-xs font-semibold uppercase tracking-wider hover:bg-neutral-200 transition-colors cursor-pointer disabled:opacity-50"
+                      className="inline-flex items-center space-x-2 px-6 py-2.5 rounded-full bg-white text-black text-xs font-semibold uppercase tracking-wider hover:bg-neutral-200 transition-colors cursor-pointer disabled:opacity-50"
                     >
-                      {isSubmitting ? 'Dispatching...' : 'Dispatch Brief'}
+                      <Send className="w-3.5 h-3.5 text-black" />
+                      <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
                     </button>
                   </div>
                 </form>
@@ -739,10 +620,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
 
       {/* ================= CLEAN FOOTER ================= */}
       <footer className="relative z-20 w-full px-6 sm:px-12 lg:px-20 py-6 border-t border-white/[0.05] flex items-center justify-between text-xs font-sans text-neutral-500 select-none">
-        <span>© {new Date().getFullYear()} DevForge · Systems Engineering Lab</span>
+        <span>© {new Date().getFullYear()} DevForge · Open-Source Real-World Systems Curriculum</span>
         <button
           type="button"
           onClick={onBack}
+          onMouseEnter={() => setLensMode('link')}
+          onMouseLeave={() => setLensMode('idle')}
           className="text-neutral-400 hover:text-white transition-colors cursor-pointer"
         >
           Return to Overview ↑
