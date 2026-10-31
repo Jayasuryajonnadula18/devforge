@@ -53,7 +53,7 @@ export interface StaggeredMenuProps {
 
 export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   position = 'right',
-  colors = ['#180e08', '#2a150b', '#5c2912'],
+  colors = ['#0b0d11', '#13171e', '#1a202a', '#222936'],
   items = [],
   flowingItems: customFlowingItems,
   socialItems = [],
@@ -391,7 +391,17 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       data-position={position}
       data-open={open || undefined}
     >
-      {/* Pre-layers disabled for solid background */}
+      <div ref={preLayersRef} className="sm-prelayers" aria-hidden="true">
+        {(() => {
+          const raw = colors && colors.length ? colors.slice(0, 4) : ['#0b0d11', '#13171e', '#1a202a', '#222936'];
+          let arr = [...raw];
+          if (arr.length >= 3) {
+            const mid = Math.floor(arr.length / 2);
+            arr.splice(mid, 1);
+          }
+          return arr.map((c, i) => <div key={i} className="sm-prelayer" style={{ background: c }} />);
+        })()}
+      </div>
 
       {/* Standalone Toggle */}
       {!hideToggle && (

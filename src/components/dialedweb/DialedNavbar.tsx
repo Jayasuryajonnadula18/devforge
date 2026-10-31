@@ -241,7 +241,7 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
             onSelectInitialProject();
           }
         }}
-        colors={['#180e08', '#2a150b', '#5c2912', '#7e3a19']}
+        colors={['#0b0d11', '#13171e', '#1a202a', '#222936']}
         accentColor="#f59e0b"
         menuButtonColor="#f5f4f0"
         openMenuButtonColor="#f5f4f0"
