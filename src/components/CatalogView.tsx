@@ -126,8 +126,9 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         {/* ================= 1. ADELOS MINIMALIST FLOATING NAVBAR ================= */}
         <DialedNavbar
           totalCompleted={totalCompleted}
+          projects={projects}
+          onSelectProject={onSelectProject}
           onSelectInitialProject={() => onSelectProject(pythonProjects[0] || projects[0])}
-          onOpenCommandPalette={onOpenCommandPalette}
           onResetFilter={() => {}}
         />
 
