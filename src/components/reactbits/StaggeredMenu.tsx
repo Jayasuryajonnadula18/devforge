@@ -3,7 +3,9 @@
 import React, { useCallback, useLayoutEffect, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, ArrowRight, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { toast } from 'sonner';
+import { FlowingMenu, FlowingMenuItem } from './FlowingMenu';
 import { ProjectTrack } from '../../types';
 import './StaggeredMenu.css';
 
@@ -24,6 +26,7 @@ export interface StaggeredMenuProps {
   position?: 'left' | 'right';
   colors?: string[];
   items?: StaggeredMenuItem[];
+  flowingItems?: FlowingMenuItem[];
   socialItems?: StaggeredMenuSocialItem[];
   displaySocials?: boolean;
   displayItemNumbering?: boolean;
@@ -49,9 +52,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   position = 'right',
   colors = ['#180e08', '#2a150b', '#5c2912'],
   items = [],
+  flowingItems: customFlowingItems,
   socialItems = [],
   displaySocials = true,
-  displayItemNumbering = true,
+  displayItemNumbering = false,
   className,
   logoUrl,
   menuButtonColor = '#f5f4f0',
@@ -85,31 +89,18 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   const panelRef = useRef<HTMLDivElement>(null);
   const preLayersRef = useRef<HTMLDivElement>(null);
   const preLayerElsRef = useRef<HTMLElement[]>([]);
-  const plusHRef = useRef<HTMLSpanElement>(null);
-  const plusVRef = useRef<HTMLSpanElement>(null);
-  const iconRef = useRef<HTMLSpanElement>(null);
-  const textInnerRef = useRef<HTMLSpanElement>(null);
-  const textWrapRef = useRef<HTMLSpanElement>(null);
-  const [textLines, setTextLines] = useState(['Menu', 'Close']);
+  const toggleBtnRef = useRef<HTMLButtonElement>(null);
 
   const openTlRef = useRef<gsap.core.Timeline | null>(null);
   const closeTweenRef = useRef<gsap.core.Tween | null>(null);
-  const spinTweenRef = useRef<gsap.core.Tween | null>(null);
-  const textCycleAnimRef = useRef<gsap.core.Tween | null>(null);
   const colorTweenRef = useRef<gsap.core.Tween | null>(null);
-  const toggleBtnRef = useRef<HTMLButtonElement>(null);
   const busyRef = useRef(false);
-  const itemEntranceTweenRef = useRef<gsap.core.Tween | null>(null);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
       const panel = panelRef.current;
       const preContainer = preLayersRef.current;
-      const plusH = plusHRef.current;
-      const plusV = plusVRef.current;
-      const icon = iconRef.current;
-      const textInner = textInnerRef.current;
-      if (!panel || !plusH || !plusV || !icon || !textInner) return;
+      if (!panel) return;
 
       let preLayers: HTMLElement[] = [];
       if (preContainer) {
@@ -122,10 +113,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       if (preContainer) {
         gsap.set(preContainer, { xPercent: 0, opacity: 1 });
       }
-      gsap.set(plusH, { transformOrigin: '50% 50%', rotate: 0 });
-      gsap.set(plusV, { transformOrigin: '50% 50%', rotate: 90 });
-      gsap.set(icon, { rotate: 0, transformOrigin: '50% 50%' });
-      gsap.set(textInner, { yPercent: 0 });
       if (toggleBtnRef.current) gsap.set(toggleBtnRef.current, { color: menuButtonColor });
     });
     return () => ctx.revert();
@@ -141,9 +128,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       closeTweenRef.current.kill();
       closeTweenRef.current = null;
     }
-    itemEntranceTweenRef.current?.kill();
 
-    const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel'));
     const socialTitle = panel.querySelector('.sm-socials-title');
     const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'));
 
@@ -151,14 +136,11 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     const layerStates = layers.map(el => ({ el, start: offscreen }));
     const panelStart = offscreen;
 
-    if (itemEls.length) {
-      gsap.set(itemEls, { yPercent: 140, rotate: 10 });
-    }
     if (socialTitle) {
       gsap.set(socialTitle, { opacity: 0 });
     }
     if (socialLinks.length) {
-      gsap.set(socialLinks, { y: 25, opacity: 0 });
+      gsap.set(socialLinks, { y: 20, opacity: 0 });
     }
 
     const tl = gsap.timeline({ paused: true });
@@ -175,22 +157,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       { xPercent: 0, duration: panelDuration, ease: 'power4.out' },
       panelInsertTime
     );
-
-    if (itemEls.length) {
-      const itemsStartRatio = 0.15;
-      const itemsStart = panelInsertTime + panelDuration * itemsStartRatio;
-      tl.to(
-        itemEls,
-        {
-          yPercent: 0,
-          rotate: 0,
-          duration: 0.9,
-          ease: 'power4.out',
-          stagger: { each: 0.08, from: 'start' }
-        },
-        itemsStart
-      );
-    }
 
     if (socialTitle || socialLinks.length) {
       const socialsStart = panelInsertTime + panelDuration * 0.4;
@@ -244,7 +210,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   const playClose = useCallback(() => {
     openTlRef.current?.kill();
     openTlRef.current = null;
-    itemEntranceTweenRef.current?.kill();
 
     const panel = panelRef.current;
     const layers = preLayerElsRef.current;
@@ -259,31 +224,15 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       ease: 'power3.in',
       overwrite: 'auto',
       onComplete: () => {
-        const itemEls = Array.from(panel.querySelectorAll('.sm-panel-itemLabel'));
-        if (itemEls.length) {
-          gsap.set(itemEls, { yPercent: 140, rotate: 10 });
-        }
         const socialTitle = panel.querySelector('.sm-socials-title');
         const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'));
         if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
-        if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0 });
+        if (socialLinks.length) gsap.set(socialLinks, { y: 20, opacity: 0 });
         busyRef.current = false;
-        // Reset to main view on complete exit
         setInternalView('main');
       }
     });
   }, [position]);
-
-  const animateIcon = useCallback((opening: boolean) => {
-    const icon = iconRef.current;
-    if (!icon) return;
-    spinTweenRef.current?.kill();
-    if (opening) {
-      spinTweenRef.current = gsap.to(icon, { rotate: 225, duration: 0.8, ease: 'power4.out', overwrite: 'auto' });
-    } else {
-      spinTweenRef.current = gsap.to(icon, { rotate: 0, duration: 0.35, ease: 'power3.inOut', overwrite: 'auto' });
-    }
-  }, []);
 
   const animateColor = useCallback(
     (opening: boolean) => {
@@ -305,34 +254,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     [openMenuButtonColor, menuButtonColor, changeMenuColorOnOpen]
   );
 
-  const animateText = useCallback((opening: boolean) => {
-    const inner = textInnerRef.current;
-    if (!inner) return;
-    textCycleAnimRef.current?.kill();
-
-    const currentLabel = opening ? 'Menu' : 'Close';
-    const targetLabel = opening ? 'Close' : 'Menu';
-    const cycles = 3;
-    const seq = [currentLabel];
-    let last = currentLabel;
-    for (let i = 0; i < cycles; i++) {
-      last = last === 'Menu' ? 'Close' : 'Menu';
-      seq.push(last);
-    }
-    if (last !== targetLabel) seq.push(targetLabel);
-    seq.push(targetLabel);
-    setTextLines(seq);
-
-    gsap.set(inner, { yPercent: 0 });
-    const lineCount = seq.length;
-    const finalShift = ((lineCount - 1) / lineCount) * 100;
-    textCycleAnimRef.current = gsap.to(inner, {
-      yPercent: -finalShift,
-      duration: 0.5 + lineCount * 0.07,
-      ease: 'power4.out'
-    });
-  }, []);
-
   // Sync state if controlled
   useEffect(() => {
     if (isOpenControlled) {
@@ -341,11 +262,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       } else {
         playClose();
       }
-      animateIcon(controlledIsOpen);
       animateColor(controlledIsOpen);
-      animateText(controlledIsOpen);
     }
-  }, [controlledIsOpen, isOpenControlled, playOpen, playClose, animateIcon, animateColor, animateText]);
+  }, [controlledIsOpen, isOpenControlled, playOpen, playClose, animateColor]);
 
   const toggleMenu = useCallback(() => {
     const target = !openRef.current;
@@ -356,29 +275,25 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       } else {
         playClose();
       }
-      animateIcon(target);
       animateColor(target);
-      animateText(target);
     }
     if (target) {
       onMenuOpen?.();
     } else {
       onMenuClose?.();
     }
-  }, [isOpenControlled, playOpen, playClose, animateIcon, animateColor, animateText, onMenuOpen, onMenuClose]);
+  }, [isOpenControlled, playOpen, playClose, animateColor, onMenuOpen, onMenuClose]);
 
   const closeMenu = useCallback(() => {
     if (openRef.current) {
       if (!isOpenControlled) {
         setInternalOpen(false);
         playClose();
-        animateIcon(false);
         animateColor(false);
-        animateText(false);
       }
       onMenuClose?.();
     }
-  }, [isOpenControlled, playClose, animateIcon, animateColor, animateText, onMenuClose]);
+  }, [isOpenControlled, playClose, animateColor, onMenuClose]);
 
   useEffect(() => {
     if (!closeOnClickAway || !open) return;
@@ -400,6 +315,33 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     };
   }, [closeOnClickAway, open, closeMenu]);
 
+  // Default clean FlowingMenu items for DevForge
+  const defaultFlowingItems: FlowingMenuItem[] = [
+    {
+      text: 'Courses',
+      marquee: 'Courses · Systems Curriculum · Coming Soon · In Private Verification ·',
+      onClick: () => setView('courses'),
+    },
+    {
+      text: 'The Forge',
+      marquee: 'The Forge · First Principles Foundation & Monolith · Architecture · Philosophy ·',
+      link: '#meet-devforge',
+      onClick: () => closeMenu(),
+    },
+    {
+      text: 'Architecture',
+      marquee: 'Architecture · Coming Soon · Distributed Topologies & Visual Models ·',
+      onClick: () => {
+        closeMenu();
+        toast.info('Architecture — Coming Soon', {
+          description: 'Interactive visual system topologies & distributed system maps dropping in Q1 2027.',
+        });
+      },
+    },
+  ];
+
+  const resolvedFlowingItems = customFlowingItems || defaultFlowingItems;
+
   return (
     <div
       className={(className ? className + ' ' : '') + 'staggered-menu-wrapper' + (isFixed ? ' fixed-wrapper' : '')}
@@ -420,18 +362,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       </div>
 
       <header className="staggered-menu-header" aria-label="Main navigation header">
-        <div className="sm-logo" aria-label="Logo">
-          {logoUrl && (
-            <img
-              src={logoUrl}
-              alt="Logo"
-              className="sm-logo-img"
-              draggable={false}
-              width={110}
-              height={28}
-            />
-          )}
-        </div>
         <button
           ref={toggleBtnRef}
           className="sm-toggle"
@@ -441,19 +371,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
           onClick={toggleMenu}
           type="button"
         >
-          <span ref={textWrapRef} className="sm-toggle-textWrap" aria-hidden="true">
-            <span ref={textInnerRef} className="sm-toggle-textInner">
-              {textLines.map((l, i) => (
-                <span className="sm-toggle-line" key={i}>
-                  {l}
-                </span>
-              ))}
-            </span>
-          </span>
-          <span ref={iconRef} className="sm-icon" aria-hidden="true">
-            <span ref={plusHRef} className="sm-icon-line" />
-            <span ref={plusVRef} className="sm-icon-line sm-icon-line-v" />
-          </span>
+          <span className="sm-toggle-text">{open ? 'Close' : 'Menu'}</span>
         </button>
       </header>
 
@@ -467,50 +385,27 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -16 }}
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                className="flex flex-col h-full"
+                className="flex flex-col h-full justify-between"
               >
-                <ul className="sm-panel-list" role="list">
-                  {/* Integrated Courses Trigger inside the menu */}
-                  <li className="sm-panel-itemWrap">
-                    <button
-                      type="button"
-                      className="sm-panel-item group flex items-center justify-between w-full pr-0 cursor-pointer"
-                      onClick={() => setView('courses')}
-                    >
-                      <span className="sm-panel-itemLabel">Courses</span>
-                      <ChevronRight className="w-5 h-5 text-neutral-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
-                    </button>
-                  </li>
-
-                  {items && items.length ? (
-                    items.map((it, idx) => (
-                      <li className="sm-panel-itemWrap" key={it.label + idx}>
-                        {it.onClick ? (
-                          <button
-                            type="button"
-                            className="sm-panel-item flex items-center justify-between w-full pr-0 cursor-pointer"
-                            aria-label={it.ariaLabel || it.label}
-                            onClick={() => {
-                              it.onClick?.();
-                              closeMenu();
-                            }}
-                          >
-                            <span className="sm-panel-itemLabel">{it.label}</span>
-                          </button>
-                        ) : (
-                          <a 
-                            className="sm-panel-item flex items-center justify-between w-full pr-0" 
-                            href={it.link || '#'} 
-                            aria-label={it.ariaLabel || it.label} 
-                            onClick={closeMenu}
-                          >
-                            <span className="sm-panel-itemLabel">{it.label}</span>
-                          </a>
-                        )}
-                      </li>
-                    ))
-                  ) : null}
-                </ul>
+                {/* FlowingMenu from React Bits */}
+                <div className="flex-1 flex flex-col justify-center py-4">
+                  <FlowingMenu
+                    items={resolvedFlowingItems}
+                    speed={55}
+                    stretch={0.5}
+                    magnet={0.2}
+                    followCursor={0.3}
+                    textColor="#f5f4f0"
+                    bgColor="transparent"
+                    marqueeBgColor="#f59e0b"
+                    marqueeTextColor="#090706"
+                    dividers={false}
+                    showIndex={false}
+                    showArrow={false}
+                    align="left"
+                    style={{ height: '270px' }}
+                  />
+                </div>
 
                 {displaySocials && socialItems && socialItems.length > 0 && (
                   <div className="sm-socials" aria-label="Social links">

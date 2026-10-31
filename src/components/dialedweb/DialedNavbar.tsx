@@ -5,7 +5,8 @@ import { useScroll } from 'motion/react';
 import { toast } from 'sonner';
 import { ForgeSymbol } from '../icons/ForgeSymbol';
 import { LiquidGlass } from '../reactbits/LiquidGlass';
-import { StaggeredMenu, StaggeredMenuItem, StaggeredMenuSocialItem } from '../reactbits/StaggeredMenu';
+import { StaggeredMenu, StaggeredMenuSocialItem } from '../reactbits/StaggeredMenu';
+import { FlowingMenuItem } from '../reactbits/FlowingMenu';
 import { ProjectTrack } from '../../types';
 
 interface DialedNavbarProps {
@@ -51,40 +52,29 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const staggeredMenuItems: StaggeredMenuItem[] = [
+  const flowingMenuItems: FlowingMenuItem[] = [
     {
-      label: 'Studio IDE',
-      ariaLabel: 'Open Studio IDE',
+      text: 'Courses',
+      marquee: 'Courses · Systems Curriculum · Coming Soon · In Private Verification ·',
       onClick: () => {
-        setIsMenuOpen(false);
-        onSelectInitialProject();
+        setMenuView('courses');
       },
     },
     {
-      label: 'The Forge',
-      ariaLabel: 'Philosophy & Visual Foundation',
+      text: 'The Forge',
+      marquee: 'The Forge · First Principles Foundation & Monolith · Architecture · Philosophy ·',
       link: '#meet-devforge',
       onClick: () => {
         setIsMenuOpen(false);
       },
     },
     {
-      label: 'Architecture Atlas',
-      ariaLabel: 'Architecture Topologies',
+      text: 'Architecture',
+      marquee: 'Architecture · Coming Soon · Distributed Topologies & Visual Models ·',
       onClick: () => {
         setIsMenuOpen(false);
-        toast.info('Architecture Atlas — Coming Soon', {
+        toast.info('Architecture — Coming Soon', {
           description: 'Interactive visual system topologies & distributed system maps dropping in Q1 2027.',
-        });
-      },
-    },
-    {
-      label: 'System Invariants',
-      ariaLabel: 'Formal System Invariants',
-      onClick: () => {
-        setIsMenuOpen(false);
-        toast.info('Formal Invariants Guide — Coming Soon', {
-          description: 'Formal proofs and systems safety invariants coming in v1.0.',
         });
       },
     },
@@ -192,10 +182,10 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
         accentColor="#f59e0b"
         menuButtonColor="#f5f4f0"
         openMenuButtonColor="#f5f4f0"
-        items={staggeredMenuItems}
+        flowingItems={flowingMenuItems}
         socialItems={socialItems}
         displaySocials={true}
-        displayItemNumbering={true}
+        displayItemNumbering={false}
       />
     </>
   );

@@ -62,6 +62,12 @@
   grid-template-columns: auto 1fr auto;
 }
 
+.flowing-menu[data-no-index] .flowing-menu__link {
+  grid-template-columns: 1fr auto;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .flowing-menu__item[data-dimmed] .flowing-menu__link {
   opacity: 0.32;
 }
@@ -87,8 +93,8 @@
   justify-self: center;
   overflow: hidden;
   padding: 0.06em 0;
-  font-size: clamp(15px, 32cqh, 24px);
-  font-weight: 500;
+  font-size: clamp(24px, 36cqh, 36px);
+  font-weight: 600;
   line-height: 1.2;
   letter-spacing: -0.025em;
   white-space: nowrap;
@@ -161,8 +167,8 @@
 .flowing-menu__part-text {
   padding: 0 0.5em;
   font-family: var(--font-sans, sans-serif);
-  font-size: clamp(14px, calc(34cqh * var(--flowing-menu-band, 1)), 24px);
-  font-weight: 600;
+  font-size: clamp(20px, calc(36cqh * var(--flowing-menu-band, 1)), 34px);
+  font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.025em;
   white-space: nowrap;

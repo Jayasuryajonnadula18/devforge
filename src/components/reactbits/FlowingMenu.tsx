@@ -595,6 +595,7 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
       aria-label={ariaLabel}
       data-align={align === 'left' ? 'left' : 'center'}
       data-shape={shape}
+      data-no-index={!showIndex ? '' : undefined}
     >
       <ul ref={listRef} className={LIST} onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
         {items.map((item, index) => {
@@ -602,9 +603,11 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
           const handlers = linkHandlers(item, index);
           const content = (
             <>
-              <span className={INDEX} data-intro-fade="" aria-hidden="true">
-                {showIndex ? String(index + 1).padStart(2, '0') : null}
-              </span>
+              {showIndex ? (
+                <span className={INDEX} data-intro-fade="" aria-hidden="true">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+              ) : null}
               <span className={LABEL}>
                 <span className={LABEL_TEXT} data-intro-line="">
                   {item.text}
