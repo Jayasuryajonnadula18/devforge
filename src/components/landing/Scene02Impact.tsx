@@ -92,7 +92,7 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     // =========================================================================
     // 2. Cinematic Lighting Rig (Three-point studio lighting with high specular reflections)
     // =========================================================================
-    const ambientLight = new THREE.AmbientLight(0x1a2230, 1.8);
+    const ambientLight = new THREE.AmbientLight(0x242a32, 1.8);
     scene.add(ambientLight);
 
     // Scene 02 Forge Key Light
@@ -105,18 +105,18 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     forgeKeyLight.shadow.camera.far = 14;
     scene.add(forgeKeyLight);
 
-    // Front-Fill Light: reveals dimensional anvil waist, horn, and plate contours
-    const frontFillLight = new THREE.DirectionalLight(0x9ab2d5, 2.6);
+    // Front-Fill Light: reveals dimensional anvil waist, horn, and plate contours in clean metallic tone
+    const frontFillLight = new THREE.DirectionalLight(0xb4bcc8, 2.4);
     frontFillLight.position.set(1.0, 1.8, 6.0);
     scene.add(frontFillLight);
 
     // Upward Ground Bounce Light: lifts shadows on anvil base, stepped foot, and lower fragments
-    const groundBounceLight = new THREE.DirectionalLight(0x607898, 1.8);
+    const groundBounceLight = new THREE.DirectionalLight(0x505762, 1.6);
     groundBounceLight.position.set(1.0, -2.5, 3.5);
     scene.add(groundBounceLight);
 
-    // Cool Rim Light
-    const coolRimLight = new THREE.DirectionalLight(0xdce7f5, 3.8);
+    // Clean Metallic Rim Light
+    const coolRimLight = new THREE.DirectionalLight(0xd4dade, 3.6);
     coolRimLight.position.set(4.0, 4.5, -3.5);
     scene.add(coolRimLight);
 
@@ -170,25 +170,25 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     scene.add(solidAnvilGroup);
 
     const solidFaceMat = new THREE.MeshStandardMaterial({
-      color: 0xa8b8cd,
+      color: 0x48525c, // Milled Gunmetal Face
       map: brushed.diffuse,
       roughnessMap: brushed.roughness,
       bumpMap: brushed.bump,
       bumpScale: 0.008,
-      roughness: 0.18,
-      metalness: 0.88,
-      envMapIntensity: 1.5,
+      roughness: 0.20,
+      metalness: 0.92,
+      envMapIntensity: 1.55,
       transparent: true,
       opacity: 0,
     });
     const solidBodyMat = new THREE.MeshStandardMaterial({
-      color: 0x7688a0,
+      color: 0x2b323a, // Cast Gunmetal Body
       map: castIron.diffuse,
       roughnessMap: castIron.roughness,
       bumpMap: castIron.bump,
       bumpScale: 0.015,
-      roughness: 0.32,
-      metalness: 0.74,
+      roughness: 0.34,
+      metalness: 0.82,
       envMapIntensity: 1.35,
       transparent: true,
       opacity: 0,
@@ -248,26 +248,26 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     scene.add(hammerPivot);
 
     const hammerHeadMat = new THREE.MeshStandardMaterial({
-      color: 0x64748b,
+      color: 0x2b323a, // Cast Gunmetal Sledge
       map: castIron.diffuse,
       roughnessMap: castIron.roughness,
       bumpMap: castIron.bump,
       bumpScale: 0.012,
-      roughness: 0.32,
+      roughness: 0.34,
       metalness: 0.82,
-      envMapIntensity: 1.20,
+      envMapIntensity: 1.35,
       transparent: true,
       opacity: 0,
     });
     const hammerStrikeFaceMat = new THREE.MeshStandardMaterial({
-      color: 0xb5c6db,
+      color: 0x48525c, // Milled Gunmetal Strike Face
       map: brushed.diffuse,
       roughnessMap: brushed.roughness,
       bumpMap: brushed.bump,
       bumpScale: 0.008,
-      roughness: 0.16,
-      metalness: 0.95,
-      envMapIntensity: 1.45,
+      roughness: 0.18,
+      metalness: 0.94,
+      envMapIntensity: 1.55,
       transparent: true,
       opacity: 0,
     });

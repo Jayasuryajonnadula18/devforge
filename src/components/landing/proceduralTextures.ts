@@ -5,7 +5,7 @@ import * as THREE from 'three';
  * Generated purely via HTML5 2D Canvas — 0 external asset requests, zero network latency.
  */
 
-// 1. Brushed Milled Steel Texture (Hairline CNC grinding striations)
+// 1. Brushed Gunmetal Steel Texture (Hairline CNC grinding striations in authentic gunmetal)
 export function createBrushedSteelTexture(size = 512): {
   diffuse: THREE.CanvasTexture;
   roughness: THREE.CanvasTexture;
@@ -16,19 +16,19 @@ export function createBrushedSteelTexture(size = 512): {
   canvas.height = size;
   const ctx = canvas.getContext('2d')!;
 
-  // Base metal gray
-  ctx.fillStyle = '#8a97a8';
+  // Base authentic gunmetal gray (#384048)
+  ctx.fillStyle = '#384048';
   ctx.fillRect(0, 0, size, size);
 
-  // Hairline milling striations
+  // Hairline milling striations with neutral metallic graphite highlights
   for (let i = 0; i < 1800; i++) {
     const y = Math.random() * size;
     const len = size * (0.3 + Math.random() * 0.7);
     const x = Math.random() * size;
-    const brightness = Math.floor(115 + Math.random() * 70);
-    const alpha = 0.04 + Math.random() * 0.08;
+    const brightness = Math.floor(70 + Math.random() * 55);
+    const alpha = 0.05 + Math.random() * 0.09;
 
-    ctx.strokeStyle = `rgba(${brightness}, ${brightness + 4}, ${brightness + 10}, ${alpha})`;
+    ctx.strokeStyle = `rgba(${brightness}, ${brightness + 2}, ${brightness + 4}, ${alpha})`;
     ctx.lineWidth = 0.5 + Math.random() * 1.2;
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -45,14 +45,14 @@ export function createBrushedSteelTexture(size = 512): {
   roughCanvas.width = size;
   roughCanvas.height = size;
   const rCtx = roughCanvas.getContext('2d')!;
-  rCtx.fillStyle = '#3a3a3a'; // Base low roughness (glossy milled)
+  rCtx.fillStyle = '#3c3c3c'; // Low roughness (semi-gloss gunmetal sheen)
   rCtx.fillRect(0, 0, size, size);
 
   for (let i = 0; i < 1200; i++) {
     const y = Math.random() * size;
     const len = size * (0.2 + Math.random() * 0.8);
     const x = Math.random() * size;
-    const val = Math.floor(45 + Math.random() * 65);
+    const val = Math.floor(40 + Math.random() * 50);
     rCtx.strokeStyle = `rgba(${val}, ${val}, ${val}, 0.12)`;
     rCtx.lineWidth = 0.8 + Math.random() * 1.5;
     rCtx.beginPath();
@@ -65,12 +65,12 @@ export function createBrushedSteelTexture(size = 512): {
   roughness.wrapS = THREE.RepeatWrapping;
   roughness.wrapT = THREE.RepeatWrapping;
 
-  const bump = diffuse; // Can share high-frequency hairline bump
+  const bump = diffuse;
 
   return { diffuse, roughness, bump };
 }
 
-// 2. Cast Forged Iron Texture (Heavy industrial cast micro-pebble stipple)
+// 2. Cast Gunmetal Texture (Heavy industrial forged gunmetal micro-pebble stipple)
 export function createCastIronTexture(size = 512): {
   diffuse: THREE.CanvasTexture;
   roughness: THREE.CanvasTexture;
@@ -81,19 +81,19 @@ export function createCastIronTexture(size = 512): {
   canvas.height = size;
   const ctx = canvas.getContext('2d')!;
 
-  // Base cast slate-steel
-  ctx.fillStyle = '#475569';
+  // Base dark cast gunmetal (#262c33)
+  ctx.fillStyle = '#262c33';
   ctx.fillRect(0, 0, size, size);
 
-  // High-frequency stipple noise for authentic cast iron texture
+  // High-frequency stipple noise for authentic cast gunmetal surface
   const imgData = ctx.getImageData(0, 0, size, size);
   const data = imgData.data;
 
   for (let i = 0; i < data.length; i += 4) {
-    const noise = (Math.random() - 0.5) * 36;
+    const noise = (Math.random() - 0.5) * 28;
     data[i] = Math.min(255, Math.max(0, data[i] + noise));
-    data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise + 2));
-    data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise + 6));
+    data[i + 1] = Math.min(255, Math.max(0, data[i + 1] + noise + 1));
+    data[i + 2] = Math.min(255, Math.max(0, data[i + 2] + noise + 2));
   }
   ctx.putImageData(imgData, 0, 0);
 
@@ -178,20 +178,20 @@ export function createHickoryHardwoodTexture(size = 512): {
   return { diffuse, roughness };
 }
 
-// 4. Studio Environment Gradient Map (Simulates softbox studio lighting on metallic surfaces)
+// 4. Studio Environment Gradient Map (Simulates softbox studio lighting on gunmetal metallic surfaces)
 export function createStudioEnvironment(size = 512): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d')!;
 
-  // Smooth vertical studio gradient (cool ambient sky, bright white softbox strip, dark grounded floor)
+  // Smooth vertical studio gradient (neutral gunmetal ambient sky, bright white softbox strip, deep grounded floor)
   const grad = ctx.createLinearGradient(0, 0, 0, size);
-  grad.addColorStop(0.0, '#3a4b60'); // Soft sky fill
+  grad.addColorStop(0.0, '#222830'); // Neutral dark gunmetal sky fill
   grad.addColorStop(0.35, '#ffffff'); // Primary overhead softbox
-  grad.addColorStop(0.50, '#94a7bd'); // Horizon fill
-  grad.addColorStop(0.70, '#1a202c'); // Ground shadow transition
-  grad.addColorStop(1.0, '#0a0d14'); // Studio floor
+  grad.addColorStop(0.50, '#58626d'); // Gunmetal horizon fill
+  grad.addColorStop(0.70, '#161a1f'); // Ground shadow transition
+  grad.addColorStop(1.0, '#0a0c0e'); // Studio floor
 
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, size, size);

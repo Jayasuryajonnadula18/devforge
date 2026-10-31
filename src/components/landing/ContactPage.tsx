@@ -398,12 +398,12 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           </h1>
         </div>
 
-        {/* Row 2: Genuine DevForge Info Row */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-5 sm:py-7 items-end border-b border-white/[0.05]">
+        {/* Row 2: Genuine DevForge Info Row — Perfectly Leveled Columns */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-5 sm:py-7 items-start border-b border-white/[0.05]">
           
           {/* Left: Open Source Platform Info */}
-          <div className="md:col-span-4 space-y-2 text-xs sm:text-sm font-sans text-neutral-400 select-none">
-            <span className="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold block">
+          <div className="md:col-span-4 select-none">
+            <span className="text-[11px] font-sans uppercase tracking-wider text-neutral-400 font-semibold block mb-2.5 leading-none">
               Creator & Maintainer
             </span>
             <p className="text-neutral-300 leading-relaxed text-xs sm:text-sm">
@@ -411,9 +411,9 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
             </p>
           </div>
 
-          {/* Center: Inquiries & Contributions */}
-          <div className="md:col-span-5 text-left space-y-1.5 select-none">
-            <span className="text-[11px] font-sans uppercase tracking-widest text-neutral-400 font-medium">
+          {/* Center: Inquiries & Coordinates */}
+          <div className="md:col-span-5 text-left select-none">
+            <span className="text-[11px] font-sans uppercase tracking-wider text-neutral-400 font-semibold block mb-2.5 leading-none">
               Direct Contact & Coordinates
             </span>
             <p className="text-xs sm:text-sm text-neutral-300 leading-relaxed max-w-sm">
@@ -422,28 +422,30 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           </div>
 
           {/* Right: Real Project Channels */}
-          <div className="md:col-span-3 flex md:flex-col items-start md:items-end justify-start gap-3 text-xs font-sans uppercase tracking-wider text-neutral-400">
-            <span className="text-[11px] text-neutral-500 font-mono hidden md:block">
+          <div className="md:col-span-3 flex md:flex-col items-start md:items-end justify-start select-none text-xs font-sans uppercase tracking-wider text-neutral-400">
+            <span className="text-[11px] text-neutral-500 font-mono hidden md:block mb-2.5 leading-none">
               MANGALAGIRI · AP · INDIA
             </span>
-            <a
-              href="https://github.com/Jayasuryajonnadula18/devforge"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white transition-colors inline-flex items-center space-x-1"
-            >
-              <span>GitHub</span>
-              <ArrowUpRight className="w-3 h-3 text-neutral-500" />
-            </a>
-            <a
-              href="https://github.com/Jayasuryajonnadula18/devforge/discussions"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-white transition-colors inline-flex items-center space-x-1"
-            >
-              <span>Discussions</span>
-              <ArrowUpRight className="w-3 h-3 text-neutral-500" />
-            </a>
+            <div className="flex items-center md:items-end flex-wrap gap-4 md:gap-2">
+              <a
+                href="https://github.com/Jayasuryajonnadula18/devforge"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors inline-flex items-center space-x-1"
+              >
+                <span>GitHub</span>
+                <ArrowUpRight className="w-3 h-3 text-neutral-500" />
+              </a>
+              <a
+                href="https://github.com/Jayasuryajonnadula18/devforge/discussions"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors inline-flex items-center space-x-1"
+              >
+                <span>Discussions</span>
+                <ArrowUpRight className="w-3 h-3 text-neutral-500" />
+              </a>
+            </div>
           </div>
         </div>
 

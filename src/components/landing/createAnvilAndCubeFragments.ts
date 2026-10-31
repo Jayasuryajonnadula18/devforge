@@ -58,28 +58,28 @@ export function buildAnvilAndCubeFragments(
   cubeGroup.rotation.set(0.38, -0.68, 0.12);
   cubeGroup.position.set(0, 0.15, 0);
 
-  // Precision-machined PBR materials: bright forged titanium with hairline brushed & cast textures
+  // Precision-machined PBR materials: authentic gunmetal finish with hairline brushed & cast textures
   const faceMat = new THREE.MeshStandardMaterial({
-    color: 0x9fb0c5,
+    color: 0x48525c, // Milled Gunmetal
     map: textures?.brushedDiffuse,
     roughnessMap: textures?.brushedRoughness,
     bumpMap: textures?.brushedBump,
     bumpScale: 0.008,
-    roughness: 0.18,
-    metalness: 0.88,
-    envMapIntensity: 1.45,
+    roughness: 0.20,
+    metalness: 0.92,
+    envMapIntensity: 1.55,
     transparent: true,
   });
 
   const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0x64758d,
+    color: 0x2b323a, // Cast Gunmetal
     map: textures?.castDiffuse,
     roughnessMap: textures?.castRoughness,
     bumpMap: textures?.castBump,
     bumpScale: 0.014,
-    roughness: 0.30,
-    metalness: 0.78,
-    envMapIntensity: 1.25,
+    roughness: 0.34,
+    metalness: 0.82,
+    envMapIntensity: 1.35,
     transparent: true,
   });
 
