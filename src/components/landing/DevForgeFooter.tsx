@@ -19,6 +19,7 @@ interface DevForgeFooterProps {
   onSelectProject?: (project: ProjectTrack) => void;
   onSelectInitialProject?: () => void;
   onOpenCourses?: () => void;
+  onOpenContact?: () => void;
 }
 
 export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
@@ -26,6 +27,7 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
   onSelectProject,
   onSelectInitialProject,
   onOpenCourses,
+  onOpenContact,
 }) => {
   const [email, setEmail] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -94,6 +96,14 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
       onOpenCourses();
     } else if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('devforge:open-courses'));
+    }
+  };
+
+  const handleOpenContact = () => {
+    if (onOpenContact) {
+      onOpenContact();
+    } else if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('devforge:open-contact'));
     }
   };
 
@@ -272,7 +282,15 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
               <ul className="space-y-2.5 text-neutral-300" role="list">
                 {CONNECT_GROUP.items.map((item) => (
                   <li key={item.id}>
-                    {item.status === 'external' && item.href ? (
+                    {item.id === 'contact' ? (
+                      <button
+                        type="button"
+                        onClick={handleOpenContact}
+                        className="hover:text-white transition-colors cursor-pointer text-left block"
+                      >
+                        {item.label}
+                      </button>
+                    ) : item.status === 'external' && item.href ? (
                       <a
                         href={item.href}
                         target="_blank"

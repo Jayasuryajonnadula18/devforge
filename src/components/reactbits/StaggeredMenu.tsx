@@ -180,21 +180,20 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       panelInsertTime
     );
 
-    // Stagger animation for flowing menu items
+    // Stagger animation for flowing menu items (fade only to prevent coordinate metric collisions)
     const flowingItems = Array.from(panel.querySelectorAll('.flowing-menu__item'));
     if (flowingItems.length) {
-      gsap.set(flowingItems, { y: 28, opacity: 0 });
+      gsap.set(flowingItems, { opacity: 0 });
       tl.to(
         flowingItems,
         {
-          y: 0,
           opacity: 1,
-          duration: 0.65,
-          ease: 'power3.out',
-          stagger: 0.08,
-          clearProps: 'transform,opacity',
+          duration: 0.45,
+          ease: 'power2.out',
+          stagger: 0.05,
+          clearProps: 'opacity',
         },
-        panelInsertTime + 0.12
+        panelInsertTime + 0.08
       );
     }
 
@@ -248,7 +247,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       overwrite: 'auto',
       onComplete: () => {
         const flowingItems = Array.from(panel.querySelectorAll('.flowing-menu__item'));
-        if (flowingItems.length) gsap.set(flowingItems, { y: 28, opacity: 0 });
+        if (flowingItems.length) gsap.set(flowingItems, { opacity: 0 });
         busyRef.current = false;
         setInternalView('main');
       },
@@ -470,7 +469,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 className="flex flex-col h-full justify-between gap-6 select-none"
               >
                 {/* FlowingMenu from React Bits */}
-                <div style={{ height: '560px', position: 'relative' }} className="w-full my-auto">
+                <div style={{ height: '460px', position: 'relative' }} className="w-full my-auto">
                   <FlowingMenu
                     items={resolvedFlowingItems}
                     speed={60}
@@ -481,6 +480,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                     bgColor="transparent"
                     marqueeBgColor="#ffffff"
                     marqueeTextColor="#120F17"
+                    dividers={false}
+                    intro={false}
                   />
                 </div>
 
@@ -503,6 +504,18 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                     >
                       Philosophy
                     </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeMenu();
+                        if (typeof window !== 'undefined') {
+                          window.dispatchEvent(new CustomEvent('devforge:open-contact'));
+                        }
+                      }}
+                      className="hover:text-white transition-colors cursor-pointer"
+                    >
+                      Contact
+                    </button>
                     <button
                       type="button"
                       onClick={() => triggerComingSoonToast('Terms', 'Official terms and licensing documentation are in preparation.')}

@@ -25,14 +25,7 @@
 }
 
 .flowing-menu__divider {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 1px;
-  background: var(--flowing-menu-border, rgba(255, 255, 255, 0.14));
-  transform-origin: left center;
-  pointer-events: none;
+  display: none !important;
 }
 
 .flowing-menu__link {
@@ -86,7 +79,7 @@
   justify-self: center;
   overflow: hidden;
   padding: 0.06em 0;
-  font-size: clamp(16px, 40cqh, 140px);
+  font-size: clamp(22px, 30cqh, 42px);
   font-weight: 500;
   line-height: 1.1;
   letter-spacing: -0.035em;
@@ -156,7 +149,7 @@
 
 .flowing-menu__part-text {
   padding: 0 0.4em;
-  font-size: clamp(14px, calc(38cqh * var(--flowing-menu-band, 1)), 130px);
+  font-size: clamp(20px, calc(30cqh * var(--flowing-menu-band, 1)), 40px);
   font-weight: 400;
   line-height: 1.1;
   letter-spacing: -0.025em;
@@ -166,7 +159,8 @@
 .flowing-menu__image {
   display: block;
   flex-shrink: 0;
-  height: calc(56cqh * var(--flowing-menu-band, 1));
+  height: calc(44cqh * var(--flowing-menu-band, 1));
+  max-height: 40px;
   aspect-ratio: 2.2 / 1;
   margin: 0 calc(3.5cqh * var(--flowing-menu-band, 1));
   border-radius: 999px;

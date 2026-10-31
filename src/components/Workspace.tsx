@@ -12,10 +12,11 @@ import { TerminalOutput } from './RightPanel/TerminalOutput';
 import { CatalogView } from './CatalogView';
 import { CommandPalette } from './CommandPalette';
 import { ExploreComingSoon } from './landing/ExploreComingSoon';
+import { ContactPage } from './landing/ContactPage';
 import { PROJECTS } from '../data/projects';
 
 export const Workspace: React.FC = () => {
-  const [viewMode, setViewMode] = useState<'catalog' | 'studio'>('catalog');
+  const [viewMode, setViewMode] = useState<'catalog' | 'studio' | 'contact'>('catalog');
   const [currentProject, setCurrentProject] = useState<ProjectTrack>(PROJECTS[0]);
   const [activeFileName, setActiveFileName] = useState<string>(PROJECTS[0].initialFiles[0].name);
   const [files, setFiles] = useState<ProjectFile[]>(PROJECTS[0].initialFiles);
@@ -222,6 +223,13 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out`;
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [viewMode, handleRunTests]);
 
+  // Global event listener for opening contact page
+  useEffect(() => {
+    const handleOpenContact = () => setViewMode('contact');
+    window.addEventListener('devforge:open-contact', handleOpenContact);
+    return () => window.removeEventListener('devforge:open-contact', handleOpenContact);
+  }, []);
+
   return (
     <>
       {/* Universal Command Palette */}
@@ -252,7 +260,19 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out`;
               completedMilestones={completedMilestonesMap}
               onSelectProject={handleSelectProject}
               onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+              onOpenContact={() => setViewMode('contact')}
             />
+          </motion.div>
+        ) : viewMode === 'contact' ? (
+          <motion.div
+            key="contact"
+            initial={{ opacity: 0, scale: 0.995 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.995 }}
+            transition={{ duration: 0.2 }}
+            className="min-h-screen w-full bg-[#050608]"
+          >
+            <ContactPage onBack={() => setViewMode('catalog')} />
           </motion.div>
         ) : (
           <motion.div

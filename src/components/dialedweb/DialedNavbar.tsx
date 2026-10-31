@@ -15,6 +15,7 @@ interface DialedNavbarProps {
   onSelectProject?: (project: ProjectTrack) => void;
   onSelectInitialProject: () => void;
   onResetFilter?: () => void;
+  onOpenContact?: () => void;
 }
 
 export const DialedNavbar: React.FC<DialedNavbarProps> = ({
@@ -23,6 +24,7 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
   onSelectProject,
   onSelectInitialProject,
   onResetFilter,
+  onOpenContact,
 }) => {
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -159,12 +161,11 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
               {/* Contact */}
               <button
                 type="button"
-                onClick={() => {
-                  triggerComingSoonToast(
-                    'Contact',
-                    'Direct engineering contact and partnership channel is opening soon.'
-                  );
-                }}
+                onClick={onOpenContact || (() => {
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('devforge:open-contact'));
+                  }
+                })}
                 className="text-white/70 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 cursor-pointer"
               >
                 Contact

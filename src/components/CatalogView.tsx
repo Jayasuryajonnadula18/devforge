@@ -15,6 +15,7 @@ interface CatalogViewProps {
   completedMilestones: Record<string, number[]>;
   onSelectProject: (project: ProjectTrack) => void;
   onOpenCommandPalette?: () => void;
+  onOpenContact?: () => void;
 }
 
 export const CatalogView: React.FC<CatalogViewProps> = ({
@@ -22,6 +23,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
   completedMilestones,
   onSelectProject,
   onOpenCommandPalette,
+  onOpenContact,
 }) => {
   const heroRef = useRef<HTMLDivElement>(null);
 
@@ -130,6 +132,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           onSelectProject={onSelectProject}
           onSelectInitialProject={() => onSelectProject(pythonProjects[0] || projects[0])}
           onResetFilter={() => {}}
+          onOpenContact={onOpenContact}
         />
 
         {/* ================= SCENE 01: FULL-SCREEN MONUMENTAL HERO ================= */}
@@ -178,6 +181,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
           projects={projects}
           onSelectProject={onSelectProject}
           onSelectInitialProject={() => onSelectProject(pythonProjects[0] || projects[0])}
+          onOpenContact={onOpenContact}
         />
 
       </div>
