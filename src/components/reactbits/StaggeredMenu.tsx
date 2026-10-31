@@ -145,27 +145,29 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
     const tl = gsap.timeline({ paused: true });
 
+    gsap.set(panel, { pointerEvents: 'none' });
+
     layerStates.forEach((ls, i) => {
-      tl.fromTo(ls.el, { xPercent: ls.start }, { xPercent: 0, duration: 0.5, ease: 'power4.out' }, i * 0.07);
+      tl.fromTo(ls.el, { xPercent: ls.start }, { xPercent: 0, duration: 0.35, ease: 'power3.out' }, i * 0.04);
     });
-    const lastTime = layerStates.length ? (layerStates.length - 1) * 0.07 : 0;
-    const panelInsertTime = lastTime + (layerStates.length ? 0.08 : 0);
-    const panelDuration = 0.65;
+    const lastTime = layerStates.length ? (layerStates.length - 1) * 0.04 : 0;
+    const panelInsertTime = lastTime + (layerStates.length ? 0.04 : 0);
+    const panelDuration = 0.38;
     tl.fromTo(
       panel,
       { xPercent: panelStart },
-      { xPercent: 0, duration: panelDuration, ease: 'power4.out' },
+      { xPercent: 0, duration: panelDuration, ease: 'power3.out' },
       panelInsertTime
     );
 
     if (socialTitle || socialLinks.length) {
-      const socialsStart = panelInsertTime + panelDuration * 0.4;
+      const socialsStart = panelInsertTime + panelDuration * 0.3;
       if (socialTitle) {
         tl.to(
           socialTitle,
           {
             opacity: 1,
-            duration: 0.5,
+            duration: 0.3,
             ease: 'power2.out'
           },
           socialsStart
@@ -177,14 +179,14 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
           {
             y: 0,
             opacity: 1,
-            duration: 0.55,
+            duration: 0.35,
             ease: 'power3.out',
-            stagger: { each: 0.08, from: 'start' },
+            stagger: { each: 0.05, from: 'start' },
             onComplete: () => {
               gsap.set(socialLinks, { clearProps: 'opacity' });
             }
           },
-          socialsStart + 0.04
+          socialsStart + 0.02
         );
       }
     }
@@ -196,10 +198,14 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   const playOpen = useCallback(() => {
     if (busyRef.current) return;
     busyRef.current = true;
+    const panel = panelRef.current;
+    if (panel) gsap.set(panel, { pointerEvents: 'none' });
+
     const tl = buildOpenTimeline();
     if (tl) {
       tl.eventCallback('onComplete', () => {
         busyRef.current = false;
+        if (panel) gsap.set(panel, { pointerEvents: 'auto' });
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new Event('resize'));
         }
@@ -207,6 +213,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       tl.play(0);
     } else {
       busyRef.current = false;
+      if (panel) gsap.set(panel, { pointerEvents: 'auto' });
     }
   }, [buildOpenTimeline]);
 
@@ -387,10 +394,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
             {currentView === 'main' ? (
               <motion.div
                 key="main-view"
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -16 }}
-                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
                 className="flex flex-col h-full justify-between"
               >
                 {/* FlowingMenu from React Bits */}
@@ -434,10 +441,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
               /* Subview: Minimalist Coming Soon View */
               <motion.div
                 key="courses-view"
-                initial={{ opacity: 0, x: 16 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 16 }}
-                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
                 className="flex flex-col h-full justify-between py-2 select-none"
               >
                 <div className="space-y-8">
