@@ -22,10 +22,17 @@
   min-height: 56px;
   overflow: hidden;
   container-type: size;
+  border: none !important;
+  outline: none !important;
 }
 
 .flowing-menu__divider {
   display: none !important;
+  opacity: 0 !important;
+  height: 0 !important;
+  width: 0 !important;
+  border: none !important;
+  pointer-events: none !important;
 }
 
 .flowing-menu__link {

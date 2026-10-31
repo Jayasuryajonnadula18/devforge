@@ -110,10 +110,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
               {/* Headline */}
               <div className="space-y-4 max-w-3xl">
                 <h1 className="font-rector text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.05]">
-                  Let’s engineer something{' '}
-                  <span className="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-white to-neutral-300">
-                    real.
-                  </span>
+                  Let’s engineer something <span className="italic font-normal text-white">real.</span>
                 </h1>
                 <p className="text-base sm:text-lg text-neutral-400 leading-relaxed font-sans pt-1">
                   Have an architecture question, systems project, or collaboration in mind? Reach out directly to our core team.
@@ -127,7 +124,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                   <span className="block text-xs font-sans uppercase tracking-wider text-neutral-400 font-semibold">
                     Topic of Discussion
                   </span>
-                  <div className="flex flex-wrap gap-x-8 gap-y-3">
+                  <div className="flex flex-wrap gap-2.5">
                     {INQUIRY_AREAS.map((area) => {
                       const isActive = selectedArea === area;
                       return (
@@ -135,10 +132,10 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                           key={area}
                           type="button"
                           onClick={() => setSelectedArea(area)}
-                          className={`text-sm sm:text-base font-sans transition-colors cursor-pointer pb-1 border-b ${
+                          className={`text-sm font-sans px-4 py-2 rounded-full transition-all cursor-pointer ${
                             isActive
-                              ? 'text-white border-amber-400 font-medium'
-                              : 'text-neutral-500 border-transparent hover:text-neutral-300'
+                              ? 'bg-white text-black font-medium'
+                              : 'bg-white/[0.04] text-neutral-400 hover:text-white hover:bg-white/[0.08] border border-white/[0.06]'
                           }`}
                         >
                           {area}
@@ -221,7 +218,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                   </span>
                   <a
                     href="mailto:engineering@devforge.org"
-                    className="text-base text-white hover:text-amber-200 transition-colors block"
+                    className="text-base text-white hover:text-neutral-300 transition-colors block"
                   >
                     engineering@devforge.org
                   </a>

@@ -227,8 +227,10 @@ export function FlowingMenu({
       } else {
         const side = Math.min(s.bandInset, Math.max(0, m.height / 2 - 2));
         const radius = Math.min(s.bandRadius, height / 2, Math.max(0, (row.item?.clientWidth ?? 0) / 2 - side));
+        const clipTop = Math.max(0, b.top - m.top);
+        const clipBottom = Math.max(0, m.top + m.height - b.bottom);
         row.band.style.visibility = 'visible';
-        row.band.style.clipPath = `inset(${(b.top - m.top).toFixed(2)}px ${side}px ${(m.top + m.height - b.bottom).toFixed(2)}px ${side}px round ${radius.toFixed(2)}px)`;
+        row.band.style.clipPath = `inset(${clipTop.toFixed(2)}px ${side}px ${clipBottom.toFixed(2)}px ${side}px round ${radius.toFixed(2)}px)`;
         state.covered = (to - from) / m.height > 0.04;
       }
       if (row.track) row.track.style.transform = `translate3d(${state.x.toFixed(2)}px, 0, 0)`;
@@ -574,6 +576,11 @@ export function FlowingMenu({
     c.t = now;
     const list = listRef.current;
     if (list) c.y = event.clientY - list.getBoundingClientRect().top;
+
+    if (!metrics.current.length || !metrics.current[0] || metrics.current[0].height === 0) {
+      measure();
+    }
+
     const index = rowAt(event.clientY);
     if (index >= 0 && index !== band.current.index) goTo(index, halfOf(event.clientY, index));
     else kick();
@@ -661,8 +668,14 @@ export function FlowingMenu({
                 const half = halfOf(e.clientY, index);
                 goTo(index, half);
               }}
+              onMouseMove={(e) => {
+                if (band.current.index !== index) {
+                  const half = halfOf(e.clientY, index);
+                  goTo(index, half);
+                }
+              }}
             >
-              {dividers && index > 0 && <span className={DIVIDER} data-intro-rule="" aria-hidden="true" />}
+              {dividers && index > 0 && false && <span className={DIVIDER} data-intro-rule="" aria-hidden="true" />}
               {item.link ? (
                 <a className={LINK} href={item.link} aria-current={active ? 'page' : undefined} {...handlers}>
                   {content}

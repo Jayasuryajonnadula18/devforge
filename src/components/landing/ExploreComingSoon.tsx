@@ -60,14 +60,11 @@ export const ExploreComingSoon: React.FC<ExploreComingSoonProps> = ({ onBack }) 
       <main className="flex-1 max-w-5xl mx-auto w-full px-6 sm:px-12 lg:px-20 py-16 lg:py-24 space-y-16">
         {/* Monumental Headline */}
         <div className="space-y-4 max-w-3xl">
-          <span className="block text-xs font-sans uppercase tracking-wider text-amber-400/90 font-semibold">
+          <span className="block text-xs font-sans uppercase tracking-wider text-neutral-400 font-semibold">
             Systems Lab
           </span>
           <h1 className="font-rector text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.05]">
-            Interactive sandboxes.{' '}
-            <span className="italic font-normal text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-white to-neutral-300">
-              Coming soon.
-            </span>
+            Interactive sandboxes. <span className="italic font-normal text-white">Coming soon.</span>
           </h1>
           <p className="text-base sm:text-lg text-neutral-400 leading-relaxed font-sans pt-1">
             We are engineering zero-dependency execution environments to study low-level systems architecture. Inspect state machines, execute custom bytecode, and explore memory layouts from first principles.

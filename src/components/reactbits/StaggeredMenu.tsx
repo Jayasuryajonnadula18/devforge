@@ -391,17 +391,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       data-position={position}
       data-open={open || undefined}
     >
-      <div ref={preLayersRef} className="sm-prelayers" aria-hidden="true">
-        {(() => {
-          const raw = colors && colors.length ? colors.slice(0, 4) : ['#180e08', '#2a150b', '#5c2912'];
-          let arr = [...raw];
-          if (arr.length >= 3) {
-            const mid = Math.floor(arr.length / 2);
-            arr.splice(mid, 1);
-          }
-          return arr.map((c, i) => <div key={i} className="sm-prelayer" style={{ background: c }} />);
-        })()}
-      </div>
+      {/* Pre-layers disabled for solid background */}
 
       {/* Standalone Toggle */}
       {!hideToggle && (
@@ -477,9 +467,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                     magnet={0.25}
                     followCursor={0.4}
                     textColor="#ffffff"
-                    bgColor="transparent"
+                    bgColor="#050608"
                     marqueeBgColor="#ffffff"
-                    marqueeTextColor="#120F17"
+                    marqueeTextColor="#050608"
                     dividers={false}
                     intro={false}
                   />
@@ -548,15 +538,15 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                   </button>
 
                   <div className="space-y-4 pt-4">
-                    <span className="text-xs font-mono uppercase tracking-widest text-amber-400/90 font-medium">
+                    <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 font-medium">
                       Curriculum
                     </span>
 
                     <h3 className="font-rector text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
-                      Coming <span className="italic font-normal text-amber-200/90">soon.</span>
+                      Coming <span className="italic font-normal text-white">soon.</span>
                     </h3>
 
-                    <p className="text-sm sm:text-base text-neutral-300/80 leading-relaxed font-sans max-w-sm pt-1">
+                    <p className="text-sm sm:text-base text-neutral-300 leading-relaxed font-sans max-w-sm pt-1">
                       We are currently engineering production-grade tracks on distributed consensus, compiler architecture, and kernel internals from first principles.
                     </p>
                   </div>
@@ -568,7 +558,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                       className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider text-neutral-300 hover:text-white transition-colors group"
                     >
                       <span>Explore the Foundation</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="w-3.5 h-3.5 text-neutral-400 group-hover:translate-x-1 transition-transform" />
                     </a>
                   </div>
                 </div>
@@ -594,20 +584,20 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                     onClick={() => setView('main')}
                     className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider text-neutral-400 hover:text-white transition-colors cursor-pointer group"
                   >
-                    <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform text-amber-400" />
+                    <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform text-neutral-400" />
                     <span>Back to Menu</span>
                   </button>
 
                   <div className="space-y-4 pt-4">
-                    <span className="text-xs font-mono uppercase tracking-widest text-amber-400/90 font-medium">
+                    <span className="text-xs font-mono uppercase tracking-widest text-neutral-400 font-medium">
                       Systems Lab
                     </span>
 
                     <h3 className="font-rector text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
-                      Coming <span className="italic font-normal text-amber-200/90">soon.</span>
+                      Coming <span className="italic font-normal text-white">soon.</span>
                     </h3>
 
-                    <p className="text-sm sm:text-base text-neutral-300/80 leading-relaxed font-sans max-w-sm pt-1">
+                    <p className="text-sm sm:text-base text-neutral-300 leading-relaxed font-sans max-w-sm pt-1">
                       Zero-dependency execution environments, consensus visualizers, and compiler execution sandboxes are under active development.
                     </p>
                   </div>
@@ -616,10 +606,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                     <button
                       type="button"
                       onClick={handleOpenStudio}
-                      className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider text-amber-300 hover:text-white transition-colors group cursor-pointer"
+                      className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider text-white hover:text-neutral-300 transition-colors group cursor-pointer"
                     >
                       <span>Open Full Lab Preview</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="w-3.5 h-3.5 text-neutral-400 group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>
                 </div>
