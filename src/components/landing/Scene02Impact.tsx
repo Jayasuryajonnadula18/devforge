@@ -110,11 +110,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     frontFillLight.position.set(1.0, 1.8, 6.0);
     scene.add(frontFillLight);
 
-    // Upward Ground Bounce Light: lifts shadows on anvil base, stepped foot, and lower fragments
-    const groundBounceLight = new THREE.DirectionalLight(0x505762, 1.6);
-    groundBounceLight.position.set(1.0, -2.5, 3.5);
-    scene.add(groundBounceLight);
-
     // Clean Metallic Rim Light
     const coolRimLight = new THREE.DirectionalLight(0xd4dade, 3.6);
     coolRimLight.position.set(4.0, 4.5, -3.5);
@@ -128,35 +123,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     const travelingLight = new THREE.PointLight(0xffffff, 0, 5.5);
     travelingLight.position.set(-0.45, 0.95, 0.5);
     scene.add(travelingLight);
-
-    // =========================================================================
-    // 3. Grounded Studio Reflector Floor
-    // =========================================================================
-    const floorGeo = new THREE.CircleGeometry(5.5, 64);
-    floorGeo.rotateX(-Math.PI / 2);
-    const floorMat = new THREE.MeshStandardMaterial({
-      color: 0x07090d,
-      roughness: 0.35,
-      metalness: 0.85,
-      transparent: true,
-      opacity: 0,
-    });
-    const floorMesh = new THREE.Mesh(floorGeo, floorMat);
-    floorMesh.position.set(0.5, -0.75, 0);
-    floorMesh.receiveShadow = true;
-    scene.add(floorMesh);
-
-    // Contact ambient shadow under cube/anvil
-    const shadowGeo = new THREE.PlaneGeometry(3.5, 3.5);
-    shadowGeo.rotateX(-Math.PI / 2);
-    const shadowMat = new THREE.MeshBasicMaterial({
-      color: 0x000000,
-      transparent: true,
-      opacity: 0,
-    });
-    const contactShadow = new THREE.Mesh(shadowGeo, shadowMat);
-    contactShadow.position.set(0, -0.74, 0);
-    scene.add(contactShadow);
 
     // =========================================================================
     // 4A. Authentic Solid London Anvil (100% Solid until Impact Strike)
@@ -500,8 +466,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
 
       // Initial States: Absolute Void & Zero Artifacts
       gsap.set(stage, { backgroundColor: '#050608' });
-      gsap.set(floorMat, { opacity: 0 });
-      gsap.set(contactShadow.material, { opacity: 0 });
       gsap.set(solidFaceMat, { opacity: 0 });
       gsap.set(solidBodyMat, { opacity: 0 });
       gsap.set(faceMat, { opacity: 1 });
@@ -565,8 +529,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
         trans.lookY = 0.25;
         gsap.set(solidAnvilGroup, { visible: false });
         gsap.set(anvilFragmentsGroup, { visible: true });
-        gsap.set(floorMat, { opacity: 0.85 });
-        gsap.set(contactShadow.material, { opacity: 0.45 });
         if (scene02TitleBoxRef.current) gsap.set(scene02TitleBoxRef.current, { opacity: 0 });
         if (scene03StageRef.current) gsap.set(scene03StageRef.current, { opacity: 1 });
         if (scene03HeadlineBoxRef.current) gsap.set(scene03HeadlineBoxRef.current, { opacity: 1, y: 0 });
@@ -580,7 +542,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       // Atmospheric emergence out of the void, specular light sweep across steel
       // =======================================================================
       masterTl.to([solidFaceMat, solidBodyMat], { opacity: 1.0, duration: 0.8, ease: 'power1.out' }, 0.4);
-      masterTl.to(floorMat, { opacity: 0.82, duration: 1.0, ease: 'power2.out' }, 0.6);
 
       // Focused specular sweep across the polished top face
       masterTl.to(travelingLight, { intensity: 5.2, duration: 0.4, ease: 'power2.out' }, 0.8);
@@ -731,7 +692,6 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
 
       // Warm Amber Rim Light flares up from below (from reference image)
       masterTl.to(warmRimLight, { intensity: 3.0, duration: 1.8, ease: 'power2.out' }, 7.2);
-      masterTl.to(contactShadow.material, { opacity: 0.40, duration: 1.8, ease: 'power2.out' }, 7.2);
 
       // =======================================================================
       // ACT 5: MONUMENTAL TYPOGRAPHY & MAGNETIC ASSEMBLY (8.8s → 12.2s)
@@ -789,9 +749,8 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
         masterTl.to(scene03SublineRef.current, { opacity: 0, y: -16, duration: 1.0, ease: 'power2.inOut' }, 14.8);
       }
 
-      // Smoothly dissolve the 3D cube and floor into the deep dark void
+      // Smoothly dissolve the 3D cube into the deep dark void
       masterTl.to([faceMat, bodyMat], { opacity: 0, duration: 1.4, ease: 'power2.inOut' }, 14.9);
-      masterTl.to([floorMat, contactShadow.material], { opacity: 0, duration: 1.2, ease: 'power2.inOut' }, 14.9);
       masterTl.to(warmRimLight, { intensity: 0, duration: 1.2, ease: 'power2.inOut' }, 14.9);
 
       // Camera gently draws back
