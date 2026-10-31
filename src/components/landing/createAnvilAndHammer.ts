@@ -28,16 +28,6 @@ export function buildAuthenticAnvilGeometries() {
   faceGeo.translate(-0.425, 0.79, 0);
   faceParts.push(cleanAttributes(faceGeo));
 
-  // Hardy Hole rim indentation (Square punching hole at x = -0.72)
-  const hardyGeo = new THREE.BoxGeometry(0.18, 0.08, 0.18);
-  hardyGeo.translate(-0.72, 0.86, 0);
-  faceParts.push(cleanAttributes(hardyGeo));
-
-  // Pritchel Hole rim indentation (Round punching hole at x = -1.08)
-  const pritchelGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.08, 16);
-  pritchelGeo.translate(-1.08, 0.86, 0);
-  faceParts.push(cleanAttributes(pritchelGeo));
-
   const faceMerged = BufferGeometryUtils.mergeGeometries(faceParts, false);
   faceMerged.computeVertexNormals();
 

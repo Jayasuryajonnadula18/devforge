@@ -147,16 +147,16 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     scene.add(solidAnvilGroup);
 
     const solidFaceMat = new THREE.MeshStandardMaterial({
-      color: 0x6e7b8f,
-      roughness: 0.22,
-      metalness: 0.88,
+      color: 0x3a424e,
+      roughness: 0.16,
+      metalness: 0.94,
       transparent: true,
       opacity: 0,
     });
     const solidBodyMat = new THREE.MeshStandardMaterial({
-      color: 0x2e3542,
-      roughness: 0.40,
-      metalness: 0.78,
+      color: 0x161920,
+      roughness: 0.28,
+      metalness: 0.88,
       transparent: true,
       opacity: 0,
     });
@@ -208,23 +208,23 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     scene.add(hammerPivot);
 
     const hammerHeadMat = new THREE.MeshStandardMaterial({
-      color: 0x363d4a,
-      roughness: 0.30,
-      metalness: 0.75,
+      color: 0x222731,
+      roughness: 0.22,
+      metalness: 0.88,
       transparent: true,
       opacity: 0,
     });
     const hammerStrikeFaceMat = new THREE.MeshStandardMaterial({
-      color: 0x768599,
-      roughness: 0.16,
-      metalness: 0.92,
+      color: 0x5a6678,
+      roughness: 0.12,
+      metalness: 0.96,
       transparent: true,
       opacity: 0,
     });
     const hammerWoodMat = new THREE.MeshStandardMaterial({
-      color: 0x9e7350,
-      roughness: 0.52,
-      metalness: 0.10,
+      color: 0x3d2b1f,
+      roughness: 0.58,
+      metalness: 0.05,
       transparent: true,
       opacity: 0,
     });

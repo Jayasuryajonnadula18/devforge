@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 
 export interface FragmentData {
   mesh: THREE.Mesh;
@@ -44,24 +45,24 @@ export function buildAnvilAndCubeFragments(ANVIL_X = 1.0, ANVIL_Y = -0.15): Anvi
   cubeGroup.rotation.set(0.38, -0.68, 0.12);
   cubeGroup.position.set(0, 0.15, 0);
 
-  // High-contrast PBR materials (matching reference image: dark forged steel with specular bevels)
+  // Precision-machined PBR materials: dark forged titanium with specular bevel chamfers
   const faceMat = new THREE.MeshStandardMaterial({
-    color: 0x4a5568,
-    roughness: 0.28,
-    metalness: 0.85,
+    color: 0x2e3440,
+    roughness: 0.18,
+    metalness: 0.94,
     transparent: true,
   });
 
   const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0x222730,
-    roughness: 0.38,
-    metalness: 0.78,
+    color: 0x161920,
+    roughness: 0.28,
+    metalness: 0.88,
     transparent: true,
   });
 
-  // Base unit geometry for each modular block in the 3x3x3 cube (size 0.52 with bevel margins)
+  // Base unit geometry for each modular block in the 3x3x3 cube (precision CNC beveled edges)
   const blockSize = 0.52;
-  const baseBoxGeo = new THREE.BoxGeometry(blockSize, blockSize, blockSize, 2, 2, 2);
+  const baseBoxGeo = new RoundedBoxGeometry(blockSize, blockSize, blockSize, 4, 0.032);
 
   // 1. Enumerate the 26 grid positions for a 3x3x3 cube (excluding internal center 0,0,0)
   const gridCoords: { ix: number; iy: number; iz: number }[] = [];
@@ -197,11 +198,11 @@ export function buildAnvilAndCubeFragments(ANVIL_X = 1.0, ANVIL_Y = -0.15): Anvi
     mesh.receiveShadow = true;
 
     // Subtle edge bevel line for the block seams (creates the modular puzzle aesthetic without CAD wireframes)
-    const edgesGeo = new THREE.EdgesGeometry(baseBoxGeo);
+    const edgesGeo = new THREE.EdgesGeometry(baseBoxGeo, 28);
     const edgeMat = new THREE.LineBasicMaterial({
-      color: 0x5a6578,
+      color: 0x6e8099,
       transparent: true,
-      opacity: 0.18,
+      opacity: 0.22,
     });
     const edgeLines = new THREE.LineSegments(edgesGeo, edgeMat);
     mesh.add(edgeLines);
