@@ -42,18 +42,81 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   const briefFormRef = useRef<HTMLDivElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Magnetic Cursor Follower (Le Fruit Studio Awwwards Interaction)
-  const cursorX = useMotionValue(600);
-  const cursorY = useMotionValue(400);
-  const springX = useSpring(cursorX, { stiffness: 450, damping: 28 });
-  const springY = useSpring(cursorY, { stiffness: 450, damping: 28 });
-
+  // Magnetic Cursor Follower with Collision-Aware Positioning
+  const pointerPosRef = useRef({ x: 600, y: 400 });
+  const isHoveringEmailRef = useRef(false);
   const [isHoveringEmail, setIsHoveringEmail] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
-  const followerX = useTransform(springX, (v) => v - (isHoveringEmail ? 92 : 38));
-  const followerY = useTransform(springY, (v) => v - (isHoveringEmail ? 92 : 38));
+  // Position motion values for the orb center
+  const targetOrbX = useMotionValue(600);
+  const targetOrbY = useMotionValue(400);
+
+  // Spring smoothing with calibrated damping to prevent bouncing / elastic jitter
+  const springX = useSpring(targetOrbX, { stiffness: 380, damping: 32, mass: 0.8 });
+  const springY = useSpring(targetOrbY, { stiffness: 380, damping: 32, mass: 0.8 });
+
+  // Collision-aware target computation: places orb in nearby open pocket, NEVER obscuring email or pointer
+  const updateOrbPosition = (clientX: number, clientY: number, hovering = isHoveringEmailRef.current) => {
+    pointerPosRef.current = { x: clientX, y: clientY };
+
+    if (!hovering) {
+      // Idle state: center directly on cursor
+      targetOrbX.set(clientX);
+      targetOrbY.set(clientY);
+      return;
+    }
+
+    // Contextual expanded state (over email):
+    // Collision-aware offset: Keep orb in open space, NEVER covering the email text or pointer!
+    const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1200;
+    const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 800;
+    const orbRadius = 90;
+    const margin = 24;
+
+    const emailRect = emailRef.current?.getBoundingClientRect();
+
+    let computedX = clientX;
+    let computedY = clientY;
+
+    if (emailRect) {
+      // Collision-aware placement: Strictly place the orb above the email bounding box
+      // Target Y center guarantees the bottom of the orb stays above emailRect.top
+      const gap = 16;
+      const spaceAbove = emailRect.top;
+
+      if (spaceAbove >= orbRadius * 2 + gap) {
+        // Float cleanly in the open negative space directly above email text
+        computedY = emailRect.top - (orbRadius + gap);
+      } else {
+        // If constrained above, float cleanly below email text
+        computedY = emailRect.bottom + (orbRadius + gap);
+      }
+
+      // Horizontally: offset 140px to the open side so the user's pointer is never covered
+      const isRightHalf = clientX > windowWidth / 2;
+      computedX = isRightHalf ? clientX - 140 : clientX + 140;
+    } else {
+      computedX = clientX - 140;
+      computedY = clientY - 140;
+    }
+
+    // Viewport clamping
+    const clampedX = Math.max(orbRadius + margin, Math.min(windowWidth - orbRadius - margin, computedX));
+    const clampedY = Math.max(orbRadius + margin, Math.min(windowHeight - orbRadius - margin, computedY));
+
+    targetOrbX.set(clampedX);
+    targetOrbY.set(clampedY);
+  };
+
+  // Follower transform: subtract radius so top-left tracks center
+  // Idle: width = 64px, radius = 32px
+  // Expanded: width = 180px, radius = 90px
+  const followerX = useTransform(springX, (v) => v - (isHoveringEmail ? 90 : 32));
+  const followerY = useTransform(springY, (v) => v - (isHoveringEmail ? 90 : 32));
 
   // Expandable Structured Brief Form
   const [showBriefForm, setShowBriefForm] = useState(false);
@@ -89,25 +152,41 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     return () => clearInterval(interval);
   }, []);
 
+  // Detect touch device and reduced motion preferences
+  useEffect(() => {
+    setIsTouchDevice(
+      'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0 ||
+      window.matchMedia('(pointer: coarse)').matches
+    );
+
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
   // Window-level mouse tracking for fixed follower lens
   useEffect(() => {
+    if (isTouchDevice) return;
+
     const handlePointerMove = (e: MouseEvent | PointerEvent) => {
-      cursorX.set(e.clientX);
-      cursorY.set(e.clientY);
+      updateOrbPosition(e.clientX, e.clientY);
       setCursorVisible(true);
     };
     const handlePointerLeave = () => {
       setCursorVisible(false);
     };
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('mousemove', handlePointerMove, { passive: true });
     document.addEventListener('mouseleave', handlePointerLeave);
     return () => {
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('mousemove', handlePointerMove);
       document.removeEventListener('mouseleave', handlePointerLeave);
     };
-  }, [cursorX, cursorY]);
+  }, [isTouchDevice, isHoveringEmail]);
 
   // Keyboard navigation: Escape key returns or closes brief form
   useEffect(() => {
@@ -124,19 +203,21 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showBriefForm, onBack]);
 
-  const handleCopyEmail = (e?: React.MouseEvent) => {
+  const handleCopyEmail = async (e?: React.MouseEvent) => {
     e?.preventDefault();
     e?.stopPropagation();
-    navigator.clipboard.writeText('engineering@devforge.org');
-    setCopiedEmail(true);
-    toast.success('Email Copied to Clipboard', {
-      description: 'engineering@devforge.org',
-    });
-    setTimeout(() => setCopiedEmail(false), 2400);
-
-    setTimeout(() => {
-      window.location.href = 'mailto:engineering@devforge.org?subject=DevForge%20Systems%20Architecture%20Inquiry';
-    }, 450);
+    try {
+      await navigator.clipboard.writeText('engineering@devforge.org');
+      setCopiedEmail(true);
+      toast.success('Email Copied to Clipboard', {
+        description: 'engineering@devforge.org',
+      });
+      setTimeout(() => setCopiedEmail(false), 2400);
+    } catch {
+      toast.error('Failed to copy email address', {
+        description: 'Please copy manually: engineering@devforge.org',
+      });
+    }
   };
 
   const handleCopyPgp = (e: React.MouseEvent) => {
@@ -207,58 +288,58 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     <div
       ref={containerRef}
       onPointerMove={(e) => {
-        cursorX.set(e.clientX);
-        cursorY.set(e.clientY);
+        if (isTouchDevice) return;
+        updateOrbPosition(e.clientX, e.clientY);
         if (!cursorVisible) setCursorVisible(true);
       }}
       className="relative min-h-screen w-full bg-[#050608] text-[#f5f4f0] font-sans selection:bg-white selection:text-black flex flex-col justify-between overflow-x-hidden"
     >
-      {/* ================= LE FRUIT MAGNETIC LENS FOLLOWER (FIXED) ================= */}
-      {cursorVisible && (
+      {/* ================= CONTEXTUAL GLASS ORB ACTION LENS (NON-OBSTRUCTING) ================= */}
+      {!isTouchDevice && !prefersReducedMotion && cursorVisible && (
         <motion.div
           style={{
             x: followerX,
             y: followerY,
           }}
           animate={{
-            width: isHoveringEmail ? 184 : 76,
-            height: isHoveringEmail ? 184 : 76,
-            borderColor: isHoveringEmail ? 'rgba(255, 255, 255, 0.45)' : 'rgba(255, 255, 255, 0.22)',
-            backgroundColor: isHoveringEmail ? 'rgba(5, 6, 8, 0.85)' : 'rgba(255, 255, 255, 0.02)',
+            width: isHoveringEmail ? 180 : 64,
+            height: isHoveringEmail ? 180 : 64,
+            borderColor: isHoveringEmail ? 'rgba(255, 255, 255, 0.40)' : 'rgba(255, 255, 255, 0.18)',
+            backgroundColor: isHoveringEmail ? 'rgba(5, 6, 8, 0.88)' : 'rgba(255, 255, 255, 0.03)',
+            boxShadow: isHoveringEmail
+              ? '0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.12) inset'
+              : '0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08) inset',
           }}
-          transition={{ type: 'spring', stiffness: 450, damping: 28 }}
-          className="pointer-events-none fixed top-0 left-0 z-50 rounded-full border hidden md:flex items-center justify-center overflow-hidden backdrop-blur-md shadow-2xl"
+          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+          className="pointer-events-none fixed top-0 left-0 z-50 rounded-full border hidden md:flex items-center justify-center overflow-hidden backdrop-blur-md"
         >
           {isHoveringEmail ? (
-            /* Visual Lens Reveal on Email Hover */
-            <div className="relative w-full h-full flex items-center justify-center">
+            /* Contextual Action Lens: SEND MAIL / OPEN EMAIL APP */
+            <div className="relative w-full h-full flex items-center justify-center select-none">
               <div
-                className="absolute inset-0 bg-cover bg-center opacity-85 scale-105"
+                className="absolute inset-0 bg-cover bg-center opacity-75 scale-105"
                 style={{ backgroundImage: `url('/images/menu/architecture-systems.jpg')` }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/60" />
-              <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-1">
-                {copiedEmail ? (
-                  <>
-                    <Check className="w-5 h-5 text-emerald-400" />
-                    <span className="text-[11px] font-sans font-bold uppercase tracking-wider text-white">
-                      Copied!
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <ArrowUpRight className="w-5 h-5 text-white" />
-                    <span className="text-[10px] font-sans font-bold uppercase tracking-widest text-white">
-                      Send Mail
-                    </span>
-                  </>
-                )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/65" />
+              <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-1.5 px-3">
+                <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                  <ArrowUpRight className="w-4 h-4 text-white" />
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="text-[11px] font-sans font-bold uppercase tracking-widest text-white leading-tight">
+                    SEND MAIL
+                  </span>
+                  <span className="text-[9px] font-mono uppercase tracking-wider text-neutral-400 mt-0.5">
+                    OPEN EMAIL APP
+                  </span>
+                </div>
               </div>
             </div>
           ) : (
-            /* Rest State: Thin Architectural Circle with Directional Arrow */
-            <div className="flex items-center justify-center text-white/80">
-              <ArrowRight className="w-4 h-4" />
+            /* Idle State: Restrained Glass Indicator with directional arrow & subtle reflection */
+            <div className="relative w-full h-full flex items-center justify-center select-none">
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/[0.04] to-transparent pointer-events-none" />
+              <ArrowRight className="w-3.5 h-3.5 text-white/70" />
             </div>
           )}
         </motion.div>
@@ -373,24 +454,75 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           </div>
         </div>
 
-        {/* Row 3: COLOSSAL INTERACTIVE TYPOGRAPHIC EMAIL (Le Fruit Interaction) */}
-        <a
-          href="mailto:engineering@devforge.org?subject=DevForge%20Systems%20Architecture%20Inquiry"
-          ref={emailRef}
-          onMouseEnter={() => setIsHoveringEmail(true)}
-          onMouseLeave={() => setIsHoveringEmail(false)}
-          onClick={handleCopyEmail}
-          className="w-full pt-5 sm:pt-7 pb-3 flex flex-col items-start sm:items-end text-left sm:text-right cursor-pointer select-none group focus-visible:outline-none"
-        >
-          <span className="text-xs font-sans uppercase tracking-widest text-neutral-500 font-semibold mb-1 block group-hover:text-white transition-colors">
-            Click to copy or dispatch mail →
-          </span>
+        {/* Row 3: COLOSSAL INTERACTIVE TYPOGRAPHIC EMAIL & DEDICATED ACTION TOOLBAR */}
+        <div className="w-full pt-5 sm:pt-7 pb-3 flex flex-col items-start sm:items-end text-left sm:text-right select-none group">
           
-          <div className="text-4xl sm:text-6xl md:text-7xl lg:text-[88px] xl:text-[104px] font-sans font-black tracking-tight leading-[0.92] text-white group-hover:text-neutral-300 transition-colors">
-            <span className="block">engineering@</span>
-            <span className="block">devforge.org</span>
+          {/* Action Header: Status + Dedicated Accessible Copy Button */}
+          <div className="w-full flex flex-wrap items-center justify-between gap-3 mb-2">
+            <div className="flex items-center space-x-2 text-xs font-sans uppercase tracking-widest text-neutral-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span>Direct Core Inquiries</span>
+            </div>
+
+            <div className="flex items-center space-x-3">
+              <button
+                type="button"
+                onClick={handleCopyEmail}
+                className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/10 hover:border-white/25 text-xs font-sans font-medium text-neutral-300 hover:text-white transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 active:scale-98"
+                title="Copy email address to clipboard"
+              >
+                {copiedEmail ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-neutral-400" />}
+                <span>{copiedEmail ? 'Email Copied' : 'Copy Email Address'}</span>
+              </button>
+            </div>
           </div>
-        </a>
+
+          {/* Primary Semantic Mailto Anchor */}
+          <a
+            ref={emailRef}
+            href="mailto:engineering@devforge.org?subject=DevForge%20Systems%20Architecture%20Inquiry"
+            onMouseEnter={(e) => {
+              isHoveringEmailRef.current = true;
+              setIsHoveringEmail(true);
+              updateOrbPosition(e.clientX, e.clientY, true);
+            }}
+            onMouseMove={(e) => {
+              isHoveringEmailRef.current = true;
+              updateOrbPosition(e.clientX, e.clientY, true);
+            }}
+            onMouseLeave={(e) => {
+              isHoveringEmailRef.current = false;
+              setIsHoveringEmail(false);
+              updateOrbPosition(e.clientX, e.clientY, false);
+            }}
+            className="w-full block cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-4 focus-visible:ring-offset-black rounded-xl transition-all"
+            aria-label="Send email to engineering@devforge.org (opens your default email client)"
+          >
+            <div className="text-4xl sm:text-6xl md:text-7xl lg:text-[88px] xl:text-[104px] font-sans font-black tracking-tight leading-[0.92] text-white group-hover:text-neutral-300 transition-colors">
+              <span className="block">engineering@</span>
+              <span className="block">devforge.org</span>
+            </div>
+          </a>
+
+          {/* Mobile Native Touch Targets (Accessible on touch devices) */}
+          <div className="flex sm:hidden items-stretch gap-3 w-full pt-4">
+            <a
+              href="mailto:engineering@devforge.org?subject=DevForge%20Systems%20Architecture%20Inquiry"
+              className="flex-1 py-3 px-4 rounded-xl bg-white text-black font-sans font-semibold text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-lg active:scale-98 transition-transform"
+            >
+              <ArrowUpRight className="w-4 h-4 text-black" />
+              <span>Send Mail</span>
+            </a>
+            <button
+              type="button"
+              onClick={handleCopyEmail}
+              className="py-3 px-4 rounded-xl bg-white/10 active:bg-white/15 border border-white/15 text-white font-sans font-medium text-xs uppercase tracking-wider flex items-center justify-center space-x-2 transition-colors cursor-pointer"
+            >
+              {copiedEmail ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4 text-neutral-400" />}
+              <span>{copiedEmail ? 'Copied' : 'Copy Address'}</span>
+            </button>
+          </div>
+        </div>
 
         {/* Brief Composer Toggle Trigger */}
         <div className="pt-3 flex items-center justify-between border-t border-white/[0.05]">
