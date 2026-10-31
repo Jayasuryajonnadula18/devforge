@@ -55,22 +55,14 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="min-h-screen w-full bg-[#050608] flex items-center justify-center p-6 text-[#f5f4f0] font-sans select-none">
-          {/* Subtle Background Glow */}
-          <div 
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background: 'radial-gradient(circle 600px at 50% 50%, rgba(220, 38, 38, 0.08) 0%, transparent 80%)',
-            }}
-          />
-
-          <div className="relative z-10 max-w-lg w-full bg-[#0d0907]/90 border border-amber-500/20 rounded-2xl p-8 sm:p-10 shadow-2xl backdrop-blur-md space-y-6">
+          <div className="relative z-10 max-w-lg w-full bg-[#090b0e] border border-white/10 rounded-2xl p-8 sm:p-10 shadow-2xl space-y-6">
             {/* Header Icon & Tag */}
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                <AlertTriangle className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-white">
+                <AlertTriangle className="w-5 h-5 text-amber-400" />
               </div>
               <div>
-                <span className="text-[11px] font-mono uppercase tracking-wider text-amber-400/90 font-medium">
+                <span className="text-[11px] font-sans uppercase tracking-wider text-neutral-400 font-semibold">
                   Engine Resilience
                 </span>
                 <h2 className="text-xl font-sans font-semibold text-white">
@@ -82,16 +74,16 @@ export class GlobalErrorBoundary extends Component<Props, State> {
             {/* Description */}
             <p className="text-sm text-neutral-300 leading-relaxed font-sans">
               An unexpected execution state occurred in the rendering or compute pipeline. 
-              The DevForge supervisor prevented a catastrophic application crash.
+              The DevForge supervisor prevented an application crash.
             </p>
 
             {/* Diagnostic Snapshot Box */}
             <div className="p-3.5 bg-black/60 border border-white/10 rounded-xl font-mono text-xs text-neutral-400 space-y-1 overflow-x-auto">
               <div className="flex items-center space-x-2 text-neutral-300">
-                <Terminal className="w-3.5 h-3.5 text-amber-400" />
+                <Terminal className="w-3.5 h-3.5 text-neutral-400" />
                 <span>Diagnostic Report</span>
               </div>
-              <p className="text-[11px] text-amber-300/80 break-words pt-1 font-mono">
+              <p className="text-[11px] text-neutral-300 break-words pt-1 font-mono">
                 {this.state.errorMessage || 'Invariant verification check failed.'}
               </p>
             </div>
@@ -100,7 +92,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
             <div className="flex items-center space-x-3 pt-2">
               <button
                 onClick={this.handleReload}
-                className="flex-1 h-11 px-5 rounded-xl bg-white text-black hover:bg-neutral-200 text-xs font-semibold font-sans transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-lg active:scale-[0.98]"
+                className="flex-1 h-11 px-5 rounded-none bg-white text-black hover:bg-neutral-200 text-xs font-semibold uppercase tracking-wider font-sans transition-all flex items-center justify-center space-x-2 cursor-pointer shadow-sm active:scale-[0.98]"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Re-initialize Engine</span>
@@ -108,7 +100,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
               <button
                 onClick={this.handleReset}
-                className="h-11 px-5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-xs font-medium font-sans text-neutral-300 hover:text-white transition-all cursor-pointer active:scale-[0.98]"
+                className="h-11 px-5 rounded-none bg-transparent hover:bg-white/[0.05] border border-white/15 text-xs font-medium uppercase tracking-wider font-sans text-neutral-300 hover:text-white transition-all cursor-pointer active:scale-[0.98]"
               >
                 Dismiss
               </button>
