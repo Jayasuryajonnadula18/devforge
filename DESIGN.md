@@ -1,155 +1,141 @@
-# DevForge Design System & Anti-Vibecoding Specification
-**Version**: 1.0.0  
-**Status**: Living Architecture Contract & Agent Invariant  
-**Applies To**: `devforge-platform` UI/UX, components, motion profiles, and AI generation behavior.
+# Agent Design Invariants & Anti-Vibecoding Directive (design.md)
+**Document Purpose**: Universal AI Agent Operating Contract for Frontend Design & Implementation  
+**Audience**: Antigravity & all pair-programming coding agents  
+**Status**: Permanent Invariant — Overrides default AI code-generation tendencies
 
 ---
 
-## 1. The Anti-Vibecoding Manifesto
+## 1. Prime Directive: Eradicating the "Vibecoded" Look
 
-"Vibecoding" refers to the generic, hyperactive, superficial AI-templated aesthetic that plagues modern AI-generated frontend code. It relies on cliché visual tropes that simulate complexity or "futurism" without thoughtful typographic hierarchy, functional intent, or design restraint.
+When tasked with generating or modifying user interfaces, standard LLM outputs default to **"vibecoding"**—a recognizable, cookie-cutter aesthetic characterized by neon glow borders, arbitrary status chips, faux-futuristic numbering, and hurried animations.
 
-### 🚫 The 7 Deadly Sins of Vibecoding (Strictly Prohibited)
+### 🚫 The 8 Hard Prohibitions for You
 
-| Vibecoded Anti-Pattern | Why It Fails | DevForge Enforcement Rule |
-| :--- | :--- | :--- |
-| **1. Soon / Beta Badges Everywhere** | Clutters the interface with cheap status chips glued to links, buttons, and titles. Destroys minimalism. | **NEVER** slap floating status badges or chips on navigation items. If a feature is in development, handle it through a refined editorial destination view or clean notification. |
-| **2. Faux-Futuristic Index Numbering (`01`, `02`, `03`)** | Pretentious decoration that adds visual noise and competes with actual content. | **DO NOT** prefix list items, nav items, or cards with `01`, `02`, `03` unless it is a numbered sequence (e.g. numbered tutorial steps). |
-| **3. Chevrons (`>`) and Icons Glued to Text Buttons** | Redundant indicators (`>`, `↗`, `+`, `×`) inside capsule buttons that clutter the layout. | Pure typography. Allow state to be conveyed by clean label transitions (`Menu` $\leftrightarrow$ `Close`) and subtle opacity changes. Zero capsule outlines, zero icons on standard triggers. |
-| **4. Font Mismatches & Monospace Abuse** | Switching to loud, screaming monospace or neon cyberpunk fonts for random UI headers, categories, or footers. | Use the primary font (`Montserrat` / `var(--font-sans)`) for UI headings, titles, and ecosystem labels. Monospace (`var(--font-mono)`) is reserved **strictly** for terminal outputs, memory addresses, git hashes, and code symbols. |
-| **5. Cluttered Fake Complexity** | Packing cards or drawers with dummy technical metadata (`PYTHON 3.12 ↗`, `TEST ASSERTIONS`) before the feature exists. | Practice quiet editorial confidence. Use a clean, spacious layout (e.g., the Rector serif "Coming *soon.*" view) rather than fabricating fake feature rows. |
-| **6. Hyperactive & Colliding Animations** | Linear, twitchy, hurried transitions ($<0.3\text{s}$) or stacking competing animations (e.g. drawer sliding while child keyframes fire and layout metrics distort). | Orchestrated, multi-layer motion with physical deceleration (`power4.out`, `power3.out`). Never run conflicting transforms simultaneously. Always separate entrance choreography from interactive hover states. |
-| **7. Neon Slop & Unrestrained Gradients** | Generic purple/magenta glowing boxes, rainbow gradients on every text element, and neon glow halos. | Strict, disciplined warm obsidian palette (`#090706`), deep espresso undertones (`#180e08`–`#5c2912`), warm molten amber (`#f59e0b`), and soft chalk white (`#f5f4f0`). |
+Whenever you are writing JSX, CSS, Tailwind classes, or animations, you must treat these as absolute prohibitions:
+
+1. **NO "Soon", "Beta", or Status Badges Glued Everywhere**:
+   - *Negative Behavior*: Tacking little pill tags (`Soon`, `Beta`, `New`, `Live`) onto every second menu link, card, or button.
+   - *Required Behavior*: Eliminate status clutter. If a destination or tool is upcoming, let the text stand cleanly on its own or route the user to an authoritative, minimalist editorial screen (`Coming soon.`).
+
+2. **NO Arbitrary Index Numbers (`01`, `02`, `03`)**:
+   - *Negative Behavior*: Prefixing navigation options or feature cards with `01`, `02`, `03` in a neon or orange color to look "technical" or "cyberpunk".
+   - *Required Behavior*: Content hierarchy comes from typography scale, weight, and position—never artificial numeric decorations. Use numbered indices **only** when presenting an inherently ordered sequence (e.g., numbered tutorial phases).
+
+3. **NO Icons Glued to Simple Text Triggers (`+`, `×`, `>`)**:
+   - *Negative Behavior*: Putting a plus (`+`) or chevron (`>`) inside every menu button or list item.
+   - *Required Behavior*: Pure, confident typography. State is communicated via clean text changes (`Menu` $\leftrightarrow$ `Close`) and subtle opacity or color shifts.
+
+4. **NO Arbitrary Pill / Capsule Enclosures**:
+   - *Negative Behavior*: Wrapping every standalone button or toggle in an isolated pill capsule with border outlines.
+   - *Required Behavior*: Align elements seamlessly with the baseline and padding of the surrounding layout. Do not enclose buttons in capsules unless they are part of a deliberate segmented control or glass dock.
+
+5. **NO Font Inconsistencies & Decorative Monospace**:
+   - *Negative Behavior*: Randomly switching UI section headers, drawer categories, or footer labels to screaming monospace or stylized display fonts.
+   - *Required Behavior*: Keep all UI labels, navigation links, section titles, and body copy in the primary interface font (`Montserrat` / `var(--font-sans)`). Reserve monospace **strictly** for actual machine output: code tokens, memory hex addresses, terminal logs, and system hashes.
+
+6. **NO Dividing Lines Beneath Every Option**:
+   - *Negative Behavior*: Drawing horizontal lines under every menu item or option, turning a sleek list into a cluttered lined table.
+   - *Required Behavior*: Use generous vertical rhythm and negative space for separation. Avoid lines beneath menu options unless building a formal data-dense table.
+
+7. **NO Hurried, Twitchy, or Colliding Animations**:
+   - *Negative Behavior*: Running fast, abrupt linear animations ($<0.3\text{s}$) or triggering child animations while parent containers are sliding.
+   - *Required Behavior*: Multi-stage cinematic pacing ($0.65\text{s}$–$0.85\text{s}$) with natural exponential deceleration (`power4.out`, `power3.out`). Never animate child coordinate layouts while a parent is actively in motion.
+
+8. **NO Neon Slop & Unrestrained Gradients**:
+   - *Negative Behavior*: Generic purple, violet, and magenta glowing drop-shadows and rainbow text fills.
+   - *Required Behavior*: Deep, disciplined, warm dark canvases (`#090706`), subtle espresso undertones (`#180e08`–`#5c2912`), warm molten amber (`#f59e0b`), and soft chalk white (`#f5f4f0`).
 
 ---
 
-## 2. Core DevForge Design Principles
+## 2. Core Aesthetic Foundations
 
-### Principle I: Editorial Restraint & Quiet Confidence
-DevForge is engineered for serious systems builders, compiler designers, and distributed infrastructure engineers. It communicates authority through whitespace, precise alignment, and typography—never through decorative gimmicks.
-- If an element does not provide functional utility or intentional semantic grounding, delete it.
-- Never compensate for empty space by adding meaningless borders, capsules, or status pills.
+### A. Typographic Integrity & Hierarchy
+Never mix more than three typographic voices:
+1. **Monumental Display (Serif / High-Contrast Display)**:
+   - For landmark hero headlines and editorial moments (`Coming soon.`, `The Architecture of Real-World Systems`).
+   - Use natural tracking and subtle italics for high-signal words.
+2. **Primary Interface Sans (`var(--font-sans)`)**:
+   - The workhorse of the interface: navigation, headings, row labels, buttons, and descriptive paragraphs.
+   - Geometric, crisp, and high-legibility.
+3. **Engine Monospace (`var(--font-mono)`)**:
+   - Strictly reserved for code, architectural invariants, git hashes, terminal readouts, and benchmarks.
 
-### Principle II: Typographic Hierarchy
-The project uses three distinct typographic roles:
-1. **Editorial Display (`Rector` / Display Serif)**:
-   - Reserved for monumental headlines and editorial moments (`Coming soon.`, `The Architecture of Real-World Systems`).
-   - Characterized by high contrast, elegant italics, and natural tracking.
-2. **Primary Interface Sans (`Montserrat` / `var(--font-sans)`)**:
-   - The primary voice of DevForge.
-   - Used for navigation labels, section headings, titles, ecosystem links, and body copy.
-   - Clean, geometric, legible across all viewport scales.
-3. **Engine Monospace (`JetBrains Mono` / `Geist Mono` / `var(--font-mono)`)**:
-   - **Exclusive domain**: Code snippets, system architecture invariants, memory layouts, terminal outputs, and performance microbenchmarks.
-   - Never used as a decorative substitute for standard UI headers.
+### B. Spatial Discipline & Negative Space
+- **Embrace Whitespace**: High-end software feels spacious and quiet. Low-end templates fill every pixel with boxes, chips, and dividers.
+- **Single Focal Accent**: Only allow **one** dominant accent color per viewport or interaction zone (e.g., the high-contrast white liquid band on the hovered menu item). Surrounding elements should be quiet and understated.
 
-### Principle III: Color Tokens & Light Discipline
-
+### C. Color Architecture
 ```css
-:root {
-  /* Canvas & Obsidian Surfaces */
-  --df-bg-canvas: #090706;
-  --df-bg-surface: #0d0907;
-  --df-bg-panel: rgba(13, 9, 7, 0.96);
+/* Deep Obsidian & Warm Espresso Canvas */
+--bg-canvas: #090706;
+--bg-surface: #0d0907;
+--bg-panel: rgba(13, 9, 7, 0.96);
 
-  /* Cascading Prelayer Warmth (Staggered Drawer) */
-  --df-prelayer-1: #180e08;
-  --df-prelayer-2: #2a150b;
-  --df-prelayer-3: #5c2912;
-  --df-prelayer-4: #7e3a19;
+/* Cascading Staggered Layers */
+--prelayer-1: #180e08;
+--prelayer-2: #2a150b;
+--prelayer-3: #5c2912;
+--prelayer-4: #7e3a19;
 
-  /* Typography & Foreground */
-  --df-text-primary: #ffffff;
-  --df-text-secondary: rgba(255, 255, 255, 0.7);
-  --df-text-muted: rgba(255, 255, 255, 0.4);
+/* Text & Contrast */
+--text-primary: #ffffff;
+--text-secondary: rgba(255, 255, 255, 0.7);
+--text-muted: rgba(255, 255, 255, 0.4);
 
-  /* Molten Amber Accent (High-Signal Focal Point) */
-  --df-accent-amber: #f59e0b;
-  --df-accent-amber-glow: rgba(245, 158, 11, 0.18);
-  --df-accent-dark: #090706;
+/* Accents */
+--accent-amber: #f59e0b;
+--accent-amber-glow: rgba(245, 158, 11, 0.18);
+--accent-contrast-bg: #ffffff;
+--accent-contrast-text: #120F17;
 
-  /* Architectural Hairlines */
-  --df-border-subtle: rgba(255, 255, 255, 0.08);
-  --df-border-divider: rgba(255, 255, 255, 0.14);
-}
+/* Architectural Lines */
+--border-subtle: rgba(255, 255, 255, 0.08);
+--border-hairline: rgba(255, 255, 255, 0.14);
 ```
 
-- **Rule of One Accent**: Only one dominant accent color is permitted per active interaction zone (e.g., the liquid amber hover band on the active row).
-- **Hairline Dividers**: Lines between list items must be subtle hairlines (`rgba(255, 255, 255, 0.14)`), never heavy borders.
-
 ---
 
-## 3. Motion Architecture & Collision Prevention
+## 3. Motion Architecture & Technical Safety
 
-To prevent animation collision and the twitchy feel of vibecoded templates, all complex interactive components adhere to a strict motion protocol:
+When implementing interactive components (e.g. `FlowingMenu`, `StaggeredMenu`), you must follow these technical invariants to avoid freezing and animation collisions:
 
+### 1. The 4-Stage Motion Pipeline
 ```
 [Trigger Click: Menu]
       │
-      ├── Phase 1 (0.00s - 0.65s): Multi-layer prelayers cascade (staggered by 0.08s, ease: power4.out)
+      ├── Stage 1 (0.00s - 0.65s): Multi-layer prelayers cascade (staggered by 0.08s, ease: power4.out)
       │
-      ├── Phase 2 (0.24s - 1.04s): Main panel slides in (duration: 0.8s, ease: power4.out)
+      ├── Stage 2 (0.24s - 1.04s): Main panel slides in (duration: 0.8s, ease: power4.out)
       │
-      ├── Phase 3 (0.39s - 1.10s): FlowingMenu rows glide upward (y: 30 → 0, opacity: 0 → 1, stagger: 0.08s)
+      ├── Stage 3 (0.39s - 1.10s): FlowingMenu rows glide upward (y: 30 → 0, opacity: 0 → 1, stagger: 0.08s)
       │
-      └── Phase 4 (Completion): Lock pointer events, call measure() to capture settled layout coordinates
+      └── Stage 4 (Resting State): Unlock pointer events, execute measure() to snapshot settled coordinates
             │
-            └── Interactive Hover State: Liquid band glides with physical spring easing & marquee scroll
+            └── Interactive Hover: Liquid band sweeps with physical spring physics & marquee scroll
 ```
 
-### Motion Invariants
-1. **Never calculate element bounds (`getBoundingClientRect()`) during an active GSAP slide**:
-   - Layout measurements taken while a panel is translating with `xPercent` yield distorted or shifting positions.
-   - Measurements must be taken on mount (if visible), when the drawer reaches resting state (`onComplete`), or dynamically inside `pointerenter` via relative math (`itemRect.top - listRect.top`).
-2. **StrictMode RAF Safety**:
-   - Animation engines that utilize `requestAnimationFrame` must reset their tracking handle (`loop.raf = 0`) upon cancellation. Leaving a stale positive integer permanently deadlocks the render loop.
-3. **Pacing and Timing**:
-   - Standard drawer entrances must take `0.65s` to `0.85s` using exponential deceleration curves (`power4.out`). Rapid transitions ($<0.35\text{s}$) destroy the sense of weight and physical prestige.
+### 2. RAF & React StrictMode Safety
+- **Always reset handles**: Whenever cancelling an animation frame (`cancelAnimationFrame(loop.raf)`), **always** set `loop.raf = 0`.
+- Failing to reset `loop.raf = 0` causes the animation engine to permanently deadlock in React StrictMode and Next.js hot-reloads.
+
+### 3. Decouple Layout Math from Moving Containers
+- Never run `getBoundingClientRect()` while a parent container is actively translating with GSAP (`xPercent` / `yPercent`).
+- Compute coordinates either:
+  a) Upon reaching resting state (`onComplete`).
+  b) Relative to the parent list (`itemRect.top - listRect.top`), not window coordinates.
+  c) On `pointerenter` of the row directly as an instant fallback.
 
 ---
 
-## 4. Component Standards
+## 4. Agent Self-Verification Checklist
 
-### A. Navigation Bar & Menu Trigger
-- **No Pill Capsule**: The menu trigger button (`Menu` / `Close`) must never be wrapped in a pill, capsule border, or glowing box.
-- **No Icon Clutter**: Do not attach `+`, `×`, `☰`, or chevron icons to the menu toggle.
-- **Alignment**: Vertically centered and horizontally aligned with the floating navbar container (`px-6 sm:px-12 lg:px-20 py-6`).
-- **Typography**: Clean Montserrat medium font (`13.5px`, `font-medium`, `tracking-[0.02em]`).
+Before presenting any code, UI revision, or component to the user, run your proposed output through this mental filter:
 
-### B. Navigation Drawer
-- **Menu Hierarchy**: Exactly 3 core destinations in the main drawer:
-  1. `Courses` $\rightarrow$ Triggers the minimalist editorial curriculum view.
-  2. `The Forge` $\rightarrow$ Deep-links to `#meet-devforge` (Philosophy and Foundation).
-  3. `Architecture` $\rightarrow$ Clean toast notice for the upcoming system topology explorer.
-- **Pure Whitespace & Zero Line Dividers**:
-  - **No lines beneath menu options**: Dividers between rows are strictly prohibited (`dividers={false}`). Row separation is achieved through generous vertical cadence and pure whitespace.
-  - Alignment: Centered typography (`align="center"`).
-- **Flowing Hover Effect**:
-  - Background band: High-contrast Crisp White (`#ffffff`).
-  - Marquee text: Jet Black (`#120F17` / `#090706`), bold Montserrat repeating destination titles.
-  - Image thumbnail: Monochrome pill (`imageShape="pill"`).
-- **Social / Ecosystem Footer**:
-  - Title: `DevForge Ecosystem` in primary Montserrat sans (`uppercase`, `tracking-widest`, `text-xs`).
-  - Links: `GitHub`, `Philosophy`, `Terms` with clean hover dimming across peers.
-
-### C. Curriculum & In-Progress Subviews
-- **No Cluttered Catalogs**: Do not render fake module tables with dummy languages, progress bars, or tags before the real curricula are ready.
-- **Minimalist Aesthetic**:
-  - Small uppercase mono kicker: `Curriculum` in muted amber.
-  - Monumental editorial title: `Coming soon.` (Rector display).
-  - Clear, focused narrative on distributed consensus, compiler architecture, and kernel internals.
-  - Return affordance: Subtle `← Back to Menu` button.
-
----
-
-## 5. Agent Verification Checklist
-
-Before committing any UI change or proposing frontend code, verify against this checklist:
-
-- [ ] Does any element have a decorative `Soon`, `Beta`, or status badge attached? *(If yes, remove it)*.
-- [ ] Are list items or menu rows prefixed with artificial numbers (`01`, `02`)? *(If yes, remove them)*.
-- [ ] Are buttons or links wrapped in gratuitous pill capsules with plus/chevron icons? *(If yes, strip to pure typography)*.
-- [ ] Are non-code headers using monospace or loud neon styling? *(If yes, align with `var(--font-sans)`)*.
-- [ ] Is an animation running under `0.35s` or colliding with another simultaneous transform? *(If yes, orchestrate with staggered easing)*.
-- [ ] Are layout measurements safely decoupled from moving parent containers? *(If yes, verify relative coordinates)*.
-- [ ] Does the color scheme adhere to the obsidian/espresso/amber foundation without random purple/magenta gradients? *(If yes, approve)*.
+- [ ] **Badge Check**: Did I add a `Soon`, `Beta`, or status chip? If yes, **delete it**.
+- [ ] **Numbering Check**: Did I add `01`, `02`, `03` prefixes to menu items or cards? If yes, **delete them**.
+- [ ] **Icon / Capsule Check**: Did I put `+`, `×`, or `>` icons on plain buttons, or enclose the trigger in an unnecessary capsule? If yes, **strip to pure typography**.
+- [ ] **Divider Check**: Are there horizontal lines beneath every menu option? If yes, **remove them (`dividers={false}`)**.
+- [ ] **Font Check**: Are all headings, categories, and footers in the primary interface font (`Montserrat` / `var(--font-sans)`)?
+- [ ] **Animation Pacing**: Does the entrance transition feel luxurious ($0.65\text{s}$–$0.85\text{s}$) with proper deceleration curves?
+- [ ] **Collision Check**: Are multiple animations firing at the exact same instant on the same node? If yes, **stagger and orchestrate them**.
+- [ ] **Color Check**: Is the palette restrained to warm obsidian, espresso, amber, and crisp white without neon purple/magenta slop?
