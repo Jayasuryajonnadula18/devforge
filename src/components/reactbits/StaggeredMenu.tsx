@@ -200,6 +200,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     if (tl) {
       tl.eventCallback('onComplete', () => {
         busyRef.current = false;
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new Event('resize'));
+        }
       });
       tl.play(0);
     } else {
