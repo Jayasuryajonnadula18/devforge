@@ -148,26 +148,43 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     gsap.set(panel, { pointerEvents: 'none' });
 
     layerStates.forEach((ls, i) => {
-      tl.fromTo(ls.el, { xPercent: ls.start }, { xPercent: 0, duration: 0.35, ease: 'power3.out' }, i * 0.04);
+      tl.fromTo(ls.el, { xPercent: ls.start }, { xPercent: 0, duration: 0.65, ease: 'power4.out' }, i * 0.08);
     });
-    const lastTime = layerStates.length ? (layerStates.length - 1) * 0.04 : 0;
-    const panelInsertTime = lastTime + (layerStates.length ? 0.04 : 0);
-    const panelDuration = 0.38;
+    const lastTime = layerStates.length ? (layerStates.length - 1) * 0.08 : 0;
+    const panelInsertTime = lastTime + (layerStates.length ? 0.08 : 0);
+    const panelDuration = 0.8;
     tl.fromTo(
       panel,
       { xPercent: panelStart },
-      { xPercent: 0, duration: panelDuration, ease: 'power3.out' },
+      { xPercent: 0, duration: panelDuration, ease: 'power4.out' },
       panelInsertTime
     );
 
+    const flowingItems = Array.from(panel.querySelectorAll('.flowing-menu__item'));
+    if (flowingItems.length) {
+      gsap.set(flowingItems, { y: 30, opacity: 0 });
+      tl.to(
+        flowingItems,
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.7,
+          ease: 'power3.out',
+          stagger: 0.08,
+          clearProps: 'transform,opacity'
+        },
+        panelInsertTime + 0.15
+      );
+    }
+
     if (socialTitle || socialLinks.length) {
-      const socialsStart = panelInsertTime + panelDuration * 0.3;
+      const socialsStart = panelInsertTime + panelDuration * 0.35;
       if (socialTitle) {
         tl.to(
           socialTitle,
           {
             opacity: 1,
-            duration: 0.3,
+            duration: 0.5,
             ease: 'power2.out'
           },
           socialsStart
@@ -179,14 +196,14 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
           {
             y: 0,
             opacity: 1,
-            duration: 0.35,
+            duration: 0.55,
             ease: 'power3.out',
-            stagger: { each: 0.05, from: 'start' },
+            stagger: { each: 0.08, from: 'start' },
             onComplete: () => {
               gsap.set(socialLinks, { clearProps: 'opacity' });
             }
           },
-          socialsStart + 0.02
+          socialsStart + 0.04
         );
       }
     }
@@ -230,10 +247,12 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     const offscreen = position === 'left' ? -100 : 100;
     closeTweenRef.current = gsap.to(all, {
       xPercent: offscreen,
-      duration: 0.32,
-      ease: 'power3.in',
+      duration: 0.42,
+      ease: 'power3.inOut',
       overwrite: 'auto',
       onComplete: () => {
+        const flowingItems = Array.from(panel.querySelectorAll('.flowing-menu__item'));
+        if (flowingItems.length) gsap.set(flowingItems, { y: 30, opacity: 0 });
         const socialTitle = panel.querySelector('.sm-socials-title');
         const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'));
         if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
@@ -402,9 +421,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
               >
                 {/* FlowingMenu from React Bits */}
                 <div className="flex-1 flex flex-col justify-center py-2">
-                  <div style={{ height: '380px', position: 'relative' }} className="w-full">
+                  <div style={{ height: '420px', position: 'relative' }} className="w-full">
                     <FlowingMenu
                       items={resolvedFlowingItems}
+                      isOpen={open}
                       speed={60}
                       stretch={0.6}
                       magnet={0.25}
@@ -413,10 +433,11 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                       bgColor="transparent"
                       marqueeBgColor="#f59e0b"
                       marqueeTextColor="#090706"
-                      borderColor="rgba(255, 255, 255, 0.12)"
+                      borderColor="rgba(255, 255, 255, 0.14)"
                       dividers={true}
                       showIndex={false}
                       showArrow={false}
+                      intro={false}
                       align="left"
                     />
                   </div>

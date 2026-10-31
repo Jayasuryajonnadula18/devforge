@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { HugeiconsIcon } from '@hugeicons/react';
+import { ArrowUpRight01Icon } from '@hugeicons/core-free-icons';
 import './FlowingMenu.css';
 
 const ROOT = 'flowing-menu';
@@ -46,6 +47,7 @@ export interface FlowingMenuItem {
 
 export interface FlowingMenuProps {
   items?: FlowingMenuItem[];
+  isOpen?: boolean;
   speed?: number;
   direction?: 'left' | 'right' | 'alternate';
   followCursor?: number;
@@ -74,8 +76,9 @@ export interface FlowingMenuProps {
   style?: React.CSSProperties;
 }
 
-export const FlowingMenu: React.FC<FlowingMenuProps> = ({
+export function FlowingMenu({
   items = [],
+  isOpen,
   speed = 60,
   direction = 'left',
   followCursor = 0.4,
@@ -83,26 +86,26 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
   stretch = 0.6,
   magnet = 0.25,
   bandInset = 0,
-  bandRadius = 8,
+  bandRadius = 0,
   carryContent = false,
-  textColor = '#f5f4f0',
-  bgColor = 'transparent',
-  marqueeBgColor = '#f59e0b',
-  marqueeTextColor = '#050608',
-  borderColor = 'rgba(255, 255, 255, 0.1)',
+  textColor = '#ffffff',
+  bgColor = '#120F17',
+  marqueeBgColor = '#ffffff',
+  marqueeTextColor = '#120F17',
+  borderColor = 'rgba(255, 255, 255, 0.14)',
   dividers = true,
   dimInactive = false,
-  align = 'left',
-  showIndex = true,
-  showArrow = true,
-  imageShape = 'rounded',
-  intro = false,
+  align = 'center',
+  showIndex = false,
+  showArrow = false,
+  imageShape = 'pill',
+  intro = true,
   activeIndex,
   onItemClick,
   ariaLabel = 'Menu',
   className = '',
-  style,
-}) => {
+  style
+}: FlowingMenuProps) {
   const rootRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const rows = useRef<{ item: HTMLElement | null; band: HTMLElement | null; track: HTMLElement | null }[]>([]);
@@ -118,14 +121,14 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
     lead: 1,
     shown: false,
     index: -1,
-    rest: 0,
+    rest: 0
   });
   const cursor = useRef<{ x: number; y: number | null; t: number; vx: number }>({ x: 0, y: null, t: 0, vx: 0 });
-  const engine = useRef<{ raf: number; last: number; timers: ReturnType<typeof setTimeout>[]; touched: boolean }>({
+  const engine = useRef<{ raf: number; last: number; timers: NodeJS.Timeout[]; touched: boolean }>({
     raf: 0,
     last: 0,
     timers: [],
-    touched: false,
+    touched: false
   });
   const [copies, setCopies] = useState<number[]>([]);
   const floatRef = useRef<HTMLDivElement>(null);
@@ -136,7 +139,7 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
 
   const settings = {
     speed: Math.max(0, speed),
-    direction: DIRECTIONS.includes(direction) ? direction : 'left',
+    direction: DIRECTIONS.includes(direction as any) ? direction : 'left',
     followCursor: clamp(followCursor, 0, 1),
     duration: Math.max(0.1, duration),
     stretch: clamp(stretch, 0, 1),
@@ -145,7 +148,7 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
     bandRadius: Math.max(0, bandRadius),
     carryContent,
     dimInactive,
-    onItemClick,
+    onItemClick
   };
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
@@ -190,7 +193,7 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
     const center = (b.top + b.bottom) / 2;
     const eased = 1 - Math.pow(1 - r.p, 3);
     const travel = height * 0.8 * r.dir;
-    [0, 1].forEach((slot) => {
+    [0, 1].forEach(slot => {
       const layer = layerRefs.current[slot];
       const index = r.slots[slot];
       if (!layer) return;
@@ -327,6 +330,14 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
     if (busy) loop.raf = requestAnimationFrame(frame);
   };
 
+  const cancelLoop = () => {
+    const loop = engine.current;
+    if (loop.raf) {
+      cancelAnimationFrame(loop.raf);
+      loop.raf = 0;
+    }
+  };
+
   const kick = () => {
     const loop = engine.current;
     if (loop.raf || typeof window === 'undefined') return;
@@ -336,7 +347,7 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
 
   const goTo = (index: number, from: 'top' | 'bottom' | 'center') => {
     if (index < 0 || index >= items.length) return;
-    if (!metrics.current[index] || !metrics.current[index]?.height) {
+    if (!metrics.current[index] || metrics.current[index]?.height === 0) {
       measure();
     }
     const m = metrics.current[index];
@@ -394,8 +405,8 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
   const rowAt = (clientY: number) => {
     const list = listRef.current;
     if (!list) return -1;
-    const listTop = list.getBoundingClientRect().top;
-    const y = clientY - listTop;
+    const listRect = list.getBoundingClientRect();
+    const y = clientY - listRect.top;
     return metrics.current.findIndex(m => m && y >= m.top && y <= m.top + m.height);
   };
 
@@ -403,8 +414,8 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
     const list = listRef.current;
     const m = metrics.current[index];
     if (!list || !m) return 'top';
-    const listTop = list.getBoundingClientRect().top;
-    return clientY - listTop - m.top < m.height / 2 ? 'top' : 'bottom';
+    const listRect = list.getBoundingClientRect();
+    return clientY - listRect.top - m.top < m.height / 2 ? 'top' : 'bottom';
   };
 
   const stopIntro = () => {
@@ -421,10 +432,9 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
     metrics.current = rows.current.map(row => {
       if (!row?.item) return null;
       const itemRect = row.item.getBoundingClientRect();
-      return {
-        top: itemRect.top - listRect.top,
-        height: itemRect.height || 80,
-      };
+      const top = listRect ? itemRect.top - listRect.top : row.item.offsetTop;
+      const height = itemRect.height || row.item.offsetHeight;
+      return { top, height };
     });
     if (metrics.current[0]) {
       const height = metrics.current[0].height;
@@ -470,11 +480,11 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
       const part = row?.track?.firstElementChild;
       if (part) observer.observe(part);
     });
-    const onResize = () => measureRef.current();
-    window.addEventListener('resize', onResize);
+    const handleResize = () => measureRef.current();
+    window.addEventListener('resize', handleResize);
     return () => {
       observer.disconnect();
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener('resize', handleResize);
     };
   }, [items, bandInset]);
 
@@ -498,7 +508,7 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
         duration: 900,
         delay: index * 70,
         easing: EASE,
-        fill: 'backwards',
+        fill: 'backwards'
       });
     });
     root.querySelectorAll('[data-intro-fade]').forEach((node, index) => {
@@ -506,7 +516,7 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
         duration: 700,
         delay: 200 + index * 40,
         easing: 'ease',
-        fill: 'backwards',
+        fill: 'backwards'
       });
     });
     root.querySelectorAll('[data-intro-rule]').forEach((node, index) => {
@@ -514,7 +524,7 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
         duration: 1100,
         delay: index * 70,
         easing: EASE,
-        fill: 'backwards',
+        fill: 'backwards'
       });
     });
     const loop = engine.current;
@@ -545,15 +555,28 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
   }, [intro]);
 
   useEffect(() => {
-    const loop = engine.current;
-    return () => cancelAnimationFrame(loop.raf);
+    return () => {
+      cancelLoop();
+    };
   }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      const t1 = setTimeout(() => measure(), 50);
+      const t2 = setTimeout(() => measure(), 300);
+      const t3 = setTimeout(() => measure(), 800);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
+    } else {
+      release('bottom');
+    }
+  }, [isOpen]);
 
   const onPointerMove = (event: React.PointerEvent<HTMLUListElement>) => {
     if (event.pointerType === 'touch') return;
-    if (!metrics.current.length || !metrics.current[0]?.height) {
-      measure();
-    }
     stopIntro();
     const c = cursor.current;
     const now = performance.now();
@@ -566,7 +589,13 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
     c.t = now;
     const list = listRef.current;
     if (list) c.y = event.clientY - list.getBoundingClientRect().top;
-    const index = rowAt(event.clientY);
+    let index = rowAt(event.clientY);
+    if (index < 0 && event.target instanceof Element) {
+      const itemEl = event.target.closest('.flowing-menu__item');
+      if (itemEl) {
+        index = rows.current.findIndex(r => r?.item === itemEl);
+      }
+    }
     if (index >= 0 && index !== band.current.index) goTo(index, halfOf(event.clientY, index));
     else kick();
   };
@@ -599,14 +628,12 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
       release('bottom');
     },
     onClick: (event: React.MouseEvent) => {
-      if (item.onClick) {
-        item.onClick(event);
-      }
+      if (item.onClick) item.onClick(event);
       settingsRef.current.onItemClick?.(item, index, event);
-    },
+    }
   });
 
-  const shape = SHAPES.includes(imageShape as any) ? imageShape : 'rounded';
+  const shape = SHAPES.includes(imageShape as any) ? imageShape : 'pill';
 
   return (
     <nav
@@ -616,7 +643,6 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
       aria-label={ariaLabel}
       data-align={align === 'left' ? 'left' : 'center'}
       data-shape={shape}
-      data-no-index={!showIndex ? '' : undefined}
     >
       <ul ref={listRef} className={LIST} onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
         {items.map((item, index) => {
@@ -639,7 +665,7 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
                 {item.meta ? <span className={META}>{item.meta}</span> : null}
                 {showArrow ? (
                   <span className={ARROW}>
-                    <ArrowUpRight className="w-4 h-4 text-neutral-400 group-hover:text-white transition-colors" />
+                    <HugeiconsIcon icon={ArrowUpRight01Icon} size={22} strokeWidth={1.75} />
                   </span>
                 ) : null}
               </span>
@@ -648,14 +674,16 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
           return (
             <li
               key={`${item.text}-${index}`}
-              ref={(node) => {
+              ref={node => {
                 rows.current[index] = { ...rows.current[index], item: node };
               }}
               className={ITEM}
               onPointerEnter={(e) => {
-                measure();
-                const half = halfOf(e.clientY, index);
-                goTo(index, half);
+                stopIntro();
+                if (!metrics.current[index] || metrics.current[index]?.height === 0) {
+                  measure();
+                }
+                goTo(index, halfOf(e.clientY, index));
               }}
             >
               {dividers && index > 0 && <span className={DIVIDER} data-intro-rule="" aria-hidden="true" />}
@@ -672,13 +700,13 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
                 className={BAND}
                 aria-hidden="true"
                 style={{ backgroundColor: marqueeBgColor, color: marqueeTextColor }}
-                ref={(node) => {
+                ref={node => {
                   rows.current[index] = { ...rows.current[index], band: node };
                 }}
               >
                 <div
                   className={TRACK}
-                  ref={(node) => {
+                  ref={node => {
                     rows.current[index] = { ...rows.current[index], track: node };
                   }}
                 >
@@ -701,19 +729,19 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
           ref={floatRef}
           style={{ backgroundColor: marqueeBgColor, color: marqueeTextColor }}
         >
-          {[0, 1].map((slot) => {
+          {[0, 1].map(slot => {
             const item = slots[slot] >= 0 ? items[slots[slot]] : null;
             return (
               <div
                 key={slot}
                 className={FLOAT_LAYER}
-                ref={(node) => {
+                ref={node => {
                   layerRefs.current[slot] = node;
                 }}
               >
                 <div
                   className={TRACK}
-                  ref={(node) => {
+                  ref={node => {
                     layerTracks.current[slot] = node;
                   }}
                 >
@@ -732,6 +760,6 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
       )}
     </nav>
   );
-};
+}
 
 export default FlowingMenu;

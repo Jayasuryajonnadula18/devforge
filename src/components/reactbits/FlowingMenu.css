@@ -20,7 +20,7 @@
 .flowing-menu__item {
   position: relative;
   flex: 1 1 0;
-  min-height: 52px;
+  min-height: 56px;
   overflow: hidden;
   container-type: size;
 }
@@ -31,7 +31,7 @@
   right: 0;
   left: 0;
   height: 1px;
-  background: var(--flowing-menu-border, rgba(255, 255, 255, 0.1));
+  background: var(--flowing-menu-border, rgba(255, 255, 255, 0.14));
   transform-origin: left center;
   pointer-events: none;
 }
@@ -46,7 +46,7 @@
   gap: 16px;
   width: 100%;
   height: 100%;
-  padding: 0 clamp(16px, 3cqw, 32px);
+  padding: 0 clamp(16px, 4cqw, 40px);
   border: 0;
   background: none;
   color: inherit;
@@ -55,18 +55,12 @@
   text-decoration: none;
   outline: none;
   cursor: pointer;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.45s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 .flowing-menu[data-align='left'] .flowing-menu__link {
   grid-template-columns: auto 1fr auto;
-}
-
-.flowing-menu[data-no-index] .flowing-menu__link {
-  grid-template-columns: 1fr auto;
-  padding-left: 0;
-  padding-right: 0;
 }
 
 .flowing-menu__item[data-dimmed] .flowing-menu__link {
@@ -81,8 +75,7 @@
 .flowing-menu__index {
   justify-self: start;
   min-width: 1.6em;
-  font-family: var(--font-mono, monospace);
-  font-size: clamp(11px, 12cqh, 13px);
+  font-size: clamp(11px, 12cqh, 15px);
   font-variant-numeric: tabular-nums;
   opacity: 0.5;
 }
@@ -90,14 +83,14 @@
 .flowing-menu__label {
   display: flex;
   align-items: center;
-  gap: 0.35em;
+  gap: 0.28em;
   justify-self: center;
   overflow: hidden;
   padding: 0.06em 0;
-  font-size: clamp(24px, 36cqh, 36px);
+  font-size: clamp(24px, 36cqh, 48px);
   font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.025em;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
   white-space: nowrap;
 }
 
@@ -111,8 +104,8 @@
 
 .flowing-menu__dot {
   display: block;
-  width: 0.25em;
-  height: 0.25em;
+  width: 0.2em;
+  height: 0.2em;
   flex-shrink: 0;
   border-radius: 999px;
   background: currentColor;
@@ -122,22 +115,19 @@
   display: flex;
   align-items: center;
   justify-self: end;
-  gap: 12px;
+  gap: 14px;
 }
 
 .flowing-menu__meta {
-  font-family: var(--font-mono, monospace);
-  font-size: clamp(10px, 11cqh, 12px);
+  font-size: clamp(11px, 12cqh, 15px);
   font-variant-numeric: tabular-nums;
-  opacity: 0.6;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  opacity: 0.5;
 }
 
 .flowing-menu__arrow {
   display: grid;
   place-items: center;
-  opacity: 0.65;
+  opacity: 0.55;
 }
 
 .flowing-menu__band {
@@ -166,9 +156,9 @@
 }
 
 .flowing-menu__part-text {
-  padding: 0 0.5em;
+  padding: 0 0.4em;
   font-family: var(--font-sans, sans-serif);
-  font-size: clamp(20px, calc(36cqh * var(--flowing-menu-band, 1)), 34px);
+  font-size: clamp(22px, calc(38cqh * var(--flowing-menu-band, 1)), 44px);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.025em;
@@ -178,7 +168,7 @@
 .flowing-menu__image {
   display: block;
   flex-shrink: 0;
-  height: calc(52cqh * var(--flowing-menu-band, 1));
+  height: calc(56cqh * var(--flowing-menu-band, 1));
   aspect-ratio: 2.2 / 1;
   margin: 0 calc(3.5cqh * var(--flowing-menu-band, 1));
   border-radius: 999px;
@@ -199,7 +189,7 @@
 .flowing-menu__float {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 2;
   overflow: hidden;
   visibility: hidden;
   pointer-events: none;
