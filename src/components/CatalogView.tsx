@@ -88,7 +88,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               frequency={4.2}
               spread={0.25}
               taper={1.10}
-              position={0.50}
+              position={0.46}
               pinch={0.5}
               nodes={1}
               glow={0.032}
@@ -101,7 +101,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               mouseStrength={0.65}
               pulseOnClick={true}
               shimmer={true}
-              fade={0.14}
+              fade={0.22}
             />
           </div>
 
@@ -121,8 +121,13 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             }}
           />
 
-          {/* Bottom Edge Fade */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-[#050608] via-[#050608]/80 to-transparent z-[4]" />
+          {/* Bottom Edge Fade - Deep, multi-stop feather to solid obsidian void */}
+          <div 
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-80 sm:h-96 z-[4]"
+            style={{
+              background: 'linear-gradient(to top, #050608 0%, #050608 22%, rgba(5, 6, 8, 0.96) 50%, rgba(5, 6, 8, 0.55) 78%, transparent 100%)',
+            }}
+          />
         </div>
 
         {/* ================= 1. ADELOS MINIMALIST FLOATING NAVBAR ================= */}

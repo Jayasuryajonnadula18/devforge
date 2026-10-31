@@ -49,12 +49,14 @@ export function buildAnvilAndCubeFragments(ANVIL_X = 1.0, ANVIL_Y = -0.15): Anvi
     color: 0x4a5568,
     roughness: 0.28,
     metalness: 0.85,
+    transparent: true,
   });
 
   const bodyMat = new THREE.MeshStandardMaterial({
     color: 0x222730,
     roughness: 0.38,
     metalness: 0.78,
+    transparent: true,
   });
 
   // Base unit geometry for each modular block in the 3x3x3 cube (size 0.52 with bevel margins)

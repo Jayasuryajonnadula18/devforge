@@ -772,6 +772,22 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
         }}
       />
 
+      {/* Top Seam Blend: Seamless continuous handoff from Hero */}
+      <div
+        className="absolute top-0 inset-x-0 h-44 sm:h-60 pointer-events-none z-20"
+        style={{
+          background: 'linear-gradient(to bottom, #050608 0%, #050608 15%, rgba(5, 6, 8, 0.85) 50%, transparent 100%)',
+        }}
+      />
+
+      {/* Bottom Seam Blend: Soft dissolution of 3D floor/canvas into the Footer */}
+      <div
+        className="absolute bottom-0 inset-x-0 h-48 sm:h-64 pointer-events-none z-20"
+        style={{
+          background: 'linear-gradient(to top, #050608 0%, #050608 20%, rgba(5, 6, 8, 0.85) 55%, transparent 100%)',
+        }}
+      />
+
       {/* 3D Canvas Stage: Full Viewport Coverage for both Scene 02 and Scene 03 */}
       <div
         ref={canvasMountRef}

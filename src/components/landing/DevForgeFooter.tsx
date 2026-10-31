@@ -114,8 +114,13 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
         background: 'linear-gradient(180deg, #050608 0%, #0d0907 20%, #2a150b 50%, #5c2912 80%, #7e3a19 100%)',
       }}
     >
-      {/* Top Seam Blending (Smooth transition from page dark canvas) */}
-      <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-[#050608] via-[#050608]/70 to-transparent pointer-events-none z-10" />
+      {/* Top Seam Blending (Deep, smooth transition from page dark canvas) */}
+      <div 
+        className="absolute top-0 inset-x-0 h-56 sm:h-72 pointer-events-none z-10"
+        style={{
+          background: 'linear-gradient(to bottom, #050608 0%, #050608 25%, rgba(5, 6, 8, 0.95) 55%, transparent 100%)',
+        }}
+      />
 
       {/* Subtle Noise / Film Grain Overlay */}
       <div
@@ -139,7 +144,7 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 0.85, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 py-24 sm:py-32 lg:py-36 text-[#f5f4f0]"
+        className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-12 lg:px-20 pt-32 sm:pt-40 lg:pt-48 pb-24 sm:pb-32 lg:pb-36 text-[#f5f4f0]"
       >
         {/* Main Grid: Left Newsletter / Right Navigation Groups */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
