@@ -243,6 +243,16 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out`;
     };
   }, []);
 
+  // Reset scroll and refresh Lenis scroll limits whenever changing views
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const lenis = (window as any).lenis;
+    if (lenis) {
+      lenis.scrollTo(0, { immediate: true });
+      setTimeout(() => lenis.resize(), 60);
+    }
+  }, [viewMode]);
+
   return (
     <>
       {/* Universal Command Palette */}

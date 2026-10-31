@@ -118,6 +118,27 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showForm, onBack]);
 
+  // Scroll to top on mount and synchronize Lenis
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    const lenis = (window as any).lenis;
+    if (lenis) {
+      lenis.scrollTo(0, { immediate: true });
+      lenis.resize();
+    }
+    window.dispatchEvent(new Event('resize'));
+  }, []);
+
+  // Sync scroll whenever form toggles
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const lenis = (window as any).lenis;
+      if (lenis) lenis.resize();
+      window.dispatchEvent(new Event('resize'));
+    }, 320);
+    return () => clearTimeout(timer);
+  }, [showForm]);
+
   const handleCopyEmail = async (e?: React.MouseEvent) => {
     e?.preventDefault();
     e?.stopPropagation();
@@ -135,8 +156,50 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     }
   };
 
+  const handleEmailAction = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // 1. Copy email address to clipboard immediately
+    try {
+      navigator.clipboard.writeText('engineering@devforge.org');
+      setCopiedEmail(true);
+      setTimeout(() => setCopiedEmail(false), 2400);
+    } catch {}
+
+    // 2. Open default mail client
+    window.location.href = 'mailto:engineering@devforge.org?subject=DevForge%20Inquiry';
+
+    // 3. Clear toast confirming action with Gmail fallback
+    toast.success('Opening Email App', {
+      description: 'Address copied to clipboard: engineering@devforge.org',
+      action: {
+        label: 'Open in Gmail',
+        onClick: () => {
+          window.open(
+            'https://mail.google.com/mail/?view=cm&fs=1&to=engineering@devforge.org&su=DevForge%20Inquiry',
+            '_blank'
+          );
+        },
+      },
+    });
+  };
+
   const toggleForm = () => {
-    setShowForm((prev) => !prev);
+    setShowForm((prev) => {
+      const next = !prev;
+      if (next) {
+        setTimeout(() => {
+          formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          const lenis = (window as any).lenis;
+          if (lenis) {
+            lenis.resize();
+            lenis.scrollTo(formSectionRef.current, { offset: -60, duration: 0.8 });
+          }
+        }, 140);
+      }
+      return next;
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -178,7 +241,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-[#050608] text-[#f5f4f0] font-sans selection:bg-white selection:text-black flex flex-col justify-between overflow-x-hidden">
+    <div className="relative min-h-screen w-full bg-[#050608] text-[#f5f4f0] font-sans selection:bg-white selection:text-black flex flex-col justify-between overflow-x-hidden overflow-y-auto">
       {/* ================= OPTICAL GLASS ORB (PLAYFUL TOY & ACTION LENS) ================= */}
       {!isTouchDevice && !prefersReducedMotion && (
         <motion.div
@@ -322,7 +385,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
       </header>
 
       {/* ================= HERO STAGE ================= */}
-      <main className="relative z-10 flex-1 w-full px-6 sm:px-12 lg:px-20 py-6 sm:py-8 lg:py-10 flex flex-col justify-between">
+      <main className="relative z-10 flex-1 w-full px-6 sm:px-12 lg:px-20 py-6 sm:py-8 lg:py-10 flex flex-col justify-between pb-24 sm:pb-36">
         
         {/* Row 1: Massive CONTACT Landmark Title */}
         <div className="w-full">
@@ -393,14 +456,15 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
             </button>
           </div>
 
-          {/* Primary Semantic Mailto Anchor */}
+          {/* Primary Semantic Mailto Anchor with Reliable Click & Copy Feedback */}
           <a
             ref={emailRef}
             href="mailto:engineering@devforge.org?subject=DevForge%20Inquiry"
+            onClick={handleEmailAction}
             onMouseEnter={() => setIsHoveringEmail(true)}
             onMouseLeave={() => setIsHoveringEmail(false)}
             className="w-full block cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-4 focus-visible:ring-offset-black rounded-xl transition-all"
-            aria-label="Send email to engineering@devforge.org (opens your default email client)"
+            aria-label="Send email to engineering@devforge.org (opens your default email client or copies address)"
           >
             <div className="text-4xl sm:text-6xl md:text-7xl lg:text-[88px] xl:text-[104px] font-sans font-black tracking-tight leading-[0.92] text-white group-hover:text-neutral-300 transition-colors">
               <span className="block">engineering@</span>
@@ -410,13 +474,14 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
 
           {/* Mobile Native Touch Targets */}
           <div className="flex sm:hidden items-stretch gap-3 w-full pt-4">
-            <a
-              href="mailto:engineering@devforge.org?subject=DevForge%20Inquiry"
-              className="flex-1 py-3 px-4 rounded-xl bg-white text-black font-sans font-semibold text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-lg active:scale-98 transition-transform"
+            <button
+              type="button"
+              onClick={handleEmailAction}
+              className="flex-1 py-3 px-4 rounded-xl bg-white text-black font-sans font-semibold text-xs uppercase tracking-wider flex items-center justify-center space-x-2 shadow-lg active:scale-98 transition-transform cursor-pointer"
             >
               <ArrowUpRight className="w-4 h-4 text-black" />
               <span>Send Mail</span>
-            </a>
+            </button>
             <button
               type="button"
               onClick={handleCopyEmail}
