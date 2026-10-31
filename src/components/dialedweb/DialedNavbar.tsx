@@ -120,7 +120,7 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
               <button 
                 type="button"
                 onClick={() => {
-                  toast('Architecture Atlas — Coming Soon', {
+                  toast('Architecture — Coming Soon', {
                     description: 'Interactive visual system topologies & distributed system maps dropping in Q1 2027.',
                   });
                 }}
