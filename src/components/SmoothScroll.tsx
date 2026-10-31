@@ -9,14 +9,15 @@ gsap.registerPlugin(ScrollTrigger);
 
 export const SmoothScroll: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   useEffect(() => {
-    // Lenis smooth inertia scroll configured for cinematic, velvety camera motion
+    // Lenis smooth inertia scroll configured with balanced damping
     const lenis = new Lenis({
       duration: 0.85,
-      easing: (t) => 1 - Math.pow(1 - t, 3),
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 1.0,
+      wheelMultiplier: 0.95,
+      touchMultiplier: 1.2,
     });
 
     // Synchronize Lenis with GSAP ScrollTrigger
@@ -28,7 +29,8 @@ export const SmoothScroll: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     gsap.ticker.add(updateLenis);
-    gsap.ticker.lagSmoothing(0);
+    // Enable lag smoothing to absorb frame-time variance without jarring visual skips
+    gsap.ticker.lagSmoothing(500, 33);
 
     return () => {
       gsap.ticker.remove(updateLenis);

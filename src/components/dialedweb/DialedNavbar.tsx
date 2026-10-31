@@ -32,21 +32,34 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuView, setMenuView] = useState<'main' | 'courses' | 'explore'>('main');
 
-  // Track scroll state and active section
+  // Track scroll state and active section efficiently without layout thrashing
   useEffect(() => {
-    return scrollY.on('change', (latest) => {
-      setIsScrolled(latest > 25);
-
-      const aboutEl = document.getElementById('meet-devforge');
-      if (aboutEl) {
-        const rect = aboutEl.getBoundingClientRect();
-        if (rect.top <= 200 && rect.bottom >= 150) {
-          setActiveSection('about');
-          return;
-        }
+    let wasScrolled = false;
+    const unsubscribeScroll = scrollY.on('change', (latest) => {
+      const scrolled = latest > 25;
+      if (scrolled !== wasScrolled) {
+        wasScrolled = scrolled;
+        setIsScrolled(scrolled);
       }
-      setActiveSection('hero');
     });
+
+    // Zero-overhead intersection observer for active section detection
+    let observer: IntersectionObserver | null = null;
+    const aboutEl = document.getElementById('meet-devforge');
+    if (aboutEl) {
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          setActiveSection(entry.isIntersecting ? 'about' : 'hero');
+        },
+        { rootMargin: '-15% 0px -65% 0px' }
+      );
+      observer.observe(aboutEl);
+    }
+
+    return () => {
+      unsubscribeScroll();
+      observer?.disconnect();
+    };
   }, [scrollY]);
 
   // Open menu specifically to Courses view

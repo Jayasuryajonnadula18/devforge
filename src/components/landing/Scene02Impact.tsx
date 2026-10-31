@@ -68,7 +68,7 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       powerPreference: 'high-performance',
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.35;
     renderer.shadowMap.enabled = true;
@@ -86,6 +86,10 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     const forgeKeyLight = new THREE.DirectionalLight(0xffffff, 4.2);
     forgeKeyLight.position.set(-3.2, 5.5, 4.2);
     forgeKeyLight.castShadow = true;
+    forgeKeyLight.shadow.mapSize.width = 1024;
+    forgeKeyLight.shadow.mapSize.height = 1024;
+    forgeKeyLight.shadow.camera.near = 1.0;
+    forgeKeyLight.shadow.camera.far = 14;
     scene.add(forgeKeyLight);
 
     // Cool Rim Light
@@ -321,8 +325,20 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       sparkProgress: 0,
     };
 
-    let animationFrameId: number;
+    // Reusable scratch vectors to eliminate 8,000+ GC object allocations/sec during scroll
+    const _targetPos = new THREE.Vector3();
+    const _yAxis = new THREE.Vector3(0, 1, 0);
+    const _arcVec = new THREE.Vector3();
+    let isVisible = true;
+    let animationFrameId: number = 0;
+
     const render = () => {
+      if (!isVisible) {
+        animationFrameId = 0;
+        return;
+      }
+      animationFrameId = requestAnimationFrame(render);
+
       // 1. Camera interpolation
       camera.position.set(trans.camX, trans.camY, trans.camZ);
       camera.lookAt(trans.lookX, trans.lookY, 0);
@@ -366,26 +382,19 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
             mesh.scale.set(1.0, 1.0, 1.0);
           } else {
             // Stage C: NATURAL MAGNETIC ASSEMBLY INTO MONOLITHIC CUBE
-            // Each block has an individual progress value based on its distance-to-center delay
             const pRaw = (trans.assembleProgress - frag.delay) / (1.0 - frag.delay);
             const pClamped = Math.max(0, Math.min(1, pRaw));
 
             // Smooth cubic smoothstep interpolation
             const pSmooth = pClamped * pClamped * (3 - 2 * pClamped);
 
-            // Target world position with ambient cube rotation
+            // Target world position with ambient cube rotation (zero allocations)
             const rotYOffset = trans.cubeRotationY;
-            const targetRot = new THREE.Euler(
-              cubeW.rot.x,
-              cubeW.rot.y + rotYOffset,
-              cubeW.rot.z
-            );
-            const targetPos = cubeW.pos.clone();
-            targetPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotYOffset);
+            _targetPos.copy(cubeW.pos).applyAxisAngle(_yAxis, rotYOffset);
 
-            // Curved orbital flight trajectory (parabolic arc perpendicular to travel)
+            // Curved orbital flight trajectory
             const arcWeight = Math.sin(Math.PI * pSmooth);
-            const arcVec = frag.arcOffset.clone().multiplyScalar(arcWeight);
+            _arcVec.copy(frag.arcOffset).multiplyScalar(arcWeight);
 
             // Subtle tactile settle damping when snapping into position (pClamped > 0.92)
             let settleOffset = 0;
@@ -394,17 +403,17 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
               settleOffset = Math.sin(tSettle * Math.PI * 2) * 0.014 * (1 - tSettle);
             }
 
-            const px = THREE.MathUtils.lerp(frag.scatterPos.x, targetPos.x, pSmooth) + arcVec.x;
-            const py = THREE.MathUtils.lerp(frag.scatterPos.y, targetPos.y, pSmooth) + arcVec.y + settleOffset;
-            const pz = THREE.MathUtils.lerp(frag.scatterPos.z, targetPos.z, pSmooth) + arcVec.z;
+            const px = THREE.MathUtils.lerp(frag.scatterPos.x, _targetPos.x, pSmooth) + _arcVec.x;
+            const py = THREE.MathUtils.lerp(frag.scatterPos.y, _targetPos.y, pSmooth) + _arcVec.y + settleOffset;
+            const pz = THREE.MathUtils.lerp(frag.scatterPos.z, _targetPos.z, pSmooth) + _arcVec.z;
 
             mesh.position.set(px, py, pz);
 
             // Rotation smoothly aligns and locks
             mesh.rotation.set(
-              THREE.MathUtils.lerp(frag.scatterRot.x, targetRot.x, pSmooth),
-              THREE.MathUtils.lerp(frag.scatterRot.y, targetRot.y, pSmooth),
-              THREE.MathUtils.lerp(frag.scatterRot.z, targetRot.z, pSmooth)
+              THREE.MathUtils.lerp(frag.scatterRot.x, cubeW.rot.x, pSmooth),
+              THREE.MathUtils.lerp(frag.scatterRot.y, cubeW.rot.y + rotYOffset, pSmooth),
+              THREE.MathUtils.lerp(frag.scatterRot.z, cubeW.rot.z, pSmooth)
             );
             mesh.scale.set(1.0, 1.0, 1.0);
           }
@@ -412,9 +421,23 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       }
 
       renderer.render(scene, camera);
-      animationFrameId = requestAnimationFrame(render);
     };
     render();
+
+    // Viewport-aware visibility observer: pauses WebGL rendering when out of viewport
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        const nowVisible = entry.isIntersecting;
+        if (nowVisible !== isVisible) {
+          isVisible = nowVisible;
+          if (isVisible && !animationFrameId) {
+            animationFrameId = requestAnimationFrame(render);
+          }
+        }
+      },
+      { rootMargin: '300px 0px' }
+    );
+    visibilityObserver.observe(stage);
 
     // =========================================================================
     // 8. MASTER GSAP SCROLLTRIGGER PINNED TIMELINE (Scene 02 → Scene 03)
@@ -746,9 +769,10 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     renderer.domElement.addEventListener('webglcontextlost', handleContextLost, false);
 
     return () => {
+      visibilityObserver.disconnect();
       window.removeEventListener('resize', handleResize);
       renderer.domElement.removeEventListener('webglcontextlost', handleContextLost);
-      cancelAnimationFrame(animationFrameId);
+      if (animationFrameId) cancelAnimationFrame(animationFrameId);
       ctx.revert();
       renderer.dispose();
       if (container.contains(renderer.domElement)) {

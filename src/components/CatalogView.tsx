@@ -102,6 +102,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
               pulseOnClick={true}
               shimmer={true}
               fade={0.22}
+              dpr={1.5}
             />
           </div>
 
