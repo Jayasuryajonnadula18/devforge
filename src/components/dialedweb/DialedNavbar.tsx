@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useScroll } from 'motion/react';
 import { Search } from 'lucide-react';
+import { toast } from 'sonner';
 import { ForgeSymbol } from '../icons/ForgeSymbol';
 import { LiquidGlass } from '../reactbits/LiquidGlass';
 
@@ -53,20 +54,36 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
           saturation={0.8}
         >
           <nav className="flex items-center gap-1 px-1.5">
-            <a 
-              href="#architecture" 
-              className="text-white/60 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold"
+            <button 
+              type="button"
+              onClick={() => {
+                toast('Architecture Atlas — Coming Soon', {
+                  description: 'Interactive visual system topologies & distributed system maps dropping in Q1 2027.',
+                });
+              }}
+              className="text-white/60 hover:text-white px-3 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold flex items-center gap-1.5 cursor-pointer"
             >
-              Architecture
-            </a>
-            <a 
-              href="#curriculum" 
-              className="text-white/60 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold"
+              <span>Architecture</span>
+              <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider leading-none">
+                Soon
+              </span>
+            </button>
+            <button 
+              type="button"
+              onClick={() => {
+                toast('Curriculum Tracks — Coming Soon', {
+                  description: 'Advanced compiler, kernel & distributed consensus tracks launching in private preview.',
+                });
+              }}
+              className="text-white/60 hover:text-white px-3 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold flex items-center gap-1.5 cursor-pointer"
             >
-              Courses
-            </a>
+              <span>Courses</span>
+              <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider leading-none">
+                Soon
+              </span>
+            </button>
             <a 
-              href="#problem" 
+              href="#meet-devforge" 
               className="text-white/60 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold"
             >
               Philosophy

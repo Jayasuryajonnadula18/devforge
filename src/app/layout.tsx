@@ -4,6 +4,7 @@ import { Playfair_Display, Montserrat, Cormorant_Garamond, Space_Grotesk } from 
 import { cn } from "@/lib/utils";
 import { SmoothScroll } from "@/components/SmoothScroll";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { GlobalErrorBoundary } from "@/components/GlobalErrorBoundary";
 import { Toaster } from "sonner";
 
 // Primary Font: Montserrat (Geometric, architectural sans-serif for UI, Headings & Body)
@@ -53,11 +54,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("dark h-full", montserrat.variable, playfairDisplay.variable, cormorantGaramond.variable, spaceGrotesk.variable)}>
       <body className="min-h-full font-sans antialiased selection:bg-white selection:text-black">
-        <ThemeProvider>
-          <SmoothScroll>
-            {children}
-          </SmoothScroll>
-        </ThemeProvider>
+        <GlobalErrorBoundary>
+          <ThemeProvider>
+            <SmoothScroll>
+              {children}
+            </SmoothScroll>
+          </ThemeProvider>
+        </GlobalErrorBoundary>
         <Toaster 
           theme="dark" 
           position="bottom-right"

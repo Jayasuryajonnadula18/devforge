@@ -726,7 +726,7 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       masterTl.to({}, { duration: 0.8 }, 16.5);
     }, stage);
 
-    // Resize & Cleanup
+    // Resize & Context Loss Defense
     const handleResize = () => {
       if (!container || !renderer) return;
       const w = container.clientWidth || window.innerWidth;
@@ -737,10 +737,17 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
       ScrollTrigger.refresh();
     };
 
+    const handleContextLost = (e: Event) => {
+      e.preventDefault();
+      cancelAnimationFrame(animationFrameId);
+    };
+
     window.addEventListener('resize', handleResize);
+    renderer.domElement.addEventListener('webglcontextlost', handleContextLost, false);
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      renderer.domElement.removeEventListener('webglcontextlost', handleContextLost);
       cancelAnimationFrame(animationFrameId);
       ctx.revert();
       renderer.dispose();

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { ProjectTrack } from '../../types';
 import { toast } from 'sonner';
@@ -18,6 +18,7 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
   const [deviceInfo, setDeviceInfo] = useState<string>('Detecting...');
   const [email, setEmail] = useState<string>('');
   const [isSubscribed, setIsSubscribed] = useState<boolean>(false);
+  const lastSubmitTimeRef = useRef<number>(0);
 
   // Dynamic device detection matching the 108 Supply reference
   useEffect(() => {
@@ -36,16 +37,52 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
     setDeviceInfo(`${os} · ${width}×${height}`);
   }, []);
 
+  // Secure, sanitized & rate-limited subscription handler
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !email.includes('@')) {
-      toast.error('Please enter a valid email address');
+
+    // 1. Rate-limiting check (cooldown of 3 seconds)
+    const now = Date.now();
+    if (now - lastSubmitTimeRef.current < 3000) {
+      toast.warning('Please wait a moment before resubmitting.');
       return;
     }
+    lastSubmitTimeRef.current = now;
+
+    // 2. Strict Input Sanitization
+    const sanitizedEmail = email.trim();
+    if (!sanitizedEmail) {
+      toast.error('Email address cannot be empty.');
+      return;
+    }
+
+    if (sanitizedEmail.length > 254) {
+      toast.error('Email address exceeds maximum permissible length.');
+      return;
+    }
+
+    // RFC 5322 standard email regex pattern
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+    if (!emailRegex.test(sanitizedEmail)) {
+      toast.error('Please enter a valid, well-formed email address.');
+      return;
+    }
+
     setIsSubscribed(true);
     toast.success('Joined the builder list', {
-      description: 'You will receive updates when new system tracks drop.',
+      description: 'You will receive notifications when new architecture tracks drop.',
     });
+  };
+
+  const handleOpenArchitectureTrack = (id: string, name: string) => {
+    const track = projects.find(p => p.id === id);
+    if (track && onSelectProject) {
+      onSelectProject(track);
+    } else {
+      toast.info(`${name} — Track In Preparation`, {
+        description: 'This architecture module is currently undergoing test suite verification.',
+      });
+    }
   };
 
   return (
@@ -104,6 +141,9 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    maxLength={254}
+                    autoComplete="email"
+                    spellCheck={false}
                     placeholder="Enter your email"
                     className="h-12 px-4 rounded-xl bg-[#180e08]/90 border border-white/15 text-sm text-white placeholder:text-neutral-400 focus:outline-none focus:border-white/40 focus:ring-1 focus:ring-white/20 transition-colors flex-1 w-full"
                   />
@@ -135,6 +175,7 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
                 {projects.slice(0, 4).map((proj) => (
                   <li key={proj.id}>
                     <button
+                      type="button"
                       onClick={() => onSelectProject && onSelectProject(proj)}
                       className="hover:text-white transition-colors cursor-pointer text-left flex items-center group"
                     >
@@ -144,6 +185,38 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
                     </button>
                   </li>
                 ))}
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => toast.info('Distributed Raft Track — Coming Soon', {
+                      description: 'Consensus state machines & leader election track is currently in private verification.',
+                    })}
+                    className="hover:text-white transition-colors cursor-pointer text-left flex items-center group text-neutral-400 hover:text-neutral-200"
+                  >
+                    <span className="group-hover:translate-x-0.5 transition-transform">
+                      Distributed Raft
+                    </span>
+                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider ml-1.5 leading-none">
+                      Soon
+                    </span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => toast.info('eBPF Kernel Track — Coming Soon', {
+                      description: 'Linux kernel tracepoints & ring buffer observability track dropping in Q1 2027.',
+                    })}
+                    className="hover:text-white transition-colors cursor-pointer text-left flex items-center group text-neutral-400 hover:text-neutral-200"
+                  >
+                    <span className="group-hover:translate-x-0.5 transition-transform">
+                      eBPF Observability
+                    </span>
+                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider ml-1.5 leading-none">
+                      Soon
+                    </span>
+                  </button>
+                </li>
               </ul>
             </div>
 
@@ -154,36 +227,66 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
               </span>
               <ul className="space-y-2.5 text-neutral-200">
                 <li>
-                  <span className="inline-flex items-center space-x-1.5 hover:text-white transition-colors cursor-pointer">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenArchitectureTrack('go-cache', 'In-Memory Storage')}
+                    className="inline-flex items-center space-x-1.5 hover:text-white transition-colors cursor-pointer text-left"
+                  >
                     <span>In-Memory Storage</span>
                     <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-white/10 text-neutral-300">
                       Go
                     </span>
-                  </span>
+                  </button>
                 </li>
                 <li>
-                  <span className="inline-flex items-center space-x-1.5 hover:text-white transition-colors cursor-pointer">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenArchitectureTrack('py-git', 'DAG Git Internals')}
+                    className="inline-flex items-center space-x-1.5 hover:text-white transition-colors cursor-pointer text-left"
+                  >
                     <span>DAG Git Internals</span>
                     <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-white/10 text-neutral-300">
                       Py
                     </span>
-                  </span>
+                  </button>
                 </li>
                 <li>
-                  <span className="inline-flex items-center space-x-1.5 hover:text-white transition-colors cursor-pointer">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenArchitectureTrack('ts-queue', 'Message Queues')}
+                    className="inline-flex items-center space-x-1.5 hover:text-white transition-colors cursor-pointer text-left"
+                  >
                     <span>Message Queues</span>
                     <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-white/10 text-neutral-300">
                       TS
                     </span>
-                  </span>
+                  </button>
                 </li>
                 <li>
-                  <span className="inline-flex items-center space-x-1.5 hover:text-white transition-colors cursor-pointer">
+                  <button
+                    type="button"
+                    onClick={() => handleOpenArchitectureTrack('rust-parser', 'Zero-Copy Parsers')}
+                    className="inline-flex items-center space-x-1.5 hover:text-white transition-colors cursor-pointer text-left"
+                  >
                     <span>Zero-Copy Parsers</span>
                     <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-white/10 text-neutral-300">
                       Rust
                     </span>
-                  </span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => toast.info('LSM-Tree Storage Engine — Coming Soon', {
+                      description: 'SSTables, MemTable flushing & Bloom filter architecture guide dropping soon.',
+                    })}
+                    className="inline-flex items-center space-x-1.5 hover:text-white transition-colors cursor-pointer text-left text-neutral-400 hover:text-neutral-200"
+                  >
+                    <span>LSM-Tree Engine</span>
+                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider leading-none">
+                      Soon
+                    </span>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -195,24 +298,51 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
               </span>
               <ul className="space-y-2.5 text-neutral-200">
                 <li>
-                  <a href="#meet-devforge" className="hover:text-white transition-colors">
+                  <a href="#meet-devforge" className="hover:text-white transition-colors block">
                     The Forge
                   </a>
                 </li>
                 <li>
-                  <span className="hover:text-white transition-colors cursor-pointer">
-                    First Principles
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => toast.info('First Principles Manifesto — Coming Soon', {
+                      description: 'Architectural writings on zero-cost abstractions and invariant-driven software engineering.',
+                    })}
+                    className="hover:text-white transition-colors cursor-pointer flex items-center text-left"
+                  >
+                    <span>First Principles</span>
+                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider ml-1.5 leading-none">
+                      Soon
+                    </span>
+                  </button>
                 </li>
                 <li>
-                  <span className="hover:text-white transition-colors cursor-pointer">
-                    System Invariants
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => toast.info('Formal Invariants Guide — Coming Soon', {
+                      description: 'Formal proofs and systems safety invariants coming in v1.0.',
+                    })}
+                    className="hover:text-white transition-colors cursor-pointer flex items-center text-left"
+                  >
+                    <span>System Invariants</span>
+                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider ml-1.5 leading-none">
+                      Soon
+                    </span>
+                  </button>
                 </li>
                 <li>
-                  <span className="hover:text-white transition-colors cursor-pointer">
-                    Privacy & Terms
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => toast.info('Privacy & Safety Invariants', {
+                      description: 'DevForge is strictly local-first and zero-telemetry. Official terms and licensing documentation coming soon.',
+                    })}
+                    className="hover:text-white transition-colors cursor-pointer flex items-center text-left"
+                  >
+                    <span>Privacy & Terms</span>
+                    <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/25 tracking-wider ml-1.5 leading-none">
+                      Soon
+                    </span>
+                  </button>
                 </li>
               </ul>
             </div>

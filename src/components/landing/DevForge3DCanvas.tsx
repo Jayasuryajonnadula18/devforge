@@ -656,7 +656,7 @@ export const DevForge3DCanvas: React.FC<DevForge3DCanvasProps> = ({
     render();
 
     // =========================================================================
-    // 11. Responsive Resize
+    // 11. Responsive Resize & WebGL Context Guard
     // =========================================================================
     const handleResize = () => {
       if (!container || !renderer || !camera) return;
@@ -667,10 +667,17 @@ export const DevForge3DCanvas: React.FC<DevForge3DCanvasProps> = ({
       renderer.setSize(w, h);
     };
 
+    const handleContextLost = (e: Event) => {
+      e.preventDefault();
+      cancelAnimationFrame(animationFrameId);
+    };
+
     window.addEventListener('resize', handleResize);
+    renderer.domElement.addEventListener('webglcontextlost', handleContextLost, false);
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      renderer.domElement.removeEventListener('webglcontextlost', handleContextLost);
       cancelAnimationFrame(animationFrameId);
       observer.disconnect();
       tl.kill();
