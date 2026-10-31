@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
 import { toast } from 'sonner';
 import {
@@ -12,7 +12,6 @@ import {
   ChevronDown,
   ChevronUp,
   Send,
-  Mail,
 } from 'lucide-react';
 
 interface ContactPageProps {
@@ -20,28 +19,29 @@ interface ContactPageProps {
 }
 
 export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
   const emailRef = useRef<HTMLAnchorElement>(null);
-  const formRef = useRef<HTMLDivElement>(null);
-  const nameInputRef = useRef<HTMLInputElement>(null);
+  const formSectionRef = useRef<HTMLDivElement>(null);
 
-  // Magnetic Glass Orb Lens Follower (Playful Optical Toy & Action Lens)
-  const [lensMode, setLensMode] = useState<'idle' | 'email' | 'link'>('idle');
-  const [clickPulse, setClickPulse] = useState(false);
-  const [cursorVisible, setCursorVisible] = useState(false);
-  const [copiedEmail, setCopiedEmail] = useState(false);
+  // Device & accessibility checks
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [isHoveringEmail, setIsHoveringEmail] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
 
-  // Position motion values for the orb center
+  // Motion values for orb position & opacity (isolated from React render cycles)
   const targetOrbX = useMotionValue(600);
   const targetOrbY = useMotionValue(400);
+  const orbOpacity = useMotionValue(0);
 
-  // Spring smoothing with calibrated damping for fluid, organic cursor tracking
-  const springX = useSpring(targetOrbX, { stiffness: 450, damping: 28, mass: 0.45 });
-  const springY = useSpring(targetOrbY, { stiffness: 450, damping: 28, mass: 0.45 });
+  // Playful spring scale (squishes on click without triggering React re-renders)
+  const rawScale = useMotionValue(1);
+  const springScale = useSpring(rawScale, { stiffness: 480, damping: 20 });
 
-  // Direct Message Form State (De-slopped, genuine message form)
+  // Smooth position springs for natural optical tracking
+  const springX = useSpring(targetOrbX, { stiffness: 380, damping: 30, mass: 0.5 });
+  const springY = useSpring(targetOrbY, { stiffness: 380, damping: 30, mass: 0.5 });
+
+  // Direct Message Form State
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -50,7 +50,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
 
-  // Detect touch device and reduced motion preferences
+  // Detect touch device & reduced motion
   useEffect(() => {
     setIsTouchDevice(
       'ontouchstart' in window ||
@@ -65,38 +65,43 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Window-level mouse tracking for fixed follower lens
+  // Window-level pointer tracking (runs purely through MotionValues, 0 re-render cost)
   useEffect(() => {
     if (isTouchDevice) return;
 
     const handlePointerMove = (e: PointerEvent) => {
       targetOrbX.set(e.clientX);
       targetOrbY.set(e.clientY);
-      if (!cursorVisible) setCursorVisible(true);
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('form, input, textarea')) {
+        orbOpacity.set(0);
+      } else {
+        orbOpacity.set(1);
+      }
     };
+
     const handlePointerLeave = () => {
-      setCursorVisible(false);
+      orbOpacity.set(0);
     };
+
+    // Playful toy click feedback: squishes slightly on click outside inputs/buttons
+    const handlePointerDown = (e: PointerEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('input, textarea, button, a, form')) return;
+      rawScale.set(0.8);
+      setTimeout(() => rawScale.set(1), 90);
+    };
+
     window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('pointerdown', handlePointerDown, { passive: true });
     document.addEventListener('mouseleave', handlePointerLeave);
+
     return () => {
       window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerdown', handlePointerDown);
       document.removeEventListener('mouseleave', handlePointerLeave);
     };
-  }, [isTouchDevice, cursorVisible, targetOrbX, targetOrbY]);
-
-  // Playful toy interaction: Click anywhere ripples and pulses the glass orb
-  useEffect(() => {
-    if (isTouchDevice) return;
-
-    const handlePointerDown = () => {
-      setClickPulse(true);
-      setTimeout(() => setClickPulse(false), 240);
-    };
-
-    window.addEventListener('pointerdown', handlePointerDown);
-    return () => window.removeEventListener('pointerdown', handlePointerDown);
-  }, [isTouchDevice]);
+  }, [isTouchDevice, targetOrbX, targetOrbY, orbOpacity, rawScale]);
 
   // Keyboard navigation: Escape key returns or closes message form
   useEffect(() => {
@@ -131,16 +136,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   };
 
   const toggleForm = () => {
-    setShowForm((prev) => {
-      const next = !prev;
-      if (next) {
-        setTimeout(() => {
-          formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          nameInputRef.current?.focus();
-        }, 120);
-      }
-      return next;
-    });
+    setShowForm((prev) => !prev);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -170,7 +166,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
       toast.success('Message Sent', {
         description: `Thank you, ${name.trim()}! We'll reply to ${email.trim()}.`,
       });
-    }, 450);
+    }, 400);
   };
 
   const handleResetForm = () => {
@@ -182,47 +178,44 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   };
 
   return (
-    <div
-      ref={containerRef}
-      onPointerMove={(e) => {
-        if (isTouchDevice) return;
-        targetOrbX.set(e.clientX);
-        targetOrbY.set(e.clientY);
-        if (!cursorVisible) setCursorVisible(true);
-      }}
-      className="relative min-h-screen w-full bg-[#050608] text-[#f5f4f0] font-sans selection:bg-white selection:text-black flex flex-col justify-between overflow-x-hidden"
-    >
-      {/* ================= OPTICAL GLASS ORB (PLAYFUL TOY & CONTEXTUAL ACTION LENS) ================= */}
-      {!isTouchDevice && !prefersReducedMotion && cursorVisible && (
+    <div className="relative min-h-screen w-full bg-[#050608] text-[#f5f4f0] font-sans selection:bg-white selection:text-black flex flex-col justify-between overflow-x-hidden">
+      {/* ================= OPTICAL GLASS ORB (PLAYFUL TOY & ACTION LENS) ================= */}
+      {!isTouchDevice && !prefersReducedMotion && (
         <motion.div
           style={{
             x: springX,
             y: springY,
+            opacity: orbOpacity,
           }}
           className="pointer-events-none fixed top-0 left-0 z-50 hidden md:block"
         >
           <motion.div
             style={{
               transform: 'translate(-50%, -50%)',
+              scale: springScale,
             }}
             animate={{
-              width: lensMode === 'email' ? 168 : lensMode === 'link' ? 76 : 58,
-              height: lensMode === 'email' ? 168 : lensMode === 'link' ? 76 : 58,
-              scale: clickPulse ? 0.82 : 1,
-              borderColor: lensMode === 'email' ? 'rgba(255, 255, 255, 0.50)' : 'rgba(255, 255, 255, 0.25)',
-              backgroundColor: lensMode === 'email' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.01)',
-              boxShadow: lensMode === 'email'
+              width: isHoveringEmail ? 164 : 54,
+              height: isHoveringEmail ? 164 : 54,
+              borderColor: isHoveringEmail ? 'rgba(255, 255, 255, 0.50)' : 'rgba(255, 255, 255, 0.22)',
+              backgroundColor: isHoveringEmail ? 'rgba(255, 255, 255, 0.02)' : 'rgba(255, 255, 255, 0.01)',
+              boxShadow: isHoveringEmail
                 ? [
+                    /* Red/Magenta chromatic fringe */
                     '-2px -1.5px 3px rgba(255, 40, 80, 0.65)',
+                    /* Cyan/Blue chromatic fringe */
                     '2px 1.5px 3px rgba(0, 225, 255, 0.65)',
+                    /* Atmospheric glass glow */
                     '0 15px 40px -10px rgba(0, 0, 0, 0.5)',
+                    /* Inner glass rim */
                     'inset 0 0 0 1px rgba(255, 255, 255, 0.35)',
+                    /* Inner chromatic refraction */
                     'inset -1.5px -1.5px 3px rgba(255, 40, 80, 0.45)',
                     'inset 1.5px 1.5px 3px rgba(0, 225, 255, 0.45)',
                   ].join(', ')
                 : [
-                    '-1.2px -0.8px 2px rgba(255, 40, 80, 0.5)',
-                    '1.2px 0.8px 2px rgba(0, 225, 255, 0.5)',
+                    '-1.2px -0.8px 2px rgba(255, 40, 80, 0.45)',
+                    '1.2px 0.8px 2px rgba(0, 225, 255, 0.45)',
                     '0 8px 20px -5px rgba(0, 0, 0, 0.4)',
                     'inset 0 0 0 1px rgba(255, 255, 255, 0.22)',
                     'inset -0.8px -0.8px 2px rgba(255, 40, 80, 0.3)',
@@ -231,31 +224,21 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
             }}
             transition={{
               type: 'spring',
-              stiffness: 380,
-              damping: clickPulse ? 16 : 26,
+              stiffness: 340,
+              damping: 26,
             }}
             className="relative rounded-full border flex items-center justify-center overflow-hidden backdrop-blur-[1.5px]"
           >
-            {/* Click Ripple Wave (Playful tactile feedback) */}
-            {clickPulse && (
-              <motion.div
-                initial={{ scale: 0.5, opacity: 0.9 }}
-                animate={{ scale: 2.2, opacity: 0 }}
-                transition={{ duration: 0.28, ease: 'easeOut' }}
-                className="absolute inset-0 rounded-full border border-cyan-400 pointer-events-none"
-              />
-            )}
-
-            {/* Top Curved Specular Glint (Glass highlight) */}
+            {/* Top Curved Specular Glint */}
             <div
               className="absolute inset-0 pointer-events-none rounded-full"
               style={{
                 background:
-                  'radial-gradient(ellipse 70% 35% at 50% 8%, rgba(255, 255, 255, 0.32), transparent 70%)',
+                  'radial-gradient(ellipse 70% 35% at 50% 8%, rgba(255, 255, 255, 0.35), transparent 70%)',
               }}
             />
 
-            {/* Perimeter Chromatic Prism Ring (Dispersion) */}
+            {/* Perimeter Chromatic Prism Ring */}
             <div
               className="absolute inset-0 rounded-full pointer-events-none opacity-55 mix-blend-screen"
               style={{
@@ -275,8 +258,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
               }}
             />
 
-            {lensMode === 'email' ? (
-              /* Expanded State: Highly Transparent Action Lens */
+            {isHoveringEmail ? (
+              /* Expanded State: Optical Action Lens */
               <div className="relative z-10 w-full h-full flex flex-col items-center justify-center text-center space-y-2 select-none px-3">
                 <div
                   className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center border border-white/25 shadow-lg"
@@ -302,16 +285,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
                   </span>
                 </div>
               </div>
-            ) : lensMode === 'link' ? (
-              /* Link Inspection State */
-              <div className="relative z-10 w-full h-full flex items-center justify-center space-x-1 select-none">
-                <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-white">
-                  OPEN
-                </span>
-                <ArrowUpRight className="w-3 h-3 text-white" />
-              </div>
             ) : (
-              /* Idle Playful State: Optical Lens with Chromatic Glint */
+              /* Idle State: Optical Lens with Chromatic Glint */
               <div className="relative z-10 w-full h-full flex items-center justify-center select-none">
                 <ArrowRight
                   className="w-3.5 h-3.5 text-white/80"
@@ -333,8 +308,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           <button
             type="button"
             onClick={onBack}
-            onMouseEnter={() => setLensMode('link')}
-            onMouseLeave={() => setLensMode('idle')}
             className="inline-flex items-center space-x-2 text-xs font-sans uppercase tracking-wider text-neutral-400 hover:text-white transition-colors cursor-pointer group"
           >
             <ArrowLeft className="w-3.5 h-3.5 text-neutral-500 group-hover:-translate-x-1 group-hover:text-white transition-all" />
@@ -342,7 +315,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           </button>
         </div>
 
-        {/* Header Label */}
+        {/* Clean Header Indicator */}
         <div className="text-xs font-sans uppercase tracking-widest text-neutral-400">
           <span>Contact</span>
         </div>
@@ -351,7 +324,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
       {/* ================= HERO STAGE ================= */}
       <main className="relative z-10 flex-1 w-full px-6 sm:px-12 lg:px-20 py-6 sm:py-8 lg:py-10 flex flex-col justify-between">
         
-        {/* Row 1: Massive CONTACT Title */}
+        {/* Row 1: Massive CONTACT Landmark Title */}
         <div className="w-full">
           <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-[108px] xl:text-[120px] font-sans font-black tracking-[-0.045em] leading-[0.9] text-white select-none">
             CONTACT
@@ -361,7 +334,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
         {/* Row 2: Genuine DevForge Info Row */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-5 sm:py-7 items-end border-b border-white/[0.05]">
           
-          {/* Left: Open Source Project Description */}
+          {/* Left: Open Source Platform Info */}
           <div className="md:col-span-4 space-y-2 text-xs sm:text-sm font-sans text-neutral-400 select-none">
             <span className="text-[11px] uppercase tracking-wider text-neutral-400 font-semibold block">
               Open-Source Platform
@@ -371,7 +344,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
             </p>
           </div>
 
-          {/* Center: Real Contact Guidance */}
+          {/* Center: Inquiries & Contributions */}
           <div className="md:col-span-5 text-left space-y-1.5 select-none">
             <span className="text-[11px] font-sans uppercase tracking-widest text-neutral-400 font-medium">
               Questions & Feedback
@@ -387,8 +360,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
               href="https://github.com/Jayasuryajonnadula18/devforge"
               target="_blank"
               rel="noopener noreferrer"
-              onMouseEnter={() => setLensMode('link')}
-              onMouseLeave={() => setLensMode('idle')}
               className="hover:text-white transition-colors inline-flex items-center space-x-1"
             >
               <span>GitHub</span>
@@ -398,8 +369,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
               href="https://github.com/Jayasuryajonnadula18/devforge/discussions"
               target="_blank"
               rel="noopener noreferrer"
-              onMouseEnter={() => setLensMode('link')}
-              onMouseLeave={() => setLensMode('idle')}
               className="hover:text-white transition-colors inline-flex items-center space-x-1"
             >
               <span>Discussions</span>
@@ -416,8 +385,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
             <button
               type="button"
               onClick={handleCopyEmail}
-              onMouseEnter={() => setLensMode('link')}
-              onMouseLeave={() => setLensMode('idle')}
               className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/[0.05] hover:bg-white/[0.12] border border-white/10 hover:border-white/25 text-xs font-sans font-medium text-neutral-300 hover:text-white transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 active:scale-98"
               title="Copy email address to clipboard"
             >
@@ -430,8 +397,8 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           <a
             ref={emailRef}
             href="mailto:engineering@devforge.org?subject=DevForge%20Inquiry"
-            onMouseEnter={() => setLensMode('email')}
-            onMouseLeave={() => setLensMode('idle')}
+            onMouseEnter={() => setIsHoveringEmail(true)}
+            onMouseLeave={() => setIsHoveringEmail(false)}
             className="w-full block cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-4 focus-visible:ring-offset-black rounded-xl transition-all"
             aria-label="Send email to engineering@devforge.org (opens your default email client)"
           >
@@ -466,8 +433,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           <button
             type="button"
             onClick={toggleForm}
-            onMouseEnter={() => setLensMode('link')}
-            onMouseLeave={() => setLensMode('idle')}
             className="inline-flex items-center space-x-2 text-xs font-sans uppercase tracking-wider text-neutral-400 hover:text-white transition-colors cursor-pointer py-2 group"
           >
             <span>{showForm ? 'Close Message Form' : 'Send a Message Directly'}</span>
@@ -483,136 +448,140 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
         <AnimatePresence>
           {showForm && (
             <motion.div
-              ref={formRef}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="overflow-hidden pt-6"
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden pt-4 pb-8"
             >
-              {formSubmitted ? (
-                /* Honest Success Receipt */
-                <div className="max-w-2xl mx-auto p-8 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-5 my-4 text-center">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
-                    <Check className="w-6 h-6" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <h3 className="text-xl font-sans font-bold text-white">
-                      Message Sent
-                    </h3>
-                    <p className="text-xs sm:text-sm text-neutral-400 max-w-md mx-auto">
-                      Thank you, <span className="text-white font-medium">{name}</span>. We&apos;ve received your note and will get back to you at <span className="text-white font-medium">{email}</span>.
-                    </p>
-                  </div>
-                  <div className="pt-3 flex items-center justify-center space-x-4">
-                    <button
-                      type="button"
-                      onClick={handleResetForm}
-                      className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer"
-                    >
-                      Send Another Note
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowForm(false)}
-                      className="px-5 py-2.5 rounded-full bg-white text-black hover:bg-neutral-200 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
-                    >
-                      Close Form
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                /* Clean Direct Message Form */
-                <form
-                  onSubmit={handleSubmit}
-                  className="max-w-2xl mx-auto p-6 sm:p-8 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-6 my-4"
-                >
-                  <div className="space-y-1">
-                    <h3 className="text-lg sm:text-xl font-sans font-bold text-white tracking-tight">
-                      Send a Message
-                    </h3>
-                    <p className="text-xs text-neutral-400 font-sans">
-                      Leave a question, curriculum suggestion, or feedback for the DevForge maintainers.
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div
+                ref={formSectionRef}
+                onPointerEnter={() => orbOpacity.set(0)}
+                onPointerLeave={() => orbOpacity.set(1)}
+              >
+                {formSubmitted ? (
+                  /* Honest Success Receipt */
+                  <div className="max-w-2xl mx-auto p-8 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-5 my-4 text-center">
+                    <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+                      <Check className="w-6 h-6" />
+                    </div>
                     <div className="space-y-1.5">
-                      <label htmlFor="contact-name" className="block text-xs uppercase tracking-wider text-neutral-400 font-medium">
-                        Your Name *
+                      <h3 className="text-xl font-sans font-bold text-white">
+                        Message Sent
+                      </h3>
+                      <p className="text-xs sm:text-sm text-neutral-400 max-w-md mx-auto">
+                        Thank you, <span className="text-white font-medium">{name}</span>. We&apos;ve received your note and will get back to you at <span className="text-white font-medium">{email}</span>.
+                      </p>
+                    </div>
+                    <div className="pt-3 flex items-center justify-center space-x-4">
+                      <button
+                        type="button"
+                        onClick={handleResetForm}
+                        className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer"
+                      >
+                        Send Another Note
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowForm(false)}
+                        className="px-5 py-2.5 rounded-full bg-white text-black hover:bg-neutral-200 text-xs font-semibold uppercase tracking-wider transition-colors cursor-pointer"
+                      >
+                        Close Form
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Clean Direct Message Form */
+                  <form
+                    onSubmit={handleSubmit}
+                    className="max-w-2xl mx-auto p-6 sm:p-8 rounded-2xl bg-white/[0.02] border border-white/[0.08] space-y-6 my-4"
+                  >
+                    <div className="space-y-1">
+                      <h3 className="text-lg sm:text-xl font-sans font-bold text-white tracking-tight">
+                        Send a Message
+                      </h3>
+                      <p className="text-xs text-neutral-400 font-sans">
+                        Leave a question, curriculum suggestion, or feedback for the DevForge maintainers.
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <div className="space-y-1.5">
+                        <label htmlFor="contact-name" className="block text-xs uppercase tracking-wider text-neutral-400 font-medium">
+                          Your Name *
+                        </label>
+                        <input
+                          id="contact-name"
+                          type="text"
+                          required
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          placeholder="Ada Lovelace"
+                          className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label htmlFor="contact-email" className="block text-xs uppercase tracking-wider text-neutral-400 font-medium">
+                          Your Email *
+                        </label>
+                        <input
+                          id="contact-email"
+                          type="email"
+                          required
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="ada@domain.com"
+                          className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label htmlFor="contact-subject" className="block text-xs uppercase tracking-wider text-neutral-400 font-medium">
+                        Subject (optional)
                       </label>
                       <input
-                        ref={nameInputRef}
-                        id="contact-name"
+                        id="contact-subject"
                         type="text"
-                        required
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="Ada Lovelace"
+                        value={subject}
+                        onChange={(e) => setSubject(e.target.value)}
+                        placeholder="e.g. Distributed systems track question, feedback, or collaboration"
                         className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors"
                       />
                     </div>
 
                     <div className="space-y-1.5">
-                      <label htmlFor="contact-email" className="block text-xs uppercase tracking-wider text-neutral-400 font-medium">
-                        Your Email *
+                      <label htmlFor="contact-message" className="block text-xs uppercase tracking-wider text-neutral-400 font-medium">
+                        Message *
                       </label>
-                      <input
-                        id="contact-email"
-                        type="email"
+                      <textarea
+                        id="contact-message"
+                        rows={4}
                         required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="ada@domain.com"
-                        className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        placeholder="Write your note, question, or proposal..."
+                        className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors resize-none"
                       />
                     </div>
-                  </div>
 
-                  <div className="space-y-1.5">
-                    <label htmlFor="contact-subject" className="block text-xs uppercase tracking-wider text-neutral-400 font-medium">
-                      Subject (optional)
-                    </label>
-                    <input
-                      id="contact-subject"
-                      type="text"
-                      value={subject}
-                      onChange={(e) => setSubject(e.target.value)}
-                      placeholder="e.g. Distributed systems track question, feedback, or collaboration"
-                      className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label htmlFor="contact-message" className="block text-xs uppercase tracking-wider text-neutral-400 font-medium">
-                      Message *
-                    </label>
-                    <textarea
-                      id="contact-message"
-                      rows={4}
-                      required
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Write your note, question, or proposal..."
-                      className="w-full bg-white/[0.03] border border-white/10 focus:border-white/30 rounded-lg px-3.5 py-2.5 text-sm text-white placeholder:text-neutral-600 focus:outline-none transition-colors resize-none"
-                    />
-                  </div>
-
-                  <div className="pt-1 flex items-center justify-between">
-                    <span className="text-xs text-neutral-500 font-sans">
-                      Direct maintainer inbox
-                    </span>
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="inline-flex items-center space-x-2 px-6 py-2.5 rounded-full bg-white text-black text-xs font-semibold uppercase tracking-wider hover:bg-neutral-200 transition-colors cursor-pointer disabled:opacity-50"
-                    >
-                      <Send className="w-3.5 h-3.5 text-black" />
-                      <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
-                    </button>
-                  </div>
-                </form>
-              )}
+                    <div className="pt-1 flex items-center justify-between">
+                      <span className="text-xs text-neutral-500 font-sans">
+                        Direct maintainer inbox
+                      </span>
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="inline-flex items-center space-x-2 px-6 py-2.5 rounded-full bg-white text-black text-xs font-semibold uppercase tracking-wider hover:bg-neutral-200 transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        <Send className="w-3.5 h-3.5 text-black" />
+                        <span>{isSubmitting ? 'Sending...' : 'Send Message'}</span>
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -624,8 +593,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
         <button
           type="button"
           onClick={onBack}
-          onMouseEnter={() => setLensMode('link')}
-          onMouseLeave={() => setLensMode('idle')}
           className="text-neutral-400 hover:text-white transition-colors cursor-pointer"
         >
           Return to Overview ↑
