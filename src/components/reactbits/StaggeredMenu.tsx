@@ -460,14 +460,19 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 transition={{ duration: 0.18 }}
                 className="flex flex-col h-full justify-between gap-6 select-none"
               >
-                {/* FlowingMenu: Learn, Explore, About DevForge, Philosophy */}
-                <div className="flex-1 flex flex-col justify-center py-2">
-                  <div className="w-full">
-                    <FlowingMenu
-                      items={resolvedFlowingItems}
-                      isOpen={open}
-                    />
-                  </div>
+                {/* FlowingMenu from React Bits */}
+                <div style={{ height: '560px', position: 'relative' }} className="w-full my-auto">
+                  <FlowingMenu
+                    items={resolvedFlowingItems}
+                    speed={60}
+                    stretch={0.6}
+                    magnet={0.25}
+                    followCursor={0.4}
+                    textColor="#ffffff"
+                    bgColor="transparent"
+                    marqueeBgColor="#ffffff"
+                    marqueeTextColor="#120F17"
+                  />
                 </div>
 
                 {/* Ecosystem Links and Bottom Statement */}
