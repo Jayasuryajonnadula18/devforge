@@ -85,7 +85,7 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
     onSelectInitialProject();
   };
 
-  // Flowing menu items: Learn, Explore, About DevForge, Philosophy
+  // Flowing menu items: Learn, Explore, About DevForge, Philosophy, Contact
   const flowingMenuItems: FlowingMenuItem[] = [
     {
       text: 'Learn',
@@ -115,6 +115,16 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
       link: '#meet-devforge',
       onClick: () => {
         setIsMenuOpen(false);
+      },
+    },
+    {
+      text: 'Contact',
+      image: '/images/menu/courses-documentation.jpg',
+      onClick: () => {
+        setIsMenuOpen(false);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('devforge:open-contact'));
+        }
       },
     },
   ];
@@ -241,7 +251,7 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
             onSelectInitialProject();
           }
         }}
-        colors={['#0b0d11', '#13171e', '#1a202a', '#222936']}
+        colors={['#08090c', '#0d0f14', '#13161c', '#1a1e26']}
         accentColor="#f59e0b"
         menuButtonColor="#f5f4f0"
         openMenuButtonColor="#f5f4f0"

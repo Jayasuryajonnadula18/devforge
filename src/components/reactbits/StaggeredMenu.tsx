@@ -356,7 +356,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     }
   };
 
-  // FlowingMenu items: Learn, Explore, About DevForge, Philosophy
+  // FlowingMenu items: Learn, Explore, About DevForge, Philosophy, Contact
   const defaultFlowingItems: FlowingMenuItem[] = [
     {
       text: 'Learn',
@@ -379,6 +379,16 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       image: '/images/menu/philosophy-first-principles.jpg',
       link: '#meet-devforge',
       onClick: closeMenu,
+    },
+    {
+      text: 'Contact',
+      image: '/images/menu/courses-documentation.jpg',
+      onClick: () => {
+        closeMenu();
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('devforge:open-contact'));
+        }
+      },
     },
   ];
 
@@ -431,7 +441,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         aria-label="Expanded Navigation"
       >
         {/* Header Bar inside Menu */}
-        <div className="flex items-center justify-between pb-6 sm:pb-8 border-b border-white/[0.08] select-none">
+        <div className="flex items-center justify-between pb-6 sm:pb-8 select-none">
           <div
             onClick={() => {
               closeMenu();
@@ -469,7 +479,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 className="flex flex-col h-full justify-between gap-6 select-none"
               >
                 {/* FlowingMenu from React Bits */}
-                <div style={{ height: '460px', position: 'relative' }} className="w-full my-auto">
+                <div style={{ height: '480px', position: 'relative' }} className="w-full my-auto">
                   <FlowingMenu
                     items={resolvedFlowingItems}
                     speed={60}
@@ -486,7 +496,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 </div>
 
                 {/* Ecosystem Links and Bottom Statement */}
-                <div className="pt-6 border-t border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono text-neutral-400">
+                <div className="pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono text-neutral-400">
                   <div className="flex items-center space-x-5">
                     <a
                       href="https://github.com/Jayasuryajonnadula18/devforge"

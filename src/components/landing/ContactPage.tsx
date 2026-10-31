@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring } from 'motion/react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'motion/react';
 import { toast } from 'sonner';
 import { ForgeSymbol } from '../icons/ForgeSymbol';
 import {
@@ -38,19 +38,22 @@ const TIMELINE_OPTIONS = [
 
 export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const emailRef = useRef<HTMLDivElement>(null);
+  const emailRef = useRef<HTMLAnchorElement>(null);
   const briefFormRef = useRef<HTMLDivElement>(null);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   // Magnetic Cursor Follower (Le Fruit Studio Awwwards Interaction)
-  const cursorX = useMotionValue(-500);
-  const cursorY = useMotionValue(-500);
+  const cursorX = useMotionValue(600);
+  const cursorY = useMotionValue(400);
   const springX = useSpring(cursorX, { stiffness: 450, damping: 28 });
   const springY = useSpring(cursorY, { stiffness: 450, damping: 28 });
 
   const [isHoveringEmail, setIsHoveringEmail] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
+
+  const followerX = useTransform(springX, (v) => v - (isHoveringEmail ? 92 : 38));
+  const followerY = useTransform(springY, (v) => v - (isHoveringEmail ? 92 : 38));
 
   // Expandable Structured Brief Form
   const [showBriefForm, setShowBriefForm] = useState(false);
@@ -86,6 +89,26 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     return () => clearInterval(interval);
   }, []);
 
+  // Window-level mouse tracking for fixed follower lens
+  useEffect(() => {
+    const handlePointerMove = (e: MouseEvent | PointerEvent) => {
+      cursorX.set(e.clientX);
+      cursorY.set(e.clientY);
+      setCursorVisible(true);
+    };
+    const handlePointerLeave = () => {
+      setCursorVisible(false);
+    };
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('mousemove', handlePointerMove);
+    document.addEventListener('mouseleave', handlePointerLeave);
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('mousemove', handlePointerMove);
+      document.removeEventListener('mouseleave', handlePointerLeave);
+    };
+  }, [cursorX, cursorY]);
+
   // Keyboard navigation: Escape key returns or closes brief form
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -100,13 +123,6 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showBriefForm, onBack]);
-
-  // Track viewport-relative mouse coordinates for fixed follower
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    cursorX.set(e.clientX);
-    cursorY.set(e.clientY);
-    if (!cursorVisible) setCursorVisible(true);
-  };
 
   const handleCopyEmail = (e?: React.MouseEvent) => {
     e?.preventDefault();
@@ -190,18 +206,19 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   return (
     <div
       ref={containerRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => setCursorVisible(false)}
+      onPointerMove={(e) => {
+        cursorX.set(e.clientX);
+        cursorY.set(e.clientY);
+        if (!cursorVisible) setCursorVisible(true);
+      }}
       className="relative min-h-screen w-full bg-[#050608] text-[#f5f4f0] font-sans selection:bg-white selection:text-black flex flex-col justify-between overflow-x-hidden"
     >
       {/* ================= LE FRUIT MAGNETIC LENS FOLLOWER (FIXED) ================= */}
       {cursorVisible && (
         <motion.div
           style={{
-            left: springX,
-            top: springY,
-            x: '-50%',
-            y: '-50%',
+            x: followerX,
+            y: followerY,
           }}
           animate={{
             width: isHoveringEmail ? 184 : 76,
@@ -210,7 +227,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
             backgroundColor: isHoveringEmail ? 'rgba(5, 6, 8, 0.85)' : 'rgba(255, 255, 255, 0.02)',
           }}
           transition={{ type: 'spring', stiffness: 450, damping: 28 }}
-          className="pointer-events-none fixed z-50 rounded-full border hidden md:flex items-center justify-center overflow-hidden backdrop-blur-md shadow-2xl"
+          className="pointer-events-none fixed top-0 left-0 z-50 rounded-full border hidden md:flex items-center justify-center overflow-hidden backdrop-blur-md shadow-2xl"
         >
           {isHoveringEmail ? (
             /* Visual Lens Reveal on Email Hover */
@@ -248,7 +265,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
       )}
 
       {/* ================= TOP HEADER ================= */}
-      <header className="relative z-20 w-full px-6 sm:px-12 lg:px-20 py-8 flex items-center justify-between select-none border-b border-white/[0.05]">
+      <header className="relative z-20 w-full px-6 sm:px-12 lg:px-20 py-5 sm:py-6 flex items-center justify-between select-none border-b border-white/[0.05]">
         {/* Brand & Back Button */}
         <div className="flex items-center space-x-6">
           <button
@@ -277,25 +294,25 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
       </header>
 
       {/* ================= HERO STAGE (LE FRUIT MONUMENTAL TYPOGRAPHY) ================= */}
-      <main className="relative z-10 flex-1 w-full px-6 sm:px-12 lg:px-20 py-12 lg:py-16 flex flex-col justify-between">
+      <main className="relative z-10 flex-1 w-full px-6 sm:px-12 lg:px-20 py-6 sm:py-8 lg:py-10 flex flex-col justify-between">
         
         {/* Row 1: Massive CONTACT Landmark Title */}
         <div className="w-full">
-          <h1 className="text-6xl sm:text-8xl md:text-9xl lg:text-[132px] xl:text-[144px] font-sans font-black tracking-[-0.045em] leading-[0.92] text-white select-none">
+          <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-[108px] xl:text-[120px] font-sans font-black tracking-[-0.045em] leading-[0.9] text-white select-none">
             CONTACT
           </h1>
         </div>
 
         {/* Row 2: Editorial Middle Layer (Coordinates Left · Ecosystem Right · Prompt Center) */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 py-10 sm:py-14 items-end border-b border-white/[0.05]">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-5 sm:py-7 items-end border-b border-white/[0.05]">
           
           {/* Left: Studio Physical & Invariant Coordinates */}
-          <div className="md:col-span-4 space-y-5 text-sm font-sans text-neutral-400 select-none">
+          <div className="md:col-span-4 space-y-4 text-xs sm:text-sm font-sans text-neutral-400 select-none">
             <div className="space-y-1">
-              <span className="text-xs uppercase tracking-wider text-neutral-500 font-semibold block">
+              <span className="text-[11px] uppercase tracking-wider text-neutral-500 font-semibold block">
                 Systems Engineering Lab
               </span>
-              <p className="text-neutral-300 leading-relaxed">
+              <p className="text-neutral-300 leading-relaxed text-xs sm:text-sm">
                 Mission Bay · CA 94158<br />
                 San Francisco, United States
               </p>
@@ -314,18 +331,18 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
           </div>
 
           {/* Center: Socratic Invitation Prompt */}
-          <div className="md:col-span-5 text-center md:text-left space-y-2 select-none">
-            <span className="text-[11px] sm:text-xs font-sans uppercase tracking-widest text-neutral-500 font-medium">
+          <div className="md:col-span-5 text-left space-y-1.5 select-none">
+            <span className="text-[11px] font-sans uppercase tracking-widest text-neutral-500 font-medium">
               Ready to build from first principles?
             </span>
-            <p className="text-sm text-neutral-400 leading-relaxed max-w-sm">
+            <p className="text-xs sm:text-sm text-neutral-400 leading-relaxed max-w-sm">
               Distributed protocols, compiler optimization, or kernel internals.
               Drop us your specs or direct questions.
             </p>
           </div>
 
           {/* Right: Ecosystem Channels */}
-          <div className="md:col-span-3 flex md:flex-col items-start md:items-end justify-start gap-4 text-xs font-sans uppercase tracking-wider text-neutral-400">
+          <div className="md:col-span-3 flex md:flex-col items-start md:items-end justify-start gap-3.5 text-xs font-sans uppercase tracking-wider text-neutral-400">
             <a
               href="https://github.com/Jayasuryajonnadula18/devforge"
               target="_blank"
@@ -357,25 +374,26 @@ export const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
         </div>
 
         {/* Row 3: COLOSSAL INTERACTIVE TYPOGRAPHIC EMAIL (Le Fruit Interaction) */}
-        <div
+        <a
+          href="mailto:engineering@devforge.org?subject=DevForge%20Systems%20Architecture%20Inquiry"
           ref={emailRef}
           onMouseEnter={() => setIsHoveringEmail(true)}
           onMouseLeave={() => setIsHoveringEmail(false)}
           onClick={handleCopyEmail}
-          className="w-full pt-10 sm:pt-14 pb-6 flex flex-col items-start sm:items-end text-left sm:text-right cursor-pointer select-none group"
+          className="w-full pt-5 sm:pt-7 pb-3 flex flex-col items-start sm:items-end text-left sm:text-right cursor-pointer select-none group focus-visible:outline-none"
         >
-          <span className="text-xs font-sans uppercase tracking-widest text-neutral-500 font-semibold mb-2 block group-hover:text-white transition-colors">
+          <span className="text-xs font-sans uppercase tracking-widest text-neutral-500 font-semibold mb-1 block group-hover:text-white transition-colors">
             Click to copy or dispatch mail →
           </span>
           
-          <div className="text-5xl sm:text-7xl md:text-8xl lg:text-[108px] xl:text-[124px] font-sans font-black tracking-tight leading-[0.92] text-white group-hover:text-neutral-300 transition-colors">
+          <div className="text-4xl sm:text-6xl md:text-7xl lg:text-[88px] xl:text-[104px] font-sans font-black tracking-tight leading-[0.92] text-white group-hover:text-neutral-300 transition-colors">
             <span className="block">engineering@</span>
             <span className="block">devforge.org</span>
           </div>
-        </div>
+        </a>
 
         {/* Brief Composer Toggle Trigger */}
-        <div className="pt-4 flex items-center justify-between border-t border-white/[0.05]">
+        <div className="pt-3 flex items-center justify-between border-t border-white/[0.05]">
           <button
             type="button"
             onClick={toggleBriefForm}
