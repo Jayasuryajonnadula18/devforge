@@ -2,12 +2,10 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useScroll } from 'motion/react';
-import { ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { ForgeSymbol } from '../icons/ForgeSymbol';
 import { LiquidGlass } from '../reactbits/LiquidGlass';
 import { StaggeredMenu, StaggeredMenuItem, StaggeredMenuSocialItem } from '../reactbits/StaggeredMenu';
-import { CoursesDropdown } from './CoursesDropdown';
 import { ProjectTrack } from '../../types';
 
 interface DialedNavbarProps {
@@ -27,8 +25,8 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
 }) => {
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isCoursesOpen, setIsCoursesOpen] = useState(false);
-  const [isStaggeredOpen, setIsStaggeredOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [menuView, setMenuView] = useState<'main' | 'courses'>('main');
 
   useEffect(() => {
     return scrollY.on('change', (latest) => {
@@ -36,31 +34,17 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
     });
   }, [scrollY]);
 
-  // Coordinated Menu Handlers to ensure animations never collide
-  const handleToggleCourses = useCallback(() => {
-    if (isStaggeredOpen) {
-      setIsStaggeredOpen(false);
-    }
-    setIsCoursesOpen(prev => !prev);
-  }, [isStaggeredOpen]);
-
-  const handleOpenStaggered = useCallback(() => {
-    if (isCoursesOpen) {
-      setIsCoursesOpen(false);
-    }
-    setIsStaggeredOpen(true);
-  }, [isCoursesOpen]);
-
-  const handleCloseStaggered = useCallback(() => {
-    setIsStaggeredOpen(false);
+  // Open menu specifically to Courses view
+  const handleOpenCoursesInMenu = useCallback(() => {
+    setMenuView('courses');
+    setIsMenuOpen(true);
   }, []);
 
-  // Global Escape key listener to close active menu cleanly
+  // Global Escape key listener
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setIsCoursesOpen(false);
-        setIsStaggeredOpen(false);
+        setIsMenuOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -72,16 +56,8 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
       label: 'Studio IDE',
       ariaLabel: 'Open Studio IDE',
       onClick: () => {
-        setIsStaggeredOpen(false);
+        setIsMenuOpen(false);
         onSelectInitialProject();
-      },
-    },
-    {
-      label: 'Curriculum Tracks',
-      ariaLabel: 'Browse Courses',
-      onClick: () => {
-        setIsStaggeredOpen(false);
-        setTimeout(() => setIsCoursesOpen(true), 250);
       },
     },
     {
@@ -89,14 +65,15 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
       ariaLabel: 'Philosophy & Visual Foundation',
       link: '#meet-devforge',
       onClick: () => {
-        setIsStaggeredOpen(false);
+        setIsMenuOpen(false);
       },
     },
     {
       label: 'Architecture Atlas',
       ariaLabel: 'Architecture Topologies',
+      badge: 'Soon',
       onClick: () => {
-        setIsStaggeredOpen(false);
+        setIsMenuOpen(false);
         toast.info('Architecture Atlas — Coming Soon', {
           description: 'Interactive visual system topologies & distributed system maps dropping in Q1 2027.',
         });
@@ -105,8 +82,9 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
     {
       label: 'System Invariants',
       ariaLabel: 'Formal System Invariants',
+      badge: 'Soon',
       onClick: () => {
-        setIsStaggeredOpen(false);
+        setIsMenuOpen(false);
         toast.info('Formal Invariants Guide — Coming Soon', {
           description: 'Formal proofs and systems safety invariants coming in v1.0.',
         });
@@ -163,18 +141,13 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
                 </span>
               </button>
 
-              {/* Courses Dropdown Trigger Button */}
+              {/* Courses Button: Opens the Menu directly into the Courses View */}
               <button 
                 type="button"
-                onClick={handleToggleCourses}
-                className={`px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold flex items-center gap-1.5 cursor-pointer ${
-                  isCoursesOpen 
-                    ? 'text-white bg-white/10 font-semibold' 
-                    : 'text-white/70 hover:text-white'
-                }`}
+                onClick={handleOpenCoursesInMenu}
+                className="text-white/70 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold flex items-center gap-1.5 cursor-pointer"
               >
                 <span>Courses</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isCoursesOpen ? 'rotate-180 text-amber-300' : 'text-white/50'}`} />
               </button>
 
               <a 
@@ -195,32 +168,23 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
           </LiquidGlass>
         </div>
 
-        {/* Right: Reserved for Top-Right spacing & alignment */}
+        {/* Right Spacing to balance logo on the left */}
         <div className="w-20 hidden sm:block" />
       </header>
 
-      {/* 2. Seamless StaggeredMenu Drawer (Mounted at Root level with Fixed Positioning) */}
+      {/* 2. Unified StaggeredMenu Drawer Hosting Both Navigation & Flowing Courses */}
       <StaggeredMenu
         position="right"
         isFixed={true}
         isOpenControlled={true}
-        isOpen={isStaggeredOpen}
-        onMenuOpen={handleOpenStaggered}
-        onMenuClose={handleCloseStaggered}
-        colors={['#180e08', '#2a150b', '#5c2912', '#7e3a19']}
-        accentColor="#f59e0b"
-        menuButtonColor="#f5f4f0"
-        openMenuButtonColor="#f5f4f0"
-        items={staggeredMenuItems}
-        socialItems={socialItems}
-        displaySocials={true}
-        displayItemNumbering={true}
-      />
-
-      {/* 3. Kinetic Courses Dropdown (Powered by FlowingMenu) */}
-      <CoursesDropdown
-        isOpen={isCoursesOpen}
-        onClose={() => setIsCoursesOpen(false)}
+        isOpen={isMenuOpen}
+        activeView={menuView}
+        onViewChange={(v) => setMenuView(v)}
+        onMenuOpen={() => {
+          setMenuView('main');
+          setIsMenuOpen(true);
+        }}
+        onMenuClose={() => setIsMenuOpen(false)}
         projects={projects}
         onSelectProject={(project) => {
           if (onSelectProject) {
@@ -229,6 +193,14 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
             onSelectInitialProject();
           }
         }}
+        colors={['#180e08', '#2a150b', '#5c2912', '#7e3a19']}
+        accentColor="#f59e0b"
+        menuButtonColor="#f5f4f0"
+        openMenuButtonColor="#f5f4f0"
+        items={staggeredMenuItems}
+        socialItems={socialItems}
+        displaySocials={true}
+        displayItemNumbering={true}
       />
     </>
   );

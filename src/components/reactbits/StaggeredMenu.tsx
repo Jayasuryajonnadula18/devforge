@@ -2,12 +2,17 @@
 
 import React, { useCallback, useLayoutEffect, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
+import { motion, AnimatePresence } from 'motion/react';
+import { ArrowLeft, Sparkles, ChevronRight, Terminal } from 'lucide-react';
+import { FlowingMenu, FlowingMenuItem } from './FlowingMenu';
+import { ProjectTrack } from '../../types';
 import './StaggeredMenu.css';
 
 export interface StaggeredMenuItem {
   label: string;
   ariaLabel?: string;
   link?: string;
+  badge?: string;
   onClick?: () => void;
 }
 
@@ -33,6 +38,10 @@ export interface StaggeredMenuProps {
   closeOnClickAway?: boolean;
   isOpenControlled?: boolean;
   isOpen?: boolean;
+  projects?: ProjectTrack[];
+  onSelectProject?: (p: ProjectTrack) => void;
+  activeView?: 'main' | 'courses';
+  onViewChange?: (view: 'main' | 'courses') => void;
   onMenuOpen?: () => void;
   onMenuClose?: () => void;
 }
@@ -54,6 +63,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   closeOnClickAway = true,
   isOpenControlled = false,
   isOpen: controlledIsOpen = false,
+  projects = [],
+  onSelectProject,
+  activeView: controlledActiveView,
+  onViewChange,
   onMenuOpen,
   onMenuClose,
 }) => {
@@ -61,6 +74,14 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   const open = isOpenControlled ? controlledIsOpen : internalOpen;
   const openRef = useRef(open);
   openRef.current = open;
+
+  const [internalView, setInternalView] = useState<'main' | 'courses'>('main');
+  const currentView = controlledActiveView || internalView;
+
+  const setView = (v: 'main' | 'courses') => {
+    setInternalView(v);
+    onViewChange?.(v);
+  };
 
   const panelRef = useRef<HTMLDivElement>(null);
   const preLayersRef = useRef<HTMLDivElement>(null);
@@ -268,6 +289,8 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
         if (socialLinks.length) gsap.set(socialLinks, { y: 25, opacity: 0 });
         busyRef.current = false;
+        // Reset to main view on complete exit
+        setInternalView('main');
       }
     });
   }, [position]);
@@ -398,6 +421,19 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     };
   }, [closeOnClickAway, open, closeMenu]);
 
+  // Convert project tracks into FlowingMenu items for the Courses view
+  const flowingItems: FlowingMenuItem[] = projects.map((p) => ({
+    text: p.title.split('(')[0].trim(),
+    marquee: `${p.languageBadge} · ${p.level} Complexity · ${p.tagline}`,
+    meta: p.languageBadge,
+    onClick: () => {
+      if (onSelectProject) {
+        onSelectProject(p);
+      }
+      closeMenu();
+    },
+  }));
+
   return (
     <div
       className={(className ? className + ' ' : '') + 'staggered-menu-wrapper' + (isFixed ? ' fixed-wrapper' : '')}
@@ -457,58 +493,156 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
 
       <aside id="staggered-menu-panel" ref={panelRef} className="staggered-menu-panel" aria-hidden={!open}>
         <div className="sm-panel-inner">
-          <ul className="sm-panel-list" role="list" data-numbering={displayItemNumbering || undefined}>
-            {items && items.length ? (
-              items.map((it, idx) => (
-                <li className="sm-panel-itemWrap" key={it.label + idx}>
-                  {it.onClick ? (
+          <AnimatePresence mode="wait">
+            {currentView === 'main' ? (
+              <motion.div
+                key="main-view"
+                initial={{ opacity: 0, x: -16 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -16 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-col h-full"
+              >
+                <ul className="sm-panel-list" role="list" data-numbering={displayItemNumbering || undefined}>
+                  {/* Integrated Courses Trigger inside the menu */}
+                  <li className="sm-panel-itemWrap">
                     <button
                       type="button"
-                      className="sm-panel-item"
-                      aria-label={it.ariaLabel || it.label}
-                      data-index={idx + 1}
-                      onClick={() => {
-                        it.onClick?.();
-                        closeMenu();
-                      }}
+                      className="sm-panel-item group flex items-center justify-between w-full pr-0 cursor-pointer"
+                      data-index={1}
+                      onClick={() => setView('courses')}
                     >
-                      <span className="sm-panel-itemLabel">{it.label}</span>
+                      <div className="flex items-center space-x-3">
+                        <span className="sm-panel-itemLabel">Courses</span>
+                        <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                          {projects.length} Tracks
+                        </span>
+                      </div>
+                      <ChevronRight className="w-6 h-6 text-neutral-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
                     </button>
-                  ) : (
-                    <a 
-                      className="sm-panel-item" 
-                      href={it.link || '#'} 
-                      aria-label={it.ariaLabel || it.label} 
-                      data-index={idx + 1}
-                      onClick={closeMenu}
-                    >
-                      <span className="sm-panel-itemLabel">{it.label}</span>
-                    </a>
-                  )}
-                </li>
-              ))
-            ) : (
-              <li className="sm-panel-itemWrap" aria-hidden="true">
-                <span className="sm-panel-item">
-                  <span className="sm-panel-itemLabel">No items</span>
-                </span>
-              </li>
-            )}
-          </ul>
-          {displaySocials && socialItems && socialItems.length > 0 && (
-            <div className="sm-socials" aria-label="Social links">
-              <h3 className="sm-socials-title">Socials</h3>
-              <ul className="sm-socials-list" role="list">
-                {socialItems.map((s, i) => (
-                  <li key={s.label + i} className="sm-socials-item">
-                    <a href={s.link} target="_blank" rel="noopener noreferrer" className="sm-socials-link">
-                      {s.label}
-                    </a>
                   </li>
-                ))}
-              </ul>
-            </div>
-          )}
+
+                  {items && items.length ? (
+                    items.map((it, idx) => (
+                      <li className="sm-panel-itemWrap" key={it.label + idx}>
+                        {it.onClick ? (
+                          <button
+                            type="button"
+                            className="sm-panel-item flex items-center justify-between w-full pr-0 cursor-pointer"
+                            aria-label={it.ariaLabel || it.label}
+                            data-index={idx + 2}
+                            onClick={() => {
+                              it.onClick?.();
+                              closeMenu();
+                            }}
+                          >
+                            <span className="sm-panel-itemLabel">{it.label}</span>
+                            {it.badge && (
+                              <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-neutral-400">
+                                {it.badge}
+                              </span>
+                            )}
+                          </button>
+                        ) : (
+                          <a 
+                            className="sm-panel-item flex items-center justify-between w-full pr-0" 
+                            href={it.link || '#'} 
+                            aria-label={it.ariaLabel || it.label} 
+                            data-index={idx + 2}
+                            onClick={closeMenu}
+                          >
+                            <span className="sm-panel-itemLabel">{it.label}</span>
+                            {it.badge && (
+                              <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/10 text-neutral-400">
+                                {it.badge}
+                              </span>
+                            )}
+                          </a>
+                        )}
+                      </li>
+                    ))
+                  ) : null}
+                </ul>
+
+                {displaySocials && socialItems && socialItems.length > 0 && (
+                  <div className="sm-socials" aria-label="Social links">
+                    <h3 className="sm-socials-title">DevForge Ecosystem</h3>
+                    <ul className="sm-socials-list" role="list">
+                      {socialItems.map((s, i) => (
+                        <li key={s.label + i} className="sm-socials-item">
+                          <a href={s.link} target="_blank" rel="noopener noreferrer" className="sm-socials-link">
+                            {s.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </motion.div>
+            ) : (
+              /* Subview: Interactive FlowingMenu Courses directly inside the menu */
+              <motion.div
+                key="courses-view"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                className="flex flex-col h-full space-y-4"
+              >
+                {/* Back to main navigation */}
+                <button
+                  type="button"
+                  onClick={() => setView('main')}
+                  className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider text-neutral-400 hover:text-white transition-colors cursor-pointer group"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform text-amber-400" />
+                  <span>Back to Menu</span>
+                </button>
+
+                {/* Subview Header */}
+                <div className="space-y-1 pb-1 border-b border-white/10">
+                  <div className="flex items-center space-x-2.5">
+                    <div className="w-6 h-6 rounded-md bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400">
+                      <Terminal className="w-3 h-3" />
+                    </div>
+                    <h3 className="font-sans text-xl font-bold text-white tracking-tight">
+                      Curriculum Tracks
+                    </h3>
+                  </div>
+                  <p className="text-xs text-neutral-400 font-sans">
+                    Hover to preview architecture · Click to launch Studio
+                  </p>
+                </div>
+
+                {/* Kinetic FlowingMenu embedded directly inside the drawer */}
+                <div className="flex-1 w-full min-h-[380px] overflow-hidden rounded-2xl bg-black/40 border border-white/[0.08]">
+                  <FlowingMenu
+                    items={flowingItems}
+                    speed={45}
+                    direction="alternate"
+                    stretch={0.45}
+                    magnet={0.2}
+                    followCursor={0.35}
+                    textColor="#f5f4f0"
+                    bgColor="transparent"
+                    marqueeBgColor="#f59e0b"
+                    marqueeTextColor="#050608"
+                    borderColor="rgba(255, 255, 255, 0.08)"
+                    dividers={true}
+                    showIndex={true}
+                    showArrow={true}
+                    align="left"
+                  />
+                </div>
+
+                {/* Invariant Footer */}
+                <div className="pt-2 flex items-center space-x-2 text-[11px] font-mono text-neutral-400">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                  <span>All tracks include in-browser compiler & test assertions</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </aside>
     </div>
