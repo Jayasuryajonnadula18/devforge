@@ -6,6 +6,12 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { buildAuthenticAnvilGeometries, buildAuthenticHammerGeometries } from './createAnvilAndHammer';
 import { buildAnvilAndCubeFragments } from './createAnvilAndCubeFragments';
+import {
+  createBrushedSteelTexture,
+  createCastIronTexture,
+  createHickoryHardwoodTexture,
+  createStudioEnvironment,
+} from './proceduralTextures';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -57,6 +63,13 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     // =========================================================================
     const scene = new THREE.Scene();
 
+    // Procedural Industrial Textures & Studio Reflection Environment
+    const brushed = createBrushedSteelTexture(512);
+    const castIron = createCastIronTexture(512);
+    const hardwood = createHickoryHardwoodTexture(512);
+    const studioEnv = createStudioEnvironment(512);
+    scene.environment = studioEnv;
+
     const camera = new THREE.PerspectiveCamera(24, width / height, 0.1, 50);
     // Starts at side-on view of the anvil
     camera.position.set(0.10, 0.60, 9.2);
@@ -93,9 +106,14 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     scene.add(forgeKeyLight);
 
     // Front-Fill Light: reveals dimensional anvil waist, horn, and plate contours
-    const frontFillLight = new THREE.DirectionalLight(0x8da4c4, 2.0);
-    frontFillLight.position.set(0.5, 2.0, 6.0);
+    const frontFillLight = new THREE.DirectionalLight(0x9ab2d5, 2.6);
+    frontFillLight.position.set(1.0, 1.8, 6.0);
     scene.add(frontFillLight);
+
+    // Upward Ground Bounce Light: lifts shadows on anvil base, stepped foot, and lower fragments
+    const groundBounceLight = new THREE.DirectionalLight(0x607898, 1.8);
+    groundBounceLight.position.set(1.0, -2.5, 3.5);
+    scene.add(groundBounceLight);
 
     // Cool Rim Light
     const coolRimLight = new THREE.DirectionalLight(0xdce7f5, 3.8);
@@ -152,16 +170,26 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     scene.add(solidAnvilGroup);
 
     const solidFaceMat = new THREE.MeshStandardMaterial({
-      color: 0x485263,
-      roughness: 0.16,
-      metalness: 0.92,
+      color: 0xa8b8cd,
+      map: brushed.diffuse,
+      roughnessMap: brushed.roughness,
+      bumpMap: brushed.bump,
+      bumpScale: 0.008,
+      roughness: 0.18,
+      metalness: 0.88,
+      envMapIntensity: 1.5,
       transparent: true,
       opacity: 0,
     });
     const solidBodyMat = new THREE.MeshStandardMaterial({
-      color: 0x222834,
-      roughness: 0.28,
-      metalness: 0.86,
+      color: 0x7688a0,
+      map: castIron.diffuse,
+      roughnessMap: castIron.roughness,
+      bumpMap: castIron.bump,
+      bumpScale: 0.015,
+      roughness: 0.32,
+      metalness: 0.74,
+      envMapIntensity: 1.35,
       transparent: true,
       opacity: 0,
     });
@@ -180,7 +208,14 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     // 4B. Anvil-to-Cube 26 Fragment System (Hidden until hammer strike)
     // =========================================================================
     const { fragments, cubeGroup, anvilFragmentsGroup, faceMat, bodyMat } =
-      buildAnvilAndCubeFragments(ANVIL_X, ANVIL_Y);
+      buildAnvilAndCubeFragments(ANVIL_X, ANVIL_Y, {
+        brushedDiffuse: brushed.diffuse,
+        brushedRoughness: brushed.roughness,
+        brushedBump: brushed.bump,
+        castDiffuse: castIron.diffuse,
+        castRoughness: castIron.roughness,
+        castBump: castIron.bump,
+      });
 
     scene.add(anvilFragmentsGroup);
     scene.add(cubeGroup);
@@ -213,23 +248,35 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     scene.add(hammerPivot);
 
     const hammerHeadMat = new THREE.MeshStandardMaterial({
-      color: 0x222731,
-      roughness: 0.22,
-      metalness: 0.88,
+      color: 0x64748b,
+      map: castIron.diffuse,
+      roughnessMap: castIron.roughness,
+      bumpMap: castIron.bump,
+      bumpScale: 0.012,
+      roughness: 0.32,
+      metalness: 0.82,
+      envMapIntensity: 1.20,
       transparent: true,
       opacity: 0,
     });
     const hammerStrikeFaceMat = new THREE.MeshStandardMaterial({
-      color: 0x5a6678,
-      roughness: 0.12,
-      metalness: 0.96,
+      color: 0xb5c6db,
+      map: brushed.diffuse,
+      roughnessMap: brushed.roughness,
+      bumpMap: brushed.bump,
+      bumpScale: 0.008,
+      roughness: 0.16,
+      metalness: 0.95,
+      envMapIntensity: 1.45,
       transparent: true,
       opacity: 0,
     });
     const hammerWoodMat = new THREE.MeshStandardMaterial({
-      color: 0x3d2b1f,
+      color: 0xa8794f,
+      map: hardwood.diffuse,
+      roughnessMap: hardwood.roughness,
       roughness: 0.58,
-      metalness: 0.05,
+      metalness: 0.04,
       transparent: true,
       opacity: 0,
     });

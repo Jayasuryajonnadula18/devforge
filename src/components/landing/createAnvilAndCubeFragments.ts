@@ -21,6 +21,15 @@ export interface FragmentData {
   delay: number;
 }
 
+export interface FragmentTextures {
+  brushedDiffuse?: THREE.Texture;
+  brushedRoughness?: THREE.Texture;
+  brushedBump?: THREE.Texture;
+  castDiffuse?: THREE.Texture;
+  castRoughness?: THREE.Texture;
+  castBump?: THREE.Texture;
+}
+
 export interface AnvilCubeSystem {
   fragments: FragmentData[];
   cubeGroup: THREE.Group;
@@ -35,7 +44,11 @@ export interface AnvilCubeSystem {
  * 2. Scatter into 3D suspended space in Scene 03 Stage 1 (Broken).
  * 3. Flow along organic, natural magnetic arcs to assemble into the 3x3x3 cube monolith.
  */
-export function buildAnvilAndCubeFragments(ANVIL_X = 1.0, ANVIL_Y = -0.15): AnvilCubeSystem {
+export function buildAnvilAndCubeFragments(
+  ANVIL_X = 1.0,
+  ANVIL_Y = -0.15,
+  textures?: FragmentTextures
+): AnvilCubeSystem {
   const anvilFragmentsGroup = new THREE.Group();
   anvilFragmentsGroup.position.set(ANVIL_X, ANVIL_Y, 0);
   anvilFragmentsGroup.visible = false; // INVISIBLE UNTIL IMPACT! Solid anvil is shown before strike.
@@ -45,18 +58,28 @@ export function buildAnvilAndCubeFragments(ANVIL_X = 1.0, ANVIL_Y = -0.15): Anvi
   cubeGroup.rotation.set(0.38, -0.68, 0.12);
   cubeGroup.position.set(0, 0.15, 0);
 
-  // Precision-machined PBR materials: dark forged titanium with specular bevel chamfers
+  // Precision-machined PBR materials: bright forged titanium with hairline brushed & cast textures
   const faceMat = new THREE.MeshStandardMaterial({
-    color: 0x3d4756,
-    roughness: 0.16,
-    metalness: 0.92,
+    color: 0x9fb0c5,
+    map: textures?.brushedDiffuse,
+    roughnessMap: textures?.brushedRoughness,
+    bumpMap: textures?.brushedBump,
+    bumpScale: 0.008,
+    roughness: 0.18,
+    metalness: 0.88,
+    envMapIntensity: 1.45,
     transparent: true,
   });
 
   const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0x1e2430,
-    roughness: 0.26,
-    metalness: 0.88,
+    color: 0x64758d,
+    map: textures?.castDiffuse,
+    roughnessMap: textures?.castRoughness,
+    bumpMap: textures?.castBump,
+    bumpScale: 0.014,
+    roughness: 0.30,
+    metalness: 0.78,
+    envMapIntensity: 1.25,
     transparent: true,
   });
 
