@@ -148,7 +148,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
             <h1 className="gsap-hero-item text-4xl sm:text-6xl md:text-7xl lg:text-[76px] xl:text-[84px] font-sans font-bold tracking-[-0.035em] leading-[1.15] max-w-5xl w-full select-none">
               <span className="block text-white sm:whitespace-nowrap">
                 Build from the{' '}
-                <span className="inline-block font-serif italic font-normal tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-r from-emerald-200 via-teal-100 to-white pb-3 pt-1 -mb-3 pr-2">
+                <span className="inline-block font-serif italic font-normal tracking-[-0.01em] text-white pb-3 pt-1 -mb-3 pr-2">
                   ground up.
                 </span>
               </span>

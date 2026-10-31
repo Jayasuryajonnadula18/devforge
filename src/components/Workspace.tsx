@@ -16,7 +16,7 @@ import { ContactPage } from './landing/ContactPage';
 import { PROJECTS } from '../data/projects';
 
 export const Workspace: React.FC = () => {
-  const [viewMode, setViewMode] = useState<'catalog' | 'studio' | 'contact'>('catalog');
+  const [viewMode, setViewMode] = useState<'catalog' | 'studio' | 'explore' | 'contact'>('catalog');
   const [currentProject, setCurrentProject] = useState<ProjectTrack>(PROJECTS[0]);
   const [activeFileName, setActiveFileName] = useState<string>(PROJECTS[0].initialFiles[0].name);
   const [files, setFiles] = useState<ProjectFile[]>(PROJECTS[0].initialFiles);
@@ -223,11 +223,24 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out`;
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [viewMode, handleRunTests]);
 
-  // Global event listener for opening contact page
+  // Global event listeners for routing views
   useEffect(() => {
     const handleOpenContact = () => setViewMode('contact');
+    const handleOpenExplore = () => setViewMode('explore');
+    const handleOpenStudio = () => setViewMode('studio');
+    const handleOpenCatalog = () => setViewMode('catalog');
+
     window.addEventListener('devforge:open-contact', handleOpenContact);
-    return () => window.removeEventListener('devforge:open-contact', handleOpenContact);
+    window.addEventListener('devforge:open-explore', handleOpenExplore);
+    window.addEventListener('devforge:open-studio', handleOpenStudio);
+    window.addEventListener('devforge:open-catalog', handleOpenCatalog);
+
+    return () => {
+      window.removeEventListener('devforge:open-contact', handleOpenContact);
+      window.removeEventListener('devforge:open-explore', handleOpenExplore);
+      window.removeEventListener('devforge:open-studio', handleOpenStudio);
+      window.removeEventListener('devforge:open-catalog', handleOpenCatalog);
+    };
   }, []);
 
   return (
@@ -274,9 +287,9 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out`;
           >
             <ContactPage onBack={() => setViewMode('catalog')} />
           </motion.div>
-        ) : (
+        ) : viewMode === 'explore' ? (
           <motion.div
-            key="studio"
+            key="explore"
             initial={{ opacity: 0, scale: 0.995 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.995 }}
@@ -284,6 +297,65 @@ test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out`;
             className="min-h-screen w-full bg-[#050608]"
           >
             <ExploreComingSoon onBack={() => setViewMode('catalog')} />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="studio"
+            initial={{ opacity: 0, scale: 0.995 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.995 }}
+            transition={{ duration: 0.2 }}
+            className="flex flex-col h-screen w-screen overflow-hidden bg-[#000000]"
+          >
+            {/* Top Workstation Header */}
+            <Header
+              currentProject={currentProject}
+              completedMilestoneIds={completedForCurrent}
+              onBackToCatalog={() => setViewMode('catalog')}
+              onOpenProjectModal={() => setIsCommandPaletteOpen(true)}
+              onRunTests={handleRunTests}
+              onResetCode={handleResetCode}
+              isRunningTests={isRunningTests}
+              lastResults={lastResults}
+              activeMilestoneIndex={activeMilestoneIndex}
+              onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+            />
+
+            {/* Main Split-Pane Workspace */}
+            <div className="flex-1 flex overflow-hidden">
+              {/* Left Panel: Focused Specification (42% width) */}
+              <div className="w-[42%] h-full shrink-0">
+                <ProjectSpec
+                  project={currentProject}
+                  completedMilestoneIds={completedForCurrent}
+                  activeMilestoneId={activeMilestoneId}
+                  onSelectMilestone={(id) => setActiveMilestoneId(id)}
+                  testResults={lastResults?.results || []}
+                />
+              </div>
+
+              {/* Right Panel: Code Studio & Terminal (58% width) */}
+              <div className="flex-1 flex flex-col h-full overflow-hidden">
+                {/* Upper: Multi-file Code Editor */}
+                <div className="flex-1 overflow-hidden">
+                  <CodeEditor
+                    files={files}
+                    activeFileName={activeFileName}
+                    onSelectFile={(name) => setActiveFileName(name)}
+                    onCodeChange={handleCodeChange}
+                  />
+                </div>
+
+                {/* Lower: Terminal Console */}
+                <TerminalOutput
+                  results={lastResults}
+                  isRunning={isRunningTests}
+                  language={currentProject.language}
+                  onAdvanceStage={handleAdvanceStage}
+                  hasNextStage={hasNextStage}
+                />
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

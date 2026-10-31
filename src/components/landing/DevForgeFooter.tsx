@@ -212,7 +212,7 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
           <div className="lg:col-span-6 grid grid-cols-2 sm:grid-cols-3 gap-8 text-sm">
             {/* 1. EXPLORE */}
             <div className="space-y-3.5">
-              <span className="text-xs font-mono uppercase tracking-wider text-neutral-400 font-medium">
+              <span className="text-xs font-sans uppercase tracking-wider text-neutral-400 font-semibold">
                 {EXPLORE_GROUP.title}
               </span>
               <ul className="space-y-2.5 text-neutral-300" role="list">
@@ -250,7 +250,7 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
 
             {/* 2. ABOUT */}
             <div className="space-y-3.5">
-              <span className="text-xs font-mono uppercase tracking-wider text-neutral-400 font-medium">
+              <span className="text-xs font-sans uppercase tracking-wider text-neutral-400 font-semibold">
                 ABOUT
               </span>
               <ul className="space-y-2.5 text-neutral-300" role="list">
@@ -276,7 +276,7 @@ export const DevForgeFooter: React.FC<DevForgeFooterProps> = ({
 
             {/* 3. CONNECT */}
             <div className="space-y-3.5">
-              <span className="text-xs font-mono uppercase tracking-wider text-neutral-400 font-medium">
+              <span className="text-xs font-sans uppercase tracking-wider text-neutral-400 font-semibold">
                 {CONNECT_GROUP.title}
               </span>
               <ul className="space-y-2.5 text-neutral-300" role="list">
