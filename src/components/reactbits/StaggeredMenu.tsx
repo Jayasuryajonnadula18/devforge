@@ -319,18 +319,21 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   const defaultFlowingItems: FlowingMenuItem[] = [
     {
       text: 'Courses',
-      marquee: 'Courses · Systems Curriculum · Coming Soon · In Private Verification ·',
+      marquee: 'Curriculum · Systems Architecture · Compilers · In Verification ·',
+      image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&h=400&fit=crop&sat=-100&auto=format',
       onClick: () => setView('courses'),
     },
     {
       text: 'The Forge',
-      marquee: 'The Forge · First Principles Foundation & Monolith · Architecture · Philosophy ·',
+      marquee: 'Philosophy · Monolith & Engine · First Principles Foundation ·',
+      image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&h=400&fit=crop&sat=-100&auto=format',
       link: '#meet-devforge',
       onClick: () => closeMenu(),
     },
     {
       text: 'Architecture',
-      marquee: 'Architecture · Coming Soon · Distributed Topologies & Visual Models ·',
+      marquee: 'Distributed Systems · Visual Topologies · Fault Tolerance · Coming Soon ·',
+      image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=600&h=400&fit=crop&sat=-100&auto=format',
       onClick: () => {
         closeMenu();
         toast.info('Architecture — Coming Soon', {
@@ -388,23 +391,25 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 className="flex flex-col h-full justify-between"
               >
                 {/* FlowingMenu from React Bits */}
-                <div className="flex-1 flex flex-col justify-center py-4">
-                  <FlowingMenu
-                    items={resolvedFlowingItems}
-                    speed={55}
-                    stretch={0.5}
-                    magnet={0.2}
-                    followCursor={0.3}
-                    textColor="#f5f4f0"
-                    bgColor="transparent"
-                    marqueeBgColor="#f59e0b"
-                    marqueeTextColor="#090706"
-                    dividers={false}
-                    showIndex={false}
-                    showArrow={false}
-                    align="left"
-                    style={{ height: '270px' }}
-                  />
+                <div className="flex-1 flex flex-col justify-center py-2">
+                  <div style={{ height: '380px', position: 'relative' }} className="w-full">
+                    <FlowingMenu
+                      items={resolvedFlowingItems}
+                      speed={60}
+                      stretch={0.6}
+                      magnet={0.25}
+                      followCursor={0.4}
+                      textColor="#ffffff"
+                      bgColor="transparent"
+                      marqueeBgColor="#f59e0b"
+                      marqueeTextColor="#090706"
+                      borderColor="rgba(255, 255, 255, 0.12)"
+                      dividers={true}
+                      showIndex={false}
+                      showArrow={false}
+                      align="left"
+                    />
+                  </div>
                 </div>
 
                 {displaySocials && socialItems && socialItems.length > 0 && (

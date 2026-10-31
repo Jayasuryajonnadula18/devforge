@@ -55,14 +55,16 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
   const flowingMenuItems: FlowingMenuItem[] = [
     {
       text: 'Courses',
-      marquee: 'Courses · Systems Curriculum · Coming Soon · In Private Verification ·',
+      marquee: 'Curriculum · Systems Architecture · Compilers · In Verification ·',
+      image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=600&h=400&fit=crop&sat=-100&auto=format',
       onClick: () => {
         setMenuView('courses');
       },
     },
     {
       text: 'The Forge',
-      marquee: 'The Forge · First Principles Foundation & Monolith · Architecture · Philosophy ·',
+      marquee: 'Philosophy · Monolith & Engine · First Principles Foundation ·',
+      image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&h=400&fit=crop&sat=-100&auto=format',
       link: '#meet-devforge',
       onClick: () => {
         setIsMenuOpen(false);
@@ -70,7 +72,8 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
     },
     {
       text: 'Architecture',
-      marquee: 'Architecture · Coming Soon · Distributed Topologies & Visual Models ·',
+      marquee: 'Distributed Systems · Visual Topologies · Fault Tolerance · Coming Soon ·',
+      image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?q=80&w=600&h=400&fit=crop&sat=-100&auto=format',
       onClick: () => {
         setIsMenuOpen(false);
         toast.info('Architecture — Coming Soon', {

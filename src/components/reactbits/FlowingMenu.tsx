@@ -533,6 +533,9 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
 
   const onPointerMove = (event: React.PointerEvent<HTMLUListElement>) => {
     if (event.pointerType === 'touch') return;
+    if (!metrics.current.length || !metrics.current[0]?.height) {
+      measure();
+    }
     stopIntro();
     const c = cursor.current;
     const now = performance.now();
@@ -631,6 +634,12 @@ export const FlowingMenu: React.FC<FlowingMenuProps> = ({
                 rows.current[index] = { ...rows.current[index], item: node };
               }}
               className={ITEM}
+              onPointerEnter={() => {
+                if (!metrics.current.length || !metrics.current[0]?.height) {
+                  measure();
+                }
+                goTo(index, 'center');
+              }}
             >
               {dividers && index > 0 && <span className={DIVIDER} data-intro-rule="" aria-hidden="true" />}
               {item.link ? (
