@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useScroll } from 'motion/react';
-import { toast } from 'sonner';
 import { ForgeSymbol } from '../icons/ForgeSymbol';
 import { LiquidGlass } from '../reactbits/LiquidGlass';
-import { StaggeredMenu, StaggeredMenuSocialItem } from '../reactbits/StaggeredMenu';
+import { StaggeredMenu } from '../reactbits/StaggeredMenu';
 import { FlowingMenuItem } from '../reactbits/FlowingMenu';
+import { triggerComingSoonToast } from '../../lib/navigationConfig';
 import { ProjectTrack } from '../../types';
 
 interface DialedNavbarProps {
@@ -26,12 +26,24 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
 }) => {
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState<'hero' | 'about'>('hero');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [menuView, setMenuView] = useState<'main' | 'courses'>('main');
 
+  // Track scroll state and active section
   useEffect(() => {
     return scrollY.on('change', (latest) => {
       setIsScrolled(latest > 25);
+
+      const aboutEl = document.getElementById('meet-devforge');
+      if (aboutEl) {
+        const rect = aboutEl.getBoundingClientRect();
+        if (rect.top <= 200 && rect.bottom >= 150) {
+          setActiveSection('about');
+          return;
+        }
+      }
+      setActiveSection('hero');
     });
   }, [scrollY]);
 
@@ -40,6 +52,13 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
     setMenuView('courses');
     setIsMenuOpen(true);
   }, []);
+
+  // Listen for global custom event (e.g. from Footer or page links)
+  useEffect(() => {
+    const handleEvent = () => handleOpenCoursesInMenu();
+    window.addEventListener('devforge:open-courses', handleEvent);
+    return () => window.removeEventListener('devforge:open-courses', handleEvent);
+  }, [handleOpenCoursesInMenu]);
 
   // Global Escape key listener
   useEffect(() => {
@@ -52,117 +71,155 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const handleScrollHome = () => {
+    if (onResetFilter) onResetFilter();
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleOpenStudio = () => {
+    setIsMenuOpen(false);
+    onSelectInitialProject();
+  };
+
+  // Flowing menu items: Learn, Explore, About DevForge, Philosophy
   const flowingMenuItems: FlowingMenuItem[] = [
     {
-      text: 'Courses',
+      text: 'Learn',
       image: '/images/menu/courses-documentation.jpg',
       onClick: () => {
         setMenuView('courses');
       },
     },
     {
-      text: 'The Forge',
+      text: 'Explore',
       image: '/images/menu/the-forge-hardware.jpg',
+      onClick: handleOpenStudio,
+    },
+    {
+      text: 'About DevForge',
+      image: '/images/menu/architecture-systems.jpg',
       link: '#meet-devforge',
       onClick: () => {
         setIsMenuOpen(false);
       },
     },
     {
-      text: 'Architecture',
-      image: '/images/menu/architecture-systems.jpg',
+      text: 'Philosophy',
+      image: '/images/menu/philosophy-first-principles.jpg',
+      link: '#meet-devforge',
       onClick: () => {
         setIsMenuOpen(false);
-        toast.info('Architecture — Coming Soon', {
-          description: 'Interactive visual system topologies & distributed system maps dropping in Q1 2027.',
-        });
       },
     },
-  ];
-
-  const socialItems: StaggeredMenuSocialItem[] = [
-    { label: 'GitHub', link: 'https://github.com/Jayasuryajonnadula18/devforge' },
-    { label: 'Philosophy', link: '#meet-devforge' },
-    { label: 'Terms', link: '#' },
   ];
 
   return (
     <>
       {/* 1. Main Floating Navigation Bar */}
-      <header className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 sm:px-12 lg:px-20 py-6 pointer-events-none">
-        
-        {/* Left: DevForge Brand Mark */}
-        <div 
-          onClick={onResetFilter}
-          className="pointer-events-auto cursor-pointer select-none group flex items-center z-20"
+      <header className="fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 sm:px-10 lg:px-16 py-5 sm:py-6 pointer-events-none select-none">
+        {/* Left: DevForge Brand Mark & Wordmark */}
+        <div
+          onClick={handleScrollHome}
+          className="pointer-events-auto cursor-pointer group flex items-center space-x-2.5 z-20"
           title="DevForge"
         >
           <div className="text-white transition-transform duration-300 group-hover:scale-105">
-            <ForgeSymbol size={28} className="w-7 h-7 text-white" />
+            <ForgeSymbol size={26} className="w-6 h-6 text-white" />
           </div>
+          <span className="font-sans font-bold text-base tracking-tight text-white hidden sm:inline-block">
+            DevForge
+          </span>
         </div>
 
-        {/* Center: Real Optical Liquid Glass Capsule */}
-        <div className="pointer-events-auto z-20">
+        {/* Center: Primary Navigation Links in Optical LiquidGlass Capsule: Paths, Contact, About, Home */}
+        <div className="pointer-events-auto z-20 hidden md:block">
           <LiquidGlass
             isScrolled={isScrolled}
-            height={52}
+            height={48}
             borderRadius={999}
             backgroundOpacity={0}
             displace={0}
             distortionScale={0}
             saturation={0.8}
           >
-            <nav className="flex items-center gap-1 px-1.5">
-              <button 
-                type="button"
-                onClick={() => {
-                  toast('Architecture — Coming Soon', {
-                    description: 'Interactive visual system topologies & distributed system maps dropping in Q1 2027.',
-                  });
-                }}
-                className="text-white/60 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold cursor-pointer"
-              >
-                Architecture
-              </button>
-
-              {/* Courses Button: Opens the Menu directly into the Courses View */}
-              <button 
-                type="button"
-                onClick={handleOpenCoursesInMenu}
-                className="text-white/70 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold flex items-center gap-1.5 cursor-pointer"
-              >
-                <span>Courses</span>
-              </button>
-
-              <a 
-                href="#meet-devforge" 
-                className="text-white/60 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold"
-              >
-                Philosophy
-              </a>
-
+            <nav className="flex items-center gap-1 px-1.5" aria-label="Primary destinations">
+              {/* Paths */}
               <button
                 type="button"
-                onClick={onSelectInitialProject}
-                className="text-white/60 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold cursor-pointer"
+                onClick={handleOpenCoursesInMenu}
+                className="text-white/70 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 cursor-pointer"
               >
-                Studio
+                Paths
+              </button>
+
+              {/* Contact */}
+              <button
+                type="button"
+                onClick={() => {
+                  triggerComingSoonToast(
+                    'Contact',
+                    'Direct engineering contact and partnership channel is opening soon.'
+                  );
+                }}
+                className="text-white/70 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 cursor-pointer"
+              >
+                Contact
+              </button>
+
+              {/* About */}
+              <a
+                href="#meet-devforge"
+                className={`px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 ${
+                  activeSection === 'about'
+                    ? 'text-white bg-white/[0.12] font-semibold'
+                    : 'text-white/70 hover:text-white'
+                }`}
+              >
+                About
+              </a>
+
+              {/* Home */}
+              <button
+                type="button"
+                onClick={handleScrollHome}
+                className="text-white/70 hover:text-white px-3.5 py-1.5 rounded-full transition-all duration-200 text-[12.8px] font-sans font-medium hover:font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 cursor-pointer"
+              >
+                Home
               </button>
             </nav>
           </LiquidGlass>
         </div>
 
-        {/* Right Spacing to balance logo on the left */}
-        <div className="w-20 hidden sm:block" />
+        {/* Right: Menu Trigger Button */}
+        <div className="pointer-events-auto z-20 flex items-center justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              if (isMenuOpen) {
+                setIsMenuOpen(false);
+              } else {
+                setMenuView('main');
+                setIsMenuOpen(true);
+              }
+            }}
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMenuOpen}
+            className="text-white/80 hover:text-white transition-all duration-200 text-[13.5px] font-sans font-medium px-4 py-2 rounded-full hover:bg-white/[0.08] border border-transparent hover:border-white/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 cursor-pointer flex items-center space-x-1.5"
+          >
+            <span>{isMenuOpen ? 'Close' : 'Menu'}</span>
+          </button>
+        </div>
       </header>
 
-      {/* 2. Unified StaggeredMenu Drawer Hosting Both Navigation & Flowing Courses */}
+      {/* 2. Structured Expanded Menu Drawer (Flowing Menu + Staggering Menu style) */}
       <StaggeredMenu
         position="right"
         isFixed={true}
         isOpenControlled={true}
         isOpen={isMenuOpen}
+        hideToggle={true}
         activeView={menuView}
         onViewChange={(v) => setMenuView(v)}
         onMenuOpen={() => {
@@ -171,7 +228,10 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
         }}
         onMenuClose={() => setIsMenuOpen(false)}
         projects={projects}
+        flowingItems={flowingMenuItems}
+        onSelectStudio={handleOpenStudio}
         onSelectProject={(project) => {
+          setIsMenuOpen(false);
           if (onSelectProject) {
             onSelectProject(project);
           } else {
@@ -182,11 +242,9 @@ export const DialedNavbar: React.FC<DialedNavbarProps> = ({
         accentColor="#f59e0b"
         menuButtonColor="#f5f4f0"
         openMenuButtonColor="#f5f4f0"
-        flowingItems={flowingMenuItems}
-        socialItems={socialItems}
-        displaySocials={true}
-        displayItemNumbering={false}
       />
     </>
   );
 };
+
+export default DialedNavbar;

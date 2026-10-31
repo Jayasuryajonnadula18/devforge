@@ -3,10 +3,11 @@
 import React, { useCallback, useLayoutEffect, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { toast } from 'sonner';
+import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ForgeSymbol } from '../icons/ForgeSymbol';
 import { FlowingMenu, FlowingMenuItem } from './FlowingMenu';
 import { ProjectTrack } from '../../types';
+import { triggerComingSoonToast } from '../../lib/navigationConfig';
 import './StaggeredMenu.css';
 
 export interface StaggeredMenuItem {
@@ -40,7 +41,9 @@ export interface StaggeredMenuProps {
   closeOnClickAway?: boolean;
   isOpenControlled?: boolean;
   isOpen?: boolean;
+  hideToggle?: boolean;
   projects?: ProjectTrack[];
+  onSelectStudio?: () => void;
   onSelectProject?: (p: ProjectTrack) => void;
   activeView?: 'main' | 'courses';
   onViewChange?: (view: 'main' | 'courses') => void;
@@ -66,7 +69,9 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   closeOnClickAway = true,
   isOpenControlled = false,
   isOpen: controlledIsOpen = false,
+  hideToggle = false,
   projects = [],
+  onSelectStudio,
   onSelectProject,
   activeView: controlledActiveView,
   onViewChange,
@@ -95,6 +100,30 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
   const closeTweenRef = useRef<gsap.core.Tween | null>(null);
   const colorTweenRef = useRef<gsap.core.Tween | null>(null);
   const busyRef = useRef(false);
+  const [currentYear, setCurrentYear] = useState<number>(2026);
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
+  }, []);
+
+  // Accessible Body Scroll-Lock while menu is open
+  useEffect(() => {
+    if (open) {
+      const originalOverflow = document.body.style.overflow;
+      const originalPaddingRight = document.body.style.paddingRight;
+      const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+      document.body.style.overflow = 'hidden';
+      if (scrollBarWidth > 0) {
+        document.body.style.paddingRight = `${scrollBarWidth}px`;
+      }
+
+      return () => {
+        document.body.style.overflow = originalOverflow;
+        document.body.style.paddingRight = originalPaddingRight;
+      };
+    }
+  }, [open]);
 
   useLayoutEffect(() => {
     const ctx = gsap.context(() => {
@@ -129,30 +158,21 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       closeTweenRef.current = null;
     }
 
-    const socialTitle = panel.querySelector('.sm-socials-title');
-    const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'));
-
     const offscreen = position === 'left' ? -100 : 100;
-    const layerStates = layers.map(el => ({ el, start: offscreen }));
+    const layerStates = layers.map((el) => ({ el, start: offscreen }));
     const panelStart = offscreen;
 
-    if (socialTitle) {
-      gsap.set(socialTitle, { opacity: 0 });
-    }
-    if (socialLinks.length) {
-      gsap.set(socialLinks, { y: 20, opacity: 0 });
-    }
-
     const tl = gsap.timeline({ paused: true });
-
     gsap.set(panel, { pointerEvents: 'none' });
 
     layerStates.forEach((ls, i) => {
       tl.fromTo(ls.el, { xPercent: ls.start }, { xPercent: 0, duration: 0.65, ease: 'power4.out' }, i * 0.08);
     });
+
     const lastTime = layerStates.length ? (layerStates.length - 1) * 0.08 : 0;
     const panelInsertTime = lastTime + (layerStates.length ? 0.08 : 0);
-    const panelDuration = 0.8;
+    const panelDuration = 0.75;
+
     tl.fromTo(
       panel,
       { xPercent: panelStart },
@@ -160,52 +180,22 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       panelInsertTime
     );
 
+    // Stagger animation for flowing menu items
     const flowingItems = Array.from(panel.querySelectorAll('.flowing-menu__item'));
     if (flowingItems.length) {
-      gsap.set(flowingItems, { y: 30, opacity: 0 });
+      gsap.set(flowingItems, { y: 28, opacity: 0 });
       tl.to(
         flowingItems,
         {
           y: 0,
           opacity: 1,
-          duration: 0.7,
+          duration: 0.65,
           ease: 'power3.out',
           stagger: 0.08,
-          clearProps: 'transform,opacity'
+          clearProps: 'transform,opacity',
         },
-        panelInsertTime + 0.15
+        panelInsertTime + 0.12
       );
-    }
-
-    if (socialTitle || socialLinks.length) {
-      const socialsStart = panelInsertTime + panelDuration * 0.35;
-      if (socialTitle) {
-        tl.to(
-          socialTitle,
-          {
-            opacity: 1,
-            duration: 0.5,
-            ease: 'power2.out'
-          },
-          socialsStart
-        );
-      }
-      if (socialLinks.length) {
-        tl.to(
-          socialLinks,
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.55,
-            ease: 'power3.out',
-            stagger: { each: 0.08, from: 'start' },
-            onComplete: () => {
-              gsap.set(socialLinks, { clearProps: 'opacity' });
-            }
-          },
-          socialsStart + 0.04
-        );
-      }
     }
 
     openTlRef.current = tl;
@@ -223,9 +213,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       tl.eventCallback('onComplete', () => {
         busyRef.current = false;
         if (panel) gsap.set(panel, { pointerEvents: 'auto' });
-        if (typeof window !== 'undefined') {
-          window.dispatchEvent(new Event('resize'));
-        }
       });
       tl.play(0);
     } else {
@@ -252,14 +239,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
       overwrite: 'auto',
       onComplete: () => {
         const flowingItems = Array.from(panel.querySelectorAll('.flowing-menu__item'));
-        if (flowingItems.length) gsap.set(flowingItems, { y: 30, opacity: 0 });
-        const socialTitle = panel.querySelector('.sm-socials-title');
-        const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link'));
-        if (socialTitle) gsap.set(socialTitle, { opacity: 0 });
-        if (socialLinks.length) gsap.set(socialLinks, { y: 20, opacity: 0 });
+        if (flowingItems.length) gsap.set(flowingItems, { y: 28, opacity: 0 });
         busyRef.current = false;
         setInternalView('main');
-      }
+      },
     });
   }, [position]);
 
@@ -274,7 +257,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
           color: targetColor,
           delay: 0.18,
           duration: 0.3,
-          ease: 'power2.out'
+          ease: 'power2.out',
         });
       } else {
         gsap.set(btn, { color: menuButtonColor });
@@ -324,6 +307,18 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     }
   }, [isOpenControlled, playClose, animateColor, onMenuClose]);
 
+  // Global Escape key listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && openRef.current) {
+        closeMenu();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [closeMenu]);
+
+  // Click outside to close
   useEffect(() => {
     if (!closeOnClickAway || !open) return;
 
@@ -344,28 +339,38 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     };
   }, [closeOnClickAway, open, closeMenu]);
 
-  // Default clean FlowingMenu items for DevForge
+  const handleOpenStudio = () => {
+    closeMenu();
+    if (onSelectStudio) {
+      onSelectStudio();
+    } else if (projects.length > 0 && onSelectProject) {
+      onSelectProject(projects[0]);
+    }
+  };
+
+  // FlowingMenu items: Learn, Explore, About DevForge, Philosophy
   const defaultFlowingItems: FlowingMenuItem[] = [
     {
-      text: 'Courses',
+      text: 'Learn',
       image: '/images/menu/courses-documentation.jpg',
       onClick: () => setView('courses'),
     },
     {
-      text: 'The Forge',
+      text: 'Explore',
       image: '/images/menu/the-forge-hardware.jpg',
-      link: '#meet-devforge',
-      onClick: () => closeMenu(),
+      onClick: handleOpenStudio,
     },
     {
-      text: 'Architecture',
+      text: 'About DevForge',
       image: '/images/menu/architecture-systems.jpg',
-      onClick: () => {
-        closeMenu();
-        toast.info('Architecture — Coming Soon', {
-          description: 'Interactive visual system topologies & distributed system maps dropping in Q1 2027.',
-        });
-      },
+      link: '#meet-devforge',
+      onClick: closeMenu,
+    },
+    {
+      text: 'Philosophy',
+      image: '/images/menu/philosophy-first-principles.jpg',
+      link: '#meet-devforge',
+      onClick: closeMenu,
     },
   ];
 
@@ -390,22 +395,61 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
         })()}
       </div>
 
-      <header className="staggered-menu-header" aria-label="Main navigation header">
-        <button
-          ref={toggleBtnRef}
-          className="sm-toggle"
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
-          aria-controls="staggered-menu-panel"
-          onClick={toggleMenu}
-          type="button"
-        >
-          <span className="sm-toggle-text">{open ? 'Close' : 'Menu'}</span>
-        </button>
-      </header>
+      {/* Standalone Toggle */}
+      {!hideToggle && (
+        <header className="staggered-menu-header" aria-label="Main navigation header">
+          <button
+            ref={toggleBtnRef}
+            className="sm-toggle"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+            aria-controls="staggered-menu-panel"
+            onClick={toggleMenu}
+            type="button"
+          >
+            <span className="sm-toggle-text">{open ? 'Close' : 'Menu'}</span>
+          </button>
+        </header>
+      )}
 
-      <aside id="staggered-menu-panel" ref={panelRef} className="staggered-menu-panel" aria-hidden={!open}>
-        <div className="sm-panel-inner">
+      {/* Main Expanded Menu Drawer */}
+      <aside
+        id="staggered-menu-panel"
+        ref={panelRef}
+        className="staggered-menu-panel"
+        aria-hidden={!open}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Expanded Navigation"
+      >
+        {/* Header Bar inside Menu */}
+        <div className="flex items-center justify-between pb-6 sm:pb-8 border-b border-white/[0.08] select-none">
+          <div
+            onClick={() => {
+              closeMenu();
+              if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="flex items-center space-x-3 cursor-pointer group"
+            title="DevForge Home"
+          >
+            <div className="text-white group-hover:scale-105 transition-transform">
+              <ForgeSymbol size={26} className="w-6 h-6 text-white" />
+            </div>
+            <span className="font-sans font-bold text-lg tracking-tight text-white">DevForge</span>
+          </div>
+
+          <button
+            type="button"
+            onClick={closeMenu}
+            aria-label="Close menu"
+            className="text-neutral-400 hover:text-white transition-colors px-3 py-1.5 rounded-lg text-xs sm:text-sm font-sans font-medium hover:bg-white/[0.06] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-400 cursor-pointer"
+          >
+            Close
+          </button>
+        </div>
+
+        {/* Content Area with AnimatePresence */}
+        <div className="sm-panel-inner py-4 flex-1 flex flex-col justify-between">
           <AnimatePresence mode="wait">
             {currentView === 'main' ? (
               <motion.div
@@ -414,10 +458,10 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.18 }}
-                className="flex flex-col h-full justify-between"
+                className="flex flex-col h-full justify-between gap-6 select-none"
               >
-                {/* Refined FlowingMenu: Large Typography paired with Horizontal Capsule Strips */}
-                <div className="flex-1 flex flex-col justify-center py-4">
+                {/* FlowingMenu: Learn, Explore, About DevForge, Philosophy */}
+                <div className="flex-1 flex flex-col justify-center py-2">
                   <div className="w-full">
                     <FlowingMenu
                       items={resolvedFlowingItems}
@@ -426,23 +470,38 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                   </div>
                 </div>
 
-                {displaySocials && socialItems && socialItems.length > 0 && (
-                  <div className="sm-socials" aria-label="Social links">
-                    <h3 className="sm-socials-title">DevForge Ecosystem</h3>
-                    <ul className="sm-socials-list" role="list">
-                      {socialItems.map((s, i) => (
-                        <li key={s.label + i} className="sm-socials-item">
-                          <a href={s.link} target="_blank" rel="noopener noreferrer" className="sm-socials-link">
-                            {s.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
+                {/* Ecosystem Links and Bottom Statement */}
+                <div className="pt-6 border-t border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono text-neutral-400">
+                  <div className="flex items-center space-x-5">
+                    <a
+                      href="https://github.com/Jayasuryajonnadula18/devforge"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="hover:text-white transition-colors inline-flex items-center space-x-1"
+                    >
+                      <span>GitHub</span>
+                      <ArrowUpRight className="w-3 h-3 text-neutral-500" />
+                    </a>
+                    <a
+                      href="#meet-devforge"
+                      onClick={closeMenu}
+                      className="hover:text-white transition-colors"
+                    >
+                      Philosophy
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => triggerComingSoonToast('Terms', 'Official terms and licensing documentation are in preparation.')}
+                      className="hover:text-white transition-colors cursor-pointer"
+                    >
+                      Terms
+                    </button>
                   </div>
-                )}
+                  <span>© {currentYear} DevForge · Architected from first principles.</span>
+                </div>
               </motion.div>
             ) : (
-              /* Subview: Minimalist Coming Soon View */
+              /* Subview: Interactive Curriculum View */
               <motion.div
                 key="courses-view"
                 initial={{ opacity: 0 }}
@@ -452,7 +511,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 className="flex flex-col h-full justify-between py-2 select-none"
               >
                 <div className="space-y-8">
-                  {/* Back to main navigation */}
                   <button
                     type="button"
                     onClick={() => setView('main')}
@@ -462,7 +520,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                     <span>Back to Menu</span>
                   </button>
 
-                  <div className="space-y-4 pt-6">
+                  <div className="space-y-4 pt-4">
                     <span className="text-xs font-mono uppercase tracking-widest text-amber-400/90 font-medium">
                       Curriculum
                     </span>
@@ -476,7 +534,7 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                     </p>
                   </div>
 
-                  <div className="pt-4">
+                  <div className="pt-2">
                     <a
                       href="#meet-devforge"
                       onClick={closeMenu}
@@ -488,7 +546,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                   </div>
                 </div>
 
-                {/* Subtle Minimalist Status Indicator */}
                 <div className="pt-6 border-t border-white/[0.08] flex items-center justify-between text-xs font-mono text-neutral-500">
                   <span>DevForge Systems</span>
                   <span>In Development</span>

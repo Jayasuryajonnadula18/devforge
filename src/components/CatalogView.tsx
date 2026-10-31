@@ -177,6 +177,7 @@ export const CatalogView: React.FC<CatalogViewProps> = ({
         <DevForgeFooter
           projects={projects}
           onSelectProject={onSelectProject}
+          onSelectInitialProject={() => onSelectProject(pythonProjects[0] || projects[0])}
         />
 
       </div>
