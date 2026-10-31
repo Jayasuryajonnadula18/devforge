@@ -330,7 +330,11 @@ export function FlowingMenu({
 
   const kick = () => {
     const loop = engine.current;
-    if (loop.raf || typeof window === 'undefined') return;
+    if (loop.raf) {
+      cancelAnimationFrame(loop.raf);
+      loop.raf = 0;
+    }
+    if (typeof window === 'undefined') return;
     loop.last = performance.now();
     loop.raf = requestAnimationFrame(frame);
   };
@@ -364,8 +368,8 @@ export function FlowingMenu({
       setSlots([...r.slots]);
     }
     if (!b.shown) {
-      const start = from === 'bottom' ? bottom : from === 'center' ? (top + bottom) / 2 : top;
-      b.top = b.bottom = start;
+      b.top = top;
+      b.bottom = bottom;
       b.vTop = b.vBottom = 0;
       b.shown = true;
     }
@@ -376,6 +380,7 @@ export function FlowingMenu({
     b.toBottom = bottom;
     b.index = index;
     markRows();
+    paint();
     kick();
   };
 
@@ -547,7 +552,12 @@ export function FlowingMenu({
 
   useEffect(() => {
     const loop = engine.current;
-    return () => cancelAnimationFrame(loop.raf);
+    return () => {
+      if (loop.raf) {
+        cancelAnimationFrame(loop.raf);
+        loop.raf = 0;
+      }
+    };
   }, []);
 
   const onPointerMove = (event: React.PointerEvent<HTMLUListElement>) => {
@@ -642,7 +652,8 @@ export function FlowingMenu({
             <li
               key={`${item.text}-${index}`}
               ref={node => {
-                rows.current[index] = { ...rows.current[index], item: node, band: null, track: null };
+                const prev = rows.current[index] || { band: null, track: null };
+                rows.current[index] = { ...prev, item: node };
               }}
               className={ITEM}
               onPointerEnter={(e) => {
@@ -666,13 +677,15 @@ export function FlowingMenu({
                 aria-hidden="true"
                 style={{ backgroundColor: marqueeBgColor, color: marqueeTextColor }}
                 ref={node => {
-                  rows.current[index] = { ...rows.current[index]!, band: node };
+                  const prev = rows.current[index] || { item: null, track: null };
+                  rows.current[index] = { ...prev, band: node };
                 }}
               >
                 <div
                   className={TRACK}
                   ref={node => {
-                    rows.current[index] = { ...rows.current[index]!, track: node };
+                    const prev = rows.current[index] || { item: null, band: null };
+                    rows.current[index] = { ...prev, track: node };
                   }}
                 >
                   {Array.from({ length: copies[index] ?? 3 }, (_, copy) => (
