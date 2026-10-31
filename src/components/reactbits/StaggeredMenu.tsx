@@ -3,8 +3,7 @@
 import React, { useCallback, useLayoutEffect, useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { motion, AnimatePresence } from 'motion/react';
-import { ArrowLeft, Sparkles, ChevronRight, Terminal } from 'lucide-react';
-import { FlowingMenu, FlowingMenuItem } from './FlowingMenu';
+import { ArrowLeft, ArrowRight, ChevronRight } from 'lucide-react';
 import { ProjectTrack } from '../../types';
 import './StaggeredMenu.css';
 
@@ -401,19 +400,6 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
     };
   }, [closeOnClickAway, open, closeMenu]);
 
-  // Convert project tracks into FlowingMenu items for the Courses view
-  const flowingItems: FlowingMenuItem[] = projects.map((p) => ({
-    text: p.title.split('(')[0].trim(),
-    marquee: `${p.languageBadge} · ${p.level} Complexity · ${p.tagline}`,
-    meta: p.languageBadge,
-    onClick: () => {
-      if (onSelectProject) {
-        onSelectProject(p);
-      }
-      closeMenu();
-    },
-  }));
-
   return (
     <div
       className={(className ? className + ' ' : '') + 'staggered-menu-wrapper' + (isFixed ? ' fixed-wrapper' : '')}
@@ -542,65 +528,56 @@ export const StaggeredMenu: React.FC<StaggeredMenuProps> = ({
                 )}
               </motion.div>
             ) : (
-              /* Subview: Interactive FlowingMenu Courses directly inside the menu */
+              /* Subview: Minimalist Coming Soon View */
               <motion.div
                 key="courses-view"
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 16 }}
                 animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
+                exit={{ opacity: 0, x: 16 }}
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                className="flex flex-col h-full space-y-4"
+                className="flex flex-col h-full justify-between py-2 select-none"
               >
-                {/* Back to main navigation */}
-                <button
-                  type="button"
-                  onClick={() => setView('main')}
-                  className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider text-neutral-400 hover:text-white transition-colors cursor-pointer group"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform text-amber-400" />
-                  <span>Back to Menu</span>
-                </button>
+                <div className="space-y-8">
+                  {/* Back to main navigation */}
+                  <button
+                    type="button"
+                    onClick={() => setView('main')}
+                    className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider text-neutral-400 hover:text-white transition-colors cursor-pointer group"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform text-amber-400" />
+                    <span>Back to Menu</span>
+                  </button>
 
-                {/* Subview Header */}
-                <div className="space-y-1 pb-1 border-b border-white/10">
-                  <div className="flex items-center space-x-2.5">
-                    <div className="w-6 h-6 rounded-md bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-amber-400">
-                      <Terminal className="w-3 h-3" />
-                    </div>
-                    <h3 className="font-sans text-xl font-bold text-white tracking-tight">
-                      Curriculum Tracks
+                  <div className="space-y-4 pt-6">
+                    <span className="text-xs font-mono uppercase tracking-widest text-amber-400/90 font-medium">
+                      Curriculum
+                    </span>
+
+                    <h3 className="font-rector text-4xl sm:text-5xl font-bold tracking-tight text-white leading-tight">
+                      Coming <span className="italic font-normal text-amber-200/90">soon.</span>
                     </h3>
+
+                    <p className="text-sm sm:text-base text-neutral-300/80 leading-relaxed font-sans max-w-sm pt-1">
+                      We are currently engineering production-grade tracks on distributed consensus, compiler architecture, and kernel internals from first principles.
+                    </p>
                   </div>
-                  <p className="text-xs text-neutral-400 font-sans">
-                    Hover to preview architecture · Click to launch Studio
-                  </p>
+
+                  <div className="pt-4">
+                    <a
+                      href="#meet-devforge"
+                      onClick={closeMenu}
+                      className="inline-flex items-center space-x-2 text-xs font-mono uppercase tracking-wider text-neutral-300 hover:text-white transition-colors group"
+                    >
+                      <span>Explore the Foundation</span>
+                      <ArrowRight className="w-3.5 h-3.5 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                    </a>
+                  </div>
                 </div>
 
-                {/* Kinetic FlowingMenu embedded directly inside the drawer */}
-                <div className="flex-1 w-full min-h-[380px] overflow-hidden rounded-2xl bg-black/40 border border-white/[0.08]">
-                  <FlowingMenu
-                    items={flowingItems}
-                    speed={45}
-                    direction="alternate"
-                    stretch={0.45}
-                    magnet={0.2}
-                    followCursor={0.35}
-                    textColor="#f5f4f0"
-                    bgColor="transparent"
-                    marqueeBgColor="#f59e0b"
-                    marqueeTextColor="#050608"
-                    borderColor="rgba(255, 255, 255, 0.08)"
-                    dividers={true}
-                    showIndex={true}
-                    showArrow={true}
-                    align="left"
-                  />
-                </div>
-
-                {/* Invariant Footer */}
-                <div className="pt-2 flex items-center space-x-2 text-[11px] font-mono text-neutral-400">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                  <span>All tracks include in-browser compiler & test assertions</span>
+                {/* Subtle Minimalist Status Indicator */}
+                <div className="pt-6 border-t border-white/[0.08] flex items-center justify-between text-xs font-mono text-neutral-500">
+                  <span>DevForge Systems</span>
+                  <span>In Development</span>
                 </div>
               </motion.div>
             )}
