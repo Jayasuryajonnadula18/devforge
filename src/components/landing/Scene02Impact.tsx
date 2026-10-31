@@ -77,13 +77,13 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     container.appendChild(renderer.domElement);
 
     // =========================================================================
-    // 2. Cinematic Lighting Rig (Side Key + Warm Amber Cube Rim from Reference)
+    // 2. Cinematic Lighting Rig (Three-point studio lighting with high specular reflections)
     // =========================================================================
-    const ambientLight = new THREE.AmbientLight(0x11151e, 1.2);
+    const ambientLight = new THREE.AmbientLight(0x1a2230, 1.8);
     scene.add(ambientLight);
 
     // Scene 02 Forge Key Light
-    const forgeKeyLight = new THREE.DirectionalLight(0xffffff, 4.2);
+    const forgeKeyLight = new THREE.DirectionalLight(0xffffff, 4.8);
     forgeKeyLight.position.set(-3.2, 5.5, 4.2);
     forgeKeyLight.castShadow = true;
     forgeKeyLight.shadow.mapSize.width = 1024;
@@ -92,8 +92,13 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     forgeKeyLight.shadow.camera.far = 14;
     scene.add(forgeKeyLight);
 
+    // Front-Fill Light: reveals dimensional anvil waist, horn, and plate contours
+    const frontFillLight = new THREE.DirectionalLight(0x8da4c4, 2.0);
+    frontFillLight.position.set(0.5, 2.0, 6.0);
+    scene.add(frontFillLight);
+
     // Cool Rim Light
-    const coolRimLight = new THREE.DirectionalLight(0xdce7f5, 3.5);
+    const coolRimLight = new THREE.DirectionalLight(0xdce7f5, 3.8);
     coolRimLight.position.set(4.0, 4.5, -3.5);
     scene.add(coolRimLight);
 
@@ -147,16 +152,16 @@ export const Scene02Impact: React.FC<Scene02ImpactProps> = ({ onSelectProject })
     scene.add(solidAnvilGroup);
 
     const solidFaceMat = new THREE.MeshStandardMaterial({
-      color: 0x3a424e,
+      color: 0x485263,
       roughness: 0.16,
-      metalness: 0.94,
+      metalness: 0.92,
       transparent: true,
       opacity: 0,
     });
     const solidBodyMat = new THREE.MeshStandardMaterial({
-      color: 0x161920,
+      color: 0x222834,
       roughness: 0.28,
-      metalness: 0.88,
+      metalness: 0.86,
       transparent: true,
       opacity: 0,
     });

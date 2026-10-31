@@ -47,15 +47,15 @@ export function buildAnvilAndCubeFragments(ANVIL_X = 1.0, ANVIL_Y = -0.15): Anvi
 
   // Precision-machined PBR materials: dark forged titanium with specular bevel chamfers
   const faceMat = new THREE.MeshStandardMaterial({
-    color: 0x2e3440,
-    roughness: 0.18,
-    metalness: 0.94,
+    color: 0x3d4756,
+    roughness: 0.16,
+    metalness: 0.92,
     transparent: true,
   });
 
   const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0x161920,
-    roughness: 0.28,
+    color: 0x1e2430,
+    roughness: 0.26,
     metalness: 0.88,
     transparent: true,
   });
